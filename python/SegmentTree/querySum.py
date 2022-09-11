@@ -1,9 +1,9 @@
 class STNode:
-    def __init__(self, left=None, right=None, val=0, add=0):
+    def __init__(self, left=None, right=None, val=0, lazy=0):
         self.left = left
         self.right = right
         self.val = val
-        self.add = add
+        self.lazy = lazy
 
 class SegmentTree:
     def __init__(self):
@@ -11,7 +11,7 @@ class SegmentTree:
     
     def add(self, node, l, r, start, end, x):
         if l == start and r == end:
-            node.add += x
+            node.lazy += x
             return
         mid = l+r>>1
         self.pushdown(node)
@@ -26,7 +26,7 @@ class SegmentTree:
 
     def query(self, node, l, r, start, end):
         if l == start and r == end:
-            return node.add * (r-l+1) + node.val
+            return node.lazy * (r-l+1) + node.val
         mid = l+r>>1
         self.pushdown(node)
         if end <= mid:
@@ -44,13 +44,13 @@ class SegmentTree:
             node.left = STNode()
         if not node.right:
             node.right = STNode()
-        if node.add:
-            node.left.add += node.add
-            node.right.add += node.add
-            node.add = 0
+        if node.lazy:
+            node.left.lazy += node.lazy
+            node.right.lazy += node.lazy
+            node.lazy = 0
     
     def pushup(self, node, ln, rn):
-        node.val = node.left.val + node.right.val + node.left.add * ln + node.right.add * rn
+        node.val = node.left.val + node.right.val + node.left.lazy * ln + node.right.lazy * rn
 
 if __name__ == "__main__":
     n, m = [int(i) for i in input().split()]
