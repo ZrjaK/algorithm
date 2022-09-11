@@ -26,7 +26,7 @@ class SegmentTree:
 
     def query(self, node, l, r, start, end):
         if l == start and r == end:
-            return max(node.lazy, node.val)
+            return node.lazy + node.val
         mid = l+r>>1
         self.pushdown(node)
         if end <= mid:
