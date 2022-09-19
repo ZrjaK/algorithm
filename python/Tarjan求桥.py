@@ -24,7 +24,7 @@ class Solution:
                         tarjan(j, i)
                         low[i] = min(low[i], low[j])
                         if dfn[i] < low[j]:
-                            res.append([i, j])
+                            bridge.append([i, j])
                     elif j in v:
                         low[i] = min(low[i], low[j])
         tarjan(0, -1)
