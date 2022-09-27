@@ -11,7 +11,7 @@ type STNode struct {
 	left  *STNode
 	right *STNode
 	val   int64
-	add   int64
+	lazy  int64
 }
 
 type SegmentTree struct {
@@ -27,7 +27,7 @@ func NewSegmentTree() *SegmentTree {
 
 func (st *SegmentTree) add(node *STNode, l, r, start, end int, x int64) {
 	if l == start && r == end {
-		node.add += x
+		node.lazy += x
 		return
 	}
 	st.pushdown(node)
@@ -45,7 +45,7 @@ func (st *SegmentTree) add(node *STNode, l, r, start, end int, x int64) {
 
 func (st *SegmentTree) query(node *STNode, l, r, start, end int) (res int64) {
 	if l == start && r == end {
-		return node.val + node.add*int64(r-l+1)
+		return node.val + node.lazy*int64(r-l+1)
 	}
 	st.pushdown(node)
 	mid := (l + r) >> 1
@@ -68,15 +68,15 @@ func (st *SegmentTree) pushdown(node *STNode) {
 	if node.right == nil {
 		node.right = new(STNode)
 	}
-	if node.add > 0 {
-		node.left.add += node.add
-		node.right.add += node.add
-		node.add = 0
+	if node.lazy > 0 {
+		node.left.lazy += node.lazy
+		node.right.lazy += node.lazy
+		node.lazy = 0
 	}
 }
 
 func (st *SegmentTree) pushup(node *STNode, ln, rn int) {
-	node.val = node.left.val + node.right.val + node.left.add*int64(ln) + node.right.add*int64(rn)
+	node.val = node.left.val + node.right.val + node.left.lazy*int64(ln) + node.right.lazy*int64(rn)
 }
 
 func main() {
