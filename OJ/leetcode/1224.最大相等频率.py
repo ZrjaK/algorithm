@@ -1,0 +1,21 @@
+# 题目：1224.最大相等频率
+# 难度：HARD
+# 最后提交：2022-09-16 09:00:50 +0800 CST
+# 语言：python3
+# 作者：ZrjaK
+
+class Solution:
+    def maxEqualFreq(self, nums: List[int]) -> int:
+        freq, count = Counter(), Counter()
+        ans = maxFreq = 0
+        for i, num in enumerate(nums):
+            if count[num]:
+                freq[count[num]] -= 1
+            count[num] += 1
+            maxFreq = max(maxFreq, count[num])
+            freq[count[num]] += 1
+            if maxFreq == 1 or \
+               freq[maxFreq] * maxFreq + freq[maxFreq - 1] * (maxFreq - 1) == i + 1 and freq[maxFreq] == 1 or \
+               freq[maxFreq] * maxFreq + 1 == i + 1 and freq[1] == 1:
+                ans = max(ans, i + 1)
+        return ans

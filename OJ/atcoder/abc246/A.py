@@ -1,0 +1,7 @@
+s = input().split()
+x1,y1 = int(s[0]), int(s[1])
+s = input().split()
+x2,y2 = int(s[0]), int(s[1])
+s = input().split()
+x3,y3 = int(s[0]), int(s[1])
+print(x1^x2^x3, y1^y2^y3)

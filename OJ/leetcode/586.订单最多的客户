@@ -1,0 +1,11 @@
+// 题目：586.订单最多的客户
+// 难度：EASY
+// 最后提交：2022-10-03 14:49:38 +0800 CST
+// 语言：mysql
+// 作者：ZrjaK
+
+# Write your MySQL query statement below
+select customer_number from Orders
+group by customer_number
+order by count(customer_number) desc
+limit 1

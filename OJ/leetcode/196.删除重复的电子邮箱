@@ -1,0 +1,10 @@
+// 题目：196.删除重复的电子邮箱
+// 难度：EASY
+// 最后提交：2022-10-03 15:07:46 +0800 CST
+// 语言：mysql
+// 作者：ZrjaK
+
+# Please write a DELETE statement and DO NOT write a SELECT statement.
+# Write your MySQL query statement below
+delete p1.* from Person p1, Person p2
+where p1.email = p2.email and p1.id > p2.id
