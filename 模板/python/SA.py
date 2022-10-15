@@ -154,7 +154,6 @@ def suffix_array(s, upper=255):
         s = [ord(c) for c in s]
     return sa_is(s, upper)
 
-
 class SuffixArray:
 
     def __init__(self, s):
@@ -198,22 +197,8 @@ class SuffixArray:
             ht[rk[sai]] = k
         return ht
 
+# https://oi-wiki.org/string/sa/
 
-class Solution:
-    def sumScores(self, s: str) -> int:
-        sa = SuffixArray(s)
-        ans = len(s)
-        start = sa.rk[0]
-        mi = int(1e9)
-        for i in range(start + 1, len(sa.height)):
-            mi = min(mi, sa.height[i])
-            ans += mi
-        mi = sa.height[start]
-        for i in range(start - 1, -1, -1):
-            ans += mi
-            mi = min(mi, sa.height[i])
-        return ans
-
-# https://leetcode.cn/problems/sum-of-scores-of-built-strings/
-
-# 2223. 构造字符串的总得分和
+# sa 数组：字典序排名为 i 的后缀是第几个；
+# rk 数组：第 i 个后缀的排名是多少（不难发现 rk 与 sa 满足 sa[rk[i]] = rk[sa[i]] = i）；
+# height 数组：存储 sa[i] 与 sa[i - 1] 的 LCP（最长公共前缀） 为何值。
