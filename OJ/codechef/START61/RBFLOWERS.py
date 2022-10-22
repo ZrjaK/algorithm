@@ -15,8 +15,17 @@ INF = float('inf')
 
 def solve():
     n = II()
-    arr = LII()
-
+    red = LII()
+    blue = LII()
+    dp = [0] + [-1e99] * sum(red)
+    for i in range(n):
+        for j in range(len(dp)-red[i]-1, -1, -1):
+            dp[j+red[i]] = max(dp[j+red[i]], dp[j])
+            dp[j] = max(dp[j], dp[j]+blue[i])
+    ans = 0
+    for i in range(len(dp)):
+        ans = max(ans, min(i, dp[i]))
+    print(ans)
     return
 
 def main():

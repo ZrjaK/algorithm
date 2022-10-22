@@ -1,0 +1,11 @@
+// 题目：1873.计算特殊奖金
+// 难度：EASY
+// 最后提交：2022-10-20 12:24:38 +0800 CST
+// 语言：mysql
+// 作者：ZrjaK
+
+# Write your MySQL query statement below
+select employee_id, 
+if(mod(employee_id, 2) != 0 and left(name, 1) != "M", salary, 0) bonus
+from Employees
+order by employee_id

@@ -6,6 +6,7 @@ from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
 from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
+from traceback import print_tb
 from types import GeneratorType
 # sys.setrecursionlimit(2*10**6)
 BUFSIZE = 4096
@@ -14,14 +15,67 @@ MODD = 998244353
 INF = float('inf')
 
 def solve():
-    n = II()
-    arr = LII()
-
+    n, m , s, t, k = LII()
+    d = defaultdict(list)
+    uf = UnionFind(n+1)
+    for _ in range(m):
+        u, v, w = LII()
+        d[u].append((v, w))
+        d[v].append((u, w))
+        uf.union(u, v)
+    if uf.find(s) != uf.find(t):
+        print("I really need TS1's time machine again!")
+        return
+    def check(maxw):
+        dist = [INF] * (n+1)
+        dist[s] = 0
+        q = deque([s])
+        v = set()
+        while q:
+            i = q.popleft()
+            if i in v:
+                continue
+            v.add(i)
+            for nxt, w in d[i]:
+                if dist[i] < dist[nxt]:
+                    if w <= maxw:
+                        q.appendleft(nxt)
+                        dist[nxt] = dist[i]
+                    elif math.ceil(114*w/514) <= maxw:
+                        q.append(nxt)
+                        dist[nxt] = dist[i] + 1
+        return dist[t] <= k
+    l, r = 0, 10**9
+    while l <= r:
+        mid = l+r>>1
+        if check(mid):
+            r = mid - 1
+        else:
+            l = mid + 1
+    print(l)
     return
 
 def main():
-    for _ in range(II()):
+    for _ in range(1):
         solve()
+
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.part = n
+
+    def find(self, i):
+        if self.parent[i] != i:
+            self.parent[i] = self.find(self.parent[i])
+        return self.parent[i]
+
+    def union(self, i, j):
+        x, y = self.find(i), self.find(j)
+        if x != y:
+            self.size[y] += self.size[x]
+            self.parent[x] = self.parent[y]
+            self.part -= 1
 
 def bootstrap(f, stack=[]):
     def wrappedfunc(*args, **kwargs):

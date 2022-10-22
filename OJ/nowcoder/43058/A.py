@@ -14,13 +14,20 @@ MODD = 998244353
 INF = float('inf')
 
 def solve():
-    n = II()
-    arr = LII()
+    n, m, k = LII()
+    a, b, c ,d = LII()
 
+    for _ in range(k):
+        x, y = LII()
+        a = min(a, x)
+        c = max(c, x+1)
+        b = min(b, y)
+        d = max(d, y+1)
+    print((c-a)*2 + (d-b)*2)
     return
 
 def main():
-    for _ in range(II()):
+    for _ in range(1):
         solve()
 
 def bootstrap(f, stack=[]):

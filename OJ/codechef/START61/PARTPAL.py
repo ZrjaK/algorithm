@@ -7,7 +7,7 @@ from io import BytesIO, IOBase
 from copy import deepcopy
 from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
 from types import GeneratorType
-# sys.setrecursionlimit(2*10**6)
+sys.setrecursionlimit(10**6)
 BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
@@ -15,8 +15,22 @@ INF = float('inf')
 
 def solve():
     n = II()
-    arr = LII()
-
+    s = I()
+    if s != s[::-1]:
+        print(1)
+        print(2*n)
+        return
+    if not ("0" in s and "1" in s):
+        print(-1)
+        return
+    i0 = max(s.index("0"), s.index("1"))
+    for i in [i0+1, i0+2]:
+        a, b = s[:i], s[i:]
+        if a != a[::-1] and b != b[::-1]:
+            print(2)
+            print(i, 2*n-i)
+            return
+    print(-1)
     return
 
 def main():

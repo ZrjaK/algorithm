@@ -15,7 +15,10 @@ INF = float('inf')
 
 def solve():
     n = II()
-    arr = LII()
+    health = LII()
+    death = LII()
+    print(sum(health)+sum(death)-max(death))
+
 
     return
 

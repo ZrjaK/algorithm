@@ -1,3 +1,21 @@
+# 题目：1803.统计异或值在范围内的数对有多少
+# 难度：HARD
+# 最后提交：2022-10-19 13:40:55 +0800 CST
+# 语言：python3
+# 作者：ZrjaK
+
+class Solution:
+    def countPairs(self, nums: List[int], low: int, high: int) -> int:
+        ans = 0
+        trie = Trie()
+        d = defaultdict(int)
+        for i in nums:
+            ans += trie.query(i, low) - trie.query(i, high) + d[low^i]
+            trie.insert(i)
+            d[i] += 1
+        return ans
+
+
 class Trie:
     def __init__(self):
         self.left = None
@@ -6,7 +24,7 @@ class Trie:
     
     def insert(self, x):
         node = self
-        for i in range(31, -1, -1):
+        for i in range(15, -1, -1):
             if x>>i & 1:
                 if not node.right:
                     node.right = Trie()
@@ -30,11 +48,11 @@ class Trie:
                 node = node.left
             node.cnt -= 1
     
-    # 树中元素 ^ x > lo的数量
     def query(self, x, lo):
         res = 0
         node = self
-        for i in range(31, -1, -1):
+        f = 0
+        for i in range(15, -1, -1):
             if lo>>i & 1 == 0:
                 if x>>i & 1:
                     if node.left:

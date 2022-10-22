@@ -16,7 +16,17 @@ INF = float('inf')
 def solve():
     n = II()
     arr = LII()
-
+    d = {v: i for i, v in enumerate(arr)}
+    l, r = d[0], d[0]
+    ans = 1
+    for mex in range(1, n):
+        while l > d[mex]:
+            ans += max(0, min(2*mex - (r-l+1) + 1, n-1-r+1))
+            l -= 1
+        while r < d[mex]:
+            ans += max(0, min(2*mex - (r-l+1) + 1, l+1))
+            r += 1
+    print(ans)
     return
 
 def main():

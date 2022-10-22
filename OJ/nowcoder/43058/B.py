@@ -15,12 +15,11 @@ INF = float('inf')
 
 def solve():
     n = II()
-    arr = LII()
-
+    print(n)
     return
 
 def main():
-    for _ in range(II()):
+    for _ in range(1):
         solve()
 
 def bootstrap(f, stack=[]):

@@ -1,3 +1,4 @@
+# cook your dish here
 import random, sys, os, math, threading
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce
@@ -15,8 +16,21 @@ INF = float('inf')
 
 def solve():
     n = II()
-    arr = LII()
-
+    s = I()
+    t = I()
+    s = sorted(list(s))
+    t = sorted(list(t))[::-1]
+    if len(set(s) & set(t)) == 0:
+        print(0)
+        return
+    cs = Counter(s)
+    ct = Counter(t)
+    ans = 0
+    for i in s:
+        ans = max(ans, min(cs[i], ct[i]))
+    for i in t:
+        ans = max(ans, min(cs[i], ct[i]))
+    print(ans)
     return
 
 def main():

@@ -14,8 +14,31 @@ MODD = 998244353
 INF = float('inf')
 
 def solve():
-    n = II()
-    arr = LII()
+    n, m = LII()
+    h = []
+    for _ in range(m):
+        h.append(LII())
+    xx = set([i[0] for i in h])
+    yy = set([i[1] for i in h])
+    if len(xx) + 1 < len(h) or len(yy) + 1 < len(h):
+        print("NO")
+        return
+    for i, j in h:
+        f = False
+        for x in range(1, n+1):
+            if x == i:
+                continue
+            if i not in xx:
+                print("YES")
+                return
+        for y in range(1, n+1):
+            if y == j:
+                continue
+            if y not in yy:
+                print("YES")
+                return
+    print("NO")
+        
 
     return
 

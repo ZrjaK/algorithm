@@ -16,7 +16,14 @@ INF = float('inf')
 def solve():
     n = II()
     arr = LII()
-
+    dp = [[1] * 2 for _ in range(n)]
+    for i in range(1, n):
+        if arr[i-1] < arr[i]:
+            dp[i][0] += max(dp[i-1])
+        else:
+            dp[i][0] += dp[i-1][1]
+            dp[i][1] += dp[i-1][1]
+    print(sum(i[0] for i in dp))
     return
 
 def main():

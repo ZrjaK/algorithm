@@ -16,7 +16,12 @@ INF = float('inf')
 def solve():
     n = II()
     arr = LII()
-
+    c1 = arr.count(1)
+    c0 = arr.count(0)
+    if c1 <= c0:
+        print(c1)
+    else:
+        print(c0 + (c1-c0)//3)
     return
 
 def main():

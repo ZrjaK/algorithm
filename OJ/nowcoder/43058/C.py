@@ -14,13 +14,27 @@ MODD = 998244353
 INF = float('inf')
 
 def solve():
-    n = II()
-    arr = LII()
-
+    s = I()
+    s = list(int(i) for i in s)
+    n = len(s)
+    dp = [[0] * 8 for _ in range(10)]
+    for i in range(n):
+        dp[s[i]][1] += 1
+        for j in range(2, 8):
+            if j in [2, 4]:
+                for k in range(s[i]):
+                    dp[s[i]][j] += dp[k][j-1]
+                    dp[s[i]][j] %= MOD
+            else:
+                for k in range(s[i]+1, 10):
+                    dp[s[i]][j] += dp[k][j-1]
+                    dp[s[i]][j] %= MOD
+    ans = sum(dp[i][7] for i in range(10)) % MOD
+    print(ans % MOD)
     return
 
 def main():
-    for _ in range(II()):
+    for _ in range(1):
         solve()
 
 def bootstrap(f, stack=[]):

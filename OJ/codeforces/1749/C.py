@@ -16,8 +16,27 @@ INF = float('inf')
 def solve():
     n = II()
     arr = LII()
-
-    return
+    arr.sort()
+    def check(k):
+        q = deque(sorted([i for i in arr if i <= k]))
+        for i in range(1, k+1):
+            if not q:
+                return False
+            while q and q[-1] > k-i+1:
+                q.pop()
+            if not q:
+                return False
+            q.pop()
+            if not q:
+                if i == k:
+                    return True
+                return False
+            q.popleft()
+        return True
+    for k in range(n, -1, -1):
+        if check(k):
+            print(k)
+            return
 
 def main():
     for _ in range(II()):

@@ -13,14 +13,25 @@ MOD = 10**9 + 7
 MODD = 998244353
 INF = float('inf')
 
-def solve():
-    n = II()
-    arr = LII()
+def isprime(a):
+    return all(a % i != 0 for i in range(2, int(a**0.5)+1))
 
+def solve():
+    n, m = LII()
+    ans = 0
+    t = 1
+    div = 1
+    for i in range(1, n+1):
+        if isprime(i):
+            div *= i
+        t *= m // div
+        ans += pow(m, i, MODD) - t
+        ans %= MODD
+    print(ans)
     return
 
 def main():
-    for _ in range(II()):
+    for _ in range(1):
         solve()
 
 def bootstrap(f, stack=[]):

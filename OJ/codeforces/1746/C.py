@@ -1,45 +1,39 @@
-import random, sys, os, math, threading
+import random
+import sys
+import os
+import math
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce
 from itertools import accumulate, combinations, permutations
 from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
+import threading
 from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
-from types import GeneratorType
-# sys.setrecursionlimit(2*10**6)
+# sys.setrecursionlimit(10**5)
 BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
-INF = float('inf')
 
 def solve():
     n = II()
     arr = LII()
-
+    h = []
+    for i in range(n-1, 0, -1):
+        if arr[i-1] > arr[i]:
+            h.append([arr[i-1]-arr[i], i+1])
+    ans = [1] * n
+    sl = SortedList(list(range(1, n+1)))
+    for f, idx in h:
+        t = sl.bisect_left(f)
+        ans[sl[t]] = idx
+        sl.pop(t)
+    print(*ans)
     return
 
 def main():
     for _ in range(II()):
         solve()
-
-def bootstrap(f, stack=[]):
-    def wrappedfunc(*args, **kwargs):
-        if stack:
-            return f(*args, **kwargs)
-        else:
-            to = f(*args, **kwargs)
-            while True:
-                if type(to) is GeneratorType:
-                    stack.append(to)
-                    to = next(to)
-                else:
-                    stack.pop()
-                    if not stack:
-                        break
-                    to = stack[-1].send(to)
-            return to
-    return wrappedfunc
 
 class SortedList:
     def __init__(self, iterable=[], _load=200):

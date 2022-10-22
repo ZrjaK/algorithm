@@ -57,12 +57,13 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 2e6 + 10;
+int arr[N];
 
 void solve() {
 	int n;
-	int arr[n];
+	cin >> n;
 	rep(i, 0, n) cin >> arr[i];
-	
+
 }
 
 int main() {

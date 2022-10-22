@@ -1,6 +1,6 @@
 # 题目：886.可能的二分法
 # 难度：MEDIUM
-# 最后提交：2022-08-02 17:10:25 +0800 CST
+# 最后提交：2022-10-16 00:02:50 +0800 CST
 # 语言：python3
 # 作者：ZrjaK
 
@@ -27,4 +27,3 @@ class Solution:
                     color[nxt] = not color[t]
                     q.append(nxt)
         return True
-        
