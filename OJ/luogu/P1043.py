@@ -1,26 +1,58 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, threading
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
-from itertools import accumulate, combinations, permutations, product
+from itertools import accumulate, combinations, permutations
 from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
 from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
-from math import factorial, ceil, floor, gcd
-from operator import mul, xor
 from types import GeneratorType
-# sys.setrecursionlimit(2*10**5)
+# sys.setrecursionlimit(2*10**6)
 BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
 INF = float('inf')
-D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
-    
+    n, m = LII()
+    arr = []
+    for _ in range(n):
+        arr.append(II())
+    @lru_cache(None)
+    def p1(i, rest):
+        if i == n:
+            return INF
+        if rest == 1:
+            return (h[n-1] - h[i-1]) % 10
+        res = INF
+        for j in range(i, n):
+            res = min(res, ((h[j]-h[i-1]) % 10) * p1(j+1, rest-1))
+        return res
+    t = INF
+    for _ in range(n):
+        arr = arr[1:] + arr[:1]
+        h = list(accumulate(arr)) + [0]
+        t = min(t, p1(0, m))
+        p1.cache_clear()
+    print(t)
+    @lru_cache(None)
+    def p2(i, rest):
+        if i == n:
+            return -INF
+        if rest == 1:
+            return (h[n-1] - h[i-1]) % 10
+        res = -INF
+        for j in range(i, n):
+            res = max(res, ((h[j]-h[i-1]) % 10) * p2(j+1, rest-1))
+        return res
+    t = -INF
+    for _ in range(n):
+        arr = arr[1:] + arr[:1]
+        h = list(accumulate(arr)) + [0]
+        t = max(t, p2(0, m))
+        p2.cache_clear()
+    print(t)
+
     return
 
 def main():
@@ -56,32 +88,6 @@ def bitcnt(n):
     c = (c & 0x00000000FFFFFFFF) + ((c >> 32) & 0x00000000FFFFFFFF)
     return c
 
-def lcm(x, y):
-    return x * y // gcd(x, y)
-
-def lowbit(x):
-    return x & -x
-
-@bootstrap
-def exgcd(a: int, b: int):
-    if b == 0:
-        d, x, y = a, 1, 0
-    else:
-        (d, p, q) = yield exgcd(b, a % b)
-        x = q
-        y = p - q * (a // b)
- 
-    yield d, x, y
-
-def perm(n, r):
-    return factorial(n) // factorial(n - r) if n >= r else 0
- 
-def comb(n, r):
-    return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
-
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

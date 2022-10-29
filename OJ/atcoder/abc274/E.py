@@ -1,32 +1,51 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, threading
 from collections import Counter, defaultdict, deque
-from functools import lru_cache, reduce, cmp_to_key
-from itertools import accumulate, combinations, permutations, product
+from functools import lru_cache, reduce
+from itertools import accumulate, combinations, permutations
 from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
 from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
-from math import factorial, ceil, floor, gcd
-from operator import mul, xor
 from types import GeneratorType
-# sys.setrecursionlimit(2*10**5)
+# sys.setrecursionlimit(2*10**6)
 BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
 INF = float('inf')
-D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
-    
+    n, m = LII()
+    h = []
+    for _ in range(n):
+        h.append(LII())
+    for _ in range(m):
+        h.append(LII())
+    h.append([0, 0])
+    dist = [[0] * (m+n+1) for _ in range(m+n+1)]
+    for i in range(m+n+1):
+        for j in range(m+n+1):
+            dist[i][j] = ((h[i][0]-h[j][0])**2+(h[i][1]-h[j][1])**2)**0.5
+    dp = [[INF] * (n+m) for _ in range(1<<m+n)]
+    for i in range(n+m):
+        dp[1<<i][i] = dist[i][-1]
+    for mask in range(1<<n+m):
+        speed = 1 << bitcnt(mask>>n)
+        for cur in range(n+m):
+            if not mask>>cur & 1: continue
+            for i in range(n+m):
+                if mask>>i & 1: continue
+                dp[mask|1<<i][i] = min(dp[mask|1<<i][i], dp[mask][cur] + dist[i][cur] / speed)
+    ans = INF
+    for mask in range(1<<m):
+        speed = 1 << bitcnt(mask)
+        mask = mask<<n|((1<<n)-1)
+        for i in range(m+n):
+            ans = min(ans, dp[mask][i] + dist[i][-1] / speed)
+    print(ans)
     return
 
 def main():
-    t = 1
-    # t = II()
-    for _ in range(t):
+    for _ in range(1):
         solve()
 
 def bootstrap(f, stack=[]):
@@ -56,32 +75,6 @@ def bitcnt(n):
     c = (c & 0x00000000FFFFFFFF) + ((c >> 32) & 0x00000000FFFFFFFF)
     return c
 
-def lcm(x, y):
-    return x * y // gcd(x, y)
-
-def lowbit(x):
-    return x & -x
-
-@bootstrap
-def exgcd(a: int, b: int):
-    if b == 0:
-        d, x, y = a, 1, 0
-    else:
-        (d, p, q) = yield exgcd(b, a % b)
-        x = q
-        y = p - q * (a // b)
- 
-    yield d, x, y
-
-def perm(n, r):
-    return factorial(n) // factorial(n - r) if n >= r else 0
- 
-def comb(n, r):
-    return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
-
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

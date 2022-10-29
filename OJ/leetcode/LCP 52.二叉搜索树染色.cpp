@@ -1,3 +1,9 @@
+// 题目：LCP 52.二叉搜索树染色
+// 难度：MEDIUM
+// 最后提交：2022-10-28 14:12:36 +0800 CST
+// 语言：cpp
+// 作者：ZrjaK
+
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
@@ -51,32 +57,68 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
 
-void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
-	}
+class ODT {
+public:
+    struct node{
+    int l,r;
+    mutable ll val;
+    bool operator<(const node &a)const {return l<a.l;}
+    node(int L,int R,ll Val):l(L),r(R),val(Val){}
+    node(int L):l(L){}
+    };
+    set<node> s;
+    using si = set<node>::iterator;
+    ODT() { s.insert(node(0, 1e9, 0)); }
+    ~ODT() {}
 
-}
-
-signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
-    int t = 1;
-	cin >> t;
-    while (t--) {
-        solve();
+    si split(int pos){
+        si it = s.lower_bound(node(pos));
+        if(it != s.end() && it->l==pos) return it;
+        --it;
+        int l=it->l,r=it->r;
+        ll val = it->val;
+        s.erase(it);
+        s.insert(node(l,pos-1,val));
+        return s.insert(node(pos,r,val)).first;
     }
-	return 0;
-}
+
+    void assign(int l,int r,ll val){
+        si itr=split(r+1),itl=split(l);
+        s.erase(itl,itr);
+        s.insert(node(l,r,val));
+    }
+};
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int ans;
+    ODT odt;
+    int getNumber(TreeNode* root, vector<vector<int>>& ops) {
+        odt.s.clear();
+        odt.s.insert(ODT::node(0, 1e9, 0));
+        ans = 0;
+        for(auto& a : ops) odt.assign(a[1], a[2], 1ll * a[0]);
+        p(root);
+        return ans;
+    }
+    void p(TreeNode* node) {
+        if (node == nullptr) return;
+        ans += odt.split(node->val)->val;
+        p(node->left), p(node->right);
+    }
+};

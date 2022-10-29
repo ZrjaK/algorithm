@@ -51,9 +51,6 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
@@ -62,11 +59,18 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-	int n;
+	ll n;
 	cin >> n;
-	rep(i, 0, n) {
+	ll f = 1;
+	while (n % 4 == 0) n /= 4, f *= 2;
+	for(int i = 0; i*i <= n; i++) {
+		ll c = sqrt(n - i * i);
+		if (c*c + i*i == n) {
+			cout << i*f << " " << c*f << endl;
+			return;
+		}
 	}
-
+	cout << -1 << endl;
 }
 
 signed main() {

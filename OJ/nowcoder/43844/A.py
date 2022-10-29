@@ -18,14 +18,21 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
+    h = []
+    for _ in range(4):
+        h.append(I())
+    for i in range(3):
+        for j in range(3):
+            if h[i][j] == h[i+1][j] == h[i][j+1] == h[i+1][j+1]:
+                print("Yes")
+                return
+    print("No")
     
     return
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
@@ -79,9 +86,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

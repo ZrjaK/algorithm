@@ -51,15 +51,34 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
+
+int parent[N], size[N];
+int part;
+
+void uf_init(int n) {
+    part = n;
+    rep(i, 0, n) parent[i] = i, size[n] = 1;
+}
+
+int find(int i) {
+    if (parent[i] != i) parent[i] = find(parent[i]);
+    return parent[i];
+}
+
+void _union(int i, int j) {
+    int x = find(i), y = find(j);
+    if (x != y) {
+        size[y] += size[x];
+        parent[x] = parent[y];
+        part -= 1;
+    }
+}
 
 void solve() {
 	int n;

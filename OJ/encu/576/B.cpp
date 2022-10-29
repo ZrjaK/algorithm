@@ -26,7 +26,7 @@ using namespace std;
 #define len(x) x.size()
 #define elif else if
 #define all(x) begin(x), end(x)
-#define mst(x, a) memset(x, a, sizeof(x))
+#define mst(x, a) memset(x,a,sizeof(x))
 #ifndef lowbit
 #define lowbit(x) (x & (-x))
 #endif
@@ -51,30 +51,57 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e6 + 10;
+
+ll n, m;
+
+
+ll depth(ll x) {
+	ll res = 0;
+	while (x != 1) {
+		x >>= 1;
+		res += 1;
+	}
+	return res;
+}
+
+ll calc(ll x) {
+	ll t = pow(2, depth(n)-depth(x), LINF);
+	ll res = t-1;
+	ll lmin = x * t;
+	ll rmax = (x+1) * t - 1;
+	res += max(0, min(n, rmax)-lmin + 1);
+	return res;
+}
 
 void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
+	cin >> n >> m;
+	ll x;
+	rep(i, 0, m) {
+		cin >> x;
+		ll ans = 1;
+		while (x != 1) {
+			if (x % 2 == 0) {
+				ans += 1;
+			} else {
+				ans += 1 + calc(x-1);
+			}
+			x /= 2;
+		}
+		cout << ans << endl;
 	}
 
 }
 
 signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
-    int t = 1;
-	cin >> t;
+    int t;
+	// cin >> t;
+	t = 1;
     while (t--) {
         solve();
     }

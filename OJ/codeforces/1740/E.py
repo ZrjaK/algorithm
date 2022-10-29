@@ -19,8 +19,24 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
-    
+    p = LII()
+    d = defaultdict(list)
+    for i in range(2, n+1):
+        d[p[i-2]].append(i)
+    ans = 0
+    @bootstrap
+    def p(i):
+        nonlocal ans
+        if not d[i]:
+            yield 0
+        h = []
+        for j in d[i]:
+            h.append((yield p(j)))
+        ans += sum(h) + len(h) - 1
+        print(i, h)
+        yield max(h) + 1
+    p(1)
+    print(ans)
     return
 
 def main():
@@ -79,9 +95,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

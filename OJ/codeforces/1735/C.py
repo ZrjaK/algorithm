@@ -1,32 +1,63 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, threading
 from collections import Counter, defaultdict, deque
-from functools import lru_cache, reduce, cmp_to_key
-from itertools import accumulate, combinations, permutations, product
+from functools import cmp_to_key, lru_cache, reduce
+from itertools import accumulate, combinations, permutations
 from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
 from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
-from math import factorial, ceil, floor, gcd
-from operator import mul, xor
 from types import GeneratorType
-# sys.setrecursionlimit(2*10**5)
+# sys.setrecursionlimit(2*10**6)
 BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
 INF = float('inf')
-D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
-    
+    s = I()
+    h = [ord(i)-97 for i in s]
+    uf = UnionFind(26)
+    d = defaultdict(int)
+    v = set()
+    for i in h:
+        if i in d:
+            continue
+        for j in range(26):
+            if j in v:
+                continue
+            if uf.find(i) == uf.find(j) and uf.part != 1:
+                continue
+            uf.union(i, j)
+            d[i] = j
+            v.add(j)
+            break
+    ans = []
+    for i in h:
+        ans.append(chr(d[i]+97))
+    print("".join(ans))
     return
 
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.part = n
+
+    def find(self, i):
+        if self.parent[i] != i:
+            self.parent[i] = self.find(self.parent[i])
+        return self.parent[i]
+
+    def union(self, i, j):
+        x, y = self.find(i), self.find(j)
+        if x != y:
+            self.size[y] += self.size[x]
+            self.parent[x] = self.parent[y]
+            self.part -= 1
+
 def main():
-    t = 1
-    # t = II()
-    for _ in range(t):
+    for _ in range(II()):
         solve()
 
 def bootstrap(f, stack=[]):
@@ -56,32 +87,6 @@ def bitcnt(n):
     c = (c & 0x00000000FFFFFFFF) + ((c >> 32) & 0x00000000FFFFFFFF)
     return c
 
-def lcm(x, y):
-    return x * y // gcd(x, y)
-
-def lowbit(x):
-    return x & -x
-
-@bootstrap
-def exgcd(a: int, b: int):
-    if b == 0:
-        d, x, y = a, 1, 0
-    else:
-        (d, p, q) = yield exgcd(b, a % b)
-        x = q
-        y = p - q * (a // b)
- 
-    yield d, x, y
-
-def perm(n, r):
-    return factorial(n) // factorial(n - r) if n >= r else 0
- 
-def comb(n, r):
-    return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
-
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

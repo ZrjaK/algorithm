@@ -20,12 +20,25 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 def solve():
     n = II()
     arr = LII()
+    h = sorted(arr)
+    ans = -INF
+    t = h.pop()
+    while len(h) >= 2:
+        ans = max(ans, t*2-h[-1]-h[0])
+        t = h.pop()
+    h = sorted(arr)[::-1]
+    t = h.pop()
+    while len(h) >= 2:
+        ans = max(ans, h[-1]+h[0]-2*t)
+        t = h.pop()
+
+    print(ans)
     
     return
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
@@ -79,9 +92,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

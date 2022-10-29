@@ -61,12 +61,35 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
-	}
+ll n, m, k;
 
+unordered_map<ll, ll> memo[1001];
+
+ll dfs(ll i, ll rest) {
+	if (rest < 0) return 0;
+	if (memo[i].find(rest) != memo[i].end()) {
+		return memo[i][rest];
+	}
+	if (i == n) {
+		memo[i][rest] = pow(m, rest, MODD);
+		return memo[i][rest];
+	}
+	ll res = 0;
+	rep(j, 1, m+1) {
+		ll t = i + j;
+		if (t > n) t = n - (t - n);
+		res += dfs(t, rest-1);
+		res %= MODD;
+	}
+	memo[i][rest] = res;
+	return res;
+}
+
+void solve() {
+	rep(i, 0, 1001) memo[i].clear();
+	cin >> n >> m >> k;
+	ll res = dfs(0, k);
+	cout << probabilityMod(res, pow(m, k, MODD), MODD);
 }
 
 signed main() {
@@ -74,7 +97,7 @@ signed main() {
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

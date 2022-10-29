@@ -20,7 +20,8 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 def solve():
     n = II()
     arr = LII()
-    
+    a, b = LII()
+    print(sum(arr[a-1:b-1]))
     return
 
 def main():
@@ -79,9 +80,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

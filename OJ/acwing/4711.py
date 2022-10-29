@@ -19,7 +19,13 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
+    d = {"rat": 1, "woman": 2, "child": 2, "man": 3, "captain": 4}
+    h = []
+    for i in range(n):
+        h.append([i] + LI())
+    h.sort(key=lambda x: (d[x[2]], x[0]))
+    for i in h:
+        print(i[1])
     
     return
 
@@ -79,9 +85,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

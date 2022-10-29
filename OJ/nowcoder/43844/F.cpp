@@ -51,9 +51,6 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
@@ -61,12 +58,18 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
+unordered_map<int, int> a;
+unordered_map<int, int> b;
+
 void solve() {
 	int n;
 	cin >> n;
-	rep(i, 0, n) {
-	}
-
+	int k;
+	rep(i, 0, n) cin >> k, a[k]++;
+	rep(i, 0, n) cin >> k, b[k]++;
+	ll ans = 0;
+	each(i, a) each(j, b) ans += 1ll * floor(sqrt((abs(i.fi - j.fi)))) * i.se * j.se;
+	cout << ans << endl;
 }
 
 signed main() {
@@ -74,7 +77,7 @@ signed main() {
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

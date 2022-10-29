@@ -1,3 +1,9 @@
+// 题目：2109.向字符串添加空格
+// 难度：MEDIUM
+// 最后提交：2022-10-24 20:59:41 +0800 CST
+// 语言：cpp
+// 作者：ZrjaK
+
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
@@ -51,32 +57,26 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
 
-void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
-	}
-
-}
-
-signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
-    int t = 1;
-	cin >> t;
-    while (t--) {
-        solve();
+class Solution {
+public:
+    string addSpaces(string s, vector<int>& spaces) {
+        reverse(all(spaces));
+        string ans;
+        int n = len(s);
+        rep(i, 0, n) {
+            if (len(spaces) != 0 && spaces[len(spaces)-1] == i) {
+                ans += " ";
+                spaces.pop_back();
+            }
+            ans += s[i];
+        }
+        return ans;
     }
-	return 0;
-}
+};

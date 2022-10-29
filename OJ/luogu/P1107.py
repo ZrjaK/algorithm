@@ -1,4 +1,4 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, threading
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
 from itertools import accumulate, combinations, permutations, product
@@ -9,7 +9,7 @@ from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
 from math import factorial, ceil, floor, gcd
 from operator import mul, xor
 from types import GeneratorType
-# sys.setrecursionlimit(2*10**5)
+sys.setrecursionlimit(5*10**6)
 BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
@@ -18,9 +18,22 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
-    
+    n, H, delta = LII()
+    h = [[0] * (H+1) for _ in range(n+1)]
+    for i in range(1, n+1):
+        for j in LII()[1:]:
+            h[i][j] += 1
+    dp = [[0] * (n+1) for _ in range(H+1)]
+    dpp = [0] * (H+1)
+    for i in range(1, H+1):
+        for j in range(1, n+1):
+            dp[i][j] = dp[i-1][j]
+            if i - delta > 0:
+                dp[i][j] = max(dp[i][j], dpp[i-delta])
+            dp[i][j] += h[j][i]
+        dpp[i] = max(dp[i])
+    print(dpp[H])
+
     return
 
 def main():
@@ -79,9 +92,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

@@ -1,3 +1,4 @@
+from ctypes import Union
 import random, sys, os, math, threading, gc
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
@@ -18,9 +19,41 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
+    n, m, k, t = LII()
     arr = LII()
-    
+    uf1 = UnionFind(m*n+m)
+    uf2 = UnionFind(m*n+m)
+    uf3 = UnionFind(m*n+m)
+    uf4 = UnionFind(m*n+m)
+    h = [list() for _ in range(m)]
+    for i in range(1, t+1):
+        y = arr[i-1]-1
+        x = len(h[y])
+        if i % 2 == 1:
+            h[y].append(1)
+        else:
+            h[y].append(0)
+
+        for nx, ny in [[x-1, y-1], [x+1, y+1]]:
+            if 0<=ny<m and 0<=nx<len(h[ny]) and h[ny][nx] == h[y][x]:
+                uf1.union(x*m+y, nx*m+ny)
+
+        for nx, ny in [[x+1, y-1], [x-1, y+1]]:
+            if 0<=ny<m and 0<=nx<len(h[ny]) and h[ny][nx] == h[y][x]:
+                uf2.union(x*m+y, nx*m+ny)
+
+        for nx, ny in [[x, y-1], [x, y+1]]:
+            if 0<=ny<m and 0<=nx<len(h[ny]) and h[ny][nx] == h[y][x]:
+                uf3.union(x*m+y, nx*m+ny)
+
+        for nx, ny in [[x+1, y], [x-1, y]]:
+            if 0<=ny<m and 0<=nx<len(h[ny]) and h[ny][nx] == h[y][x]:
+                uf4.union(x*m+y, nx*m+ny)
+                
+        if uf1.maxsize >= k or uf2.maxsize >= k or uf3.maxsize >= k or uf4.maxsize >= k:
+            print(i)
+            return
+    print(t)
     return
 
 def main():
@@ -28,6 +61,26 @@ def main():
     # t = II()
     for _ in range(t):
         solve()
+
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.part = n
+        self.maxsize = 1
+
+    def find(self, i):
+        if self.parent[i] != i:
+            self.parent[i] = self.find(self.parent[i])
+        return self.parent[i]
+
+    def union(self, i, j):
+        x, y = self.find(i), self.find(j)
+        if x != y:
+            self.size[y] += self.size[x]
+            self.parent[x] = self.parent[y]
+            self.part -= 1
+            self.maxsize = max(self.maxsize, self.size[y])
 
 def bootstrap(f, stack=[]):
     def wrappedfunc(*args, **kwargs):
@@ -79,9 +132,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

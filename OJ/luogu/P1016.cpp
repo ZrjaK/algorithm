@@ -22,11 +22,14 @@ using namespace std;
 #define se second
 #define rep(i, a, b) for(int i = a; i < b; ++i)
 #define per(i, a, b) for(int i = a; i > b; --i)
+#define for_subset(t, s) for(ll t = s; t >= 0; t = (t == 0 ? -1 : (t - 1) & s))
 #define each(x, v) for(auto& x: v)
 #define len(x) x.size()
 #define elif else if
 #define all(x) begin(x), end(x)
 #define mst(x, a) memset(x, a, sizeof(x))
+#define MIN(v) *min_element(all(v))
+#define MAX(v) *max_element(all(v))
 #ifndef lowbit
 #define lowbit(x) (x & (-x))
 #endif
@@ -51,30 +54,54 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
+
+ld d1, c, d2, p;
+int n;
+ld h[10][2];
+unordered_map<ld, ld> memo[10];
+
+ld dfs(int i, ld rest) {
+	if (rest < 0) return INF;
+	if (i == n+1) return 0;
+	if (memo[i].find(rest) != memo[i].end()) return memo[i][rest];
+	ld j = max(rest, (h[i+1][0]-h[i][0]) / d2);
+	if (j > c) return INF;
+	ld res = INF;
+	while (j <= c) {
+		res = min(res, (j-rest) * h[i][1] + dfs(i+1, j-(h[i+1][0]-h[i][0])/d2));
+		j += 0.03;
+	}
+	memo[i][rest] = res;
+	return res;
+}
 
 void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
+	mst(h, 0);
+	rep(i, 0, 10) memo[i].clear();
+	cin >> d1 >> c >> d2 >> p >> n;
+	ld x, y;
+	h[0][1] = p;
+	rep(i, 1, n+1) {
+		cin >> x >> y;
+		h[i][0] = x;
+		h[i][1] = y;
 	}
-
+	h[n+1][0] = d1;
+	ld res = dfs(0, 0);
+	if (res != INF) cout << fixed << setprecision(2) << res;
+	else cout << "No Solution";
+	cout << endl;
 }
 
 signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

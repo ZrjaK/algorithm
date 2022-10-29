@@ -1,4 +1,4 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, threading
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
 from itertools import accumulate, combinations, permutations, product
@@ -20,7 +20,29 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 def solve():
     n = II()
     arr = LII()
-    
+    if len([i for i in arr if i >= 0]) < 2:
+        arr.sort(reverse=True)
+        print(sum(arr[:2]))
+        return
+    s = sum(arr)
+    def calc(a):
+        dp1 = [-INF] * (n+1)
+        for i in range(n):
+            dp1[i] = max(dp1[i-1], 0) + a[i]
+        for i in range(n):
+            dp1[i] = max(dp1[i-1], dp1[i])
+        dp2 = [-INF] * (n+1)
+        for i in range(n-1, -1, -1):
+            dp2[i] = max(dp2[i+1], 0) + a[i]
+        for i in range(n-1, -1, -1):
+            dp2[i] = max(dp2[i+1], dp2[i])
+        res = -INF
+        for i in range(n):
+            res = max(res, dp1[i]+dp2[i+1])
+        return res
+    ans = max(calc(arr), s+calc([-i for i in arr]))
+    print(ans)
+
     return
 
 def main():
@@ -79,9 +101,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

@@ -51,30 +51,33 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
 
 void solve() {
+	int c[101];
+	mst(c, 0);
 	int n;
 	cin >> n;
+	ll a;
 	rep(i, 0, n) {
+		cin >> a;
+		c[a]++;
 	}
+	ll ans = 0;
+	rep(i, 1, 101) rep(j, i+1, 101) ans += (j-i) * c[i] * c[j];
+	cout << ans << endl;
 
 }
 
 signed main() {
 	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

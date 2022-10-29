@@ -1,4 +1,4 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, threading
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
 from itertools import accumulate, combinations, permutations, product
@@ -18,9 +18,41 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
-    
+    n, m = LII()
+    arr = []
+    d = {"S": 0, "E": 1, "N": 2, "W": 3}
+    for _ in range(n):
+        arr.append(LII())
+    g = set()
+    for i in range(n):
+        for j in range(m):
+            if arr[i][j]:
+                g.add((i, j))
+                g.add((i, j+1))
+                g.add((i+1, j))
+                g.add((i+1, j+1))
+    t = LI()
+    sx, sy, tx, ty = [int(i) for i in t[:4]]
+    f = d[t[4]]
+    q = deque([[0, sx, sy, f]])
+    v = set()
+    while q:
+        step, x, y, f = q.popleft()
+        if (x, y, f) in v:
+            continue
+        v.add((x, y, f))
+        if x == tx and y == ty:
+            print(step)
+            return
+        q.append([step+1, x, y, (f+1)%4])
+        q.append([step+1, x, y, (f-1)%4])
+        dx, dy = D4[f]
+        for i in range(1, 4):
+            nx, ny = x+i*dx, y+i*dy
+            if 0<nx<n and 0<ny<m and all((x+j*dx, y+j*dy) not in g for j in range(1, i+1)):
+                    q.append([step+1, nx, ny, f])
+    print(-1)
+
     return
 
 def main():
@@ -79,9 +111,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

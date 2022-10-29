@@ -1,4 +1,4 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, threading
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
 from itertools import accumulate, combinations, permutations, product
@@ -14,13 +14,32 @@ BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
 INF = float('inf')
-D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
-    
+    n, k, m, s, t = LII()
+    arr = [0]+LII()
+    ag = [[]]
+    for _ in range(k):
+        f = [0]+LII()
+        ag.append(sum([f[i]<<i for i in range(1, k+1)]))
+    d = defaultdict(list)
+    for _ in range(m):
+        u, v, c = LII()
+        d[u].append((v, c))
+        d[v].append((u, c))
+    pq = [[0, 1<<arr[s], s]]
+    dist = [INF] * (n+1)
+    dist[s] = 0
+    while pq:
+        step, mask, cur = heappop(pq)
+        if cur == t:
+            print(step)
+            return
+        for nxt, c in d[cur]:
+            if mask & ag[arr[nxt]] == 0 and mask & 1<<arr[nxt] == 0 and dist[cur] + c < dist[nxt]:
+                dist[nxt] = dist[cur] + c
+                heappush(pq, [dist[nxt], mask|1<<arr[nxt], nxt])
+    print(-1)
     return
 
 def main():
@@ -62,26 +81,6 @@ def lcm(x, y):
 def lowbit(x):
     return x & -x
 
-@bootstrap
-def exgcd(a: int, b: int):
-    if b == 0:
-        d, x, y = a, 1, 0
-    else:
-        (d, p, q) = yield exgcd(b, a % b)
-        x = q
-        y = p - q * (a // b)
- 
-    yield d, x, y
-
-def perm(n, r):
-    return factorial(n) // factorial(n - r) if n >= r else 0
- 
-def comb(n, r):
-    return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
-
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

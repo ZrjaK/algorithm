@@ -1,3 +1,9 @@
+// 题目：1780.判断一个数字是否可以表示成三的幂的和
+// 难度：MEDIUM
+// 最后提交：2022-10-24 17:00:40 +0800 CST
+// 语言：cpp
+// 作者：ZrjaK
+
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
@@ -51,15 +57,12 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e6 + 10;
 
 void solve() {
 	int n;
@@ -69,14 +72,21 @@ void solve() {
 
 }
 
-signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
-    int t = 1;
-	cin >> t;
-    while (t--) {
-        solve();
+class Solution {
+public:
+    int v[20];
+    bool checkPowersOfThree(int n) {
+        mst(v, 0);
+        while (n) {
+            bool f = true;
+            per(i, 15, -1) {
+                if (v[i] == 1 || pow(3, i, INF) > n) continue;
+                n -= pow(3, i, INF);
+                v[i] = 1;
+                f = false;
+            }
+            if (f) break;
+        }
+        return n == 0;
     }
-	return 0;
-}
+};

@@ -130,6 +130,7 @@ public:
 };
 
 SegmentTree st;
+
 void solve() {
 	int n, m;
 	cin >> n >> m;
@@ -143,8 +144,8 @@ void solve() {
 	while (m--) {
 		cin >> c;
 		if (c == 1) {
-			cin >> x >> y >> k;
-			st.add(st.root, 1, n, x, y, k);
+			cin >> x >> k;
+			st.add(st.root, 1, n, x, x, k);
 		} else {
 			cin >> x >> y;
 			cout << st.query(st.root, 1, n, x, y) << endl;
@@ -153,9 +154,6 @@ void solve() {
 }
 
 signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
     int t = 1;
 	// cin >> t;
     while (t--) {

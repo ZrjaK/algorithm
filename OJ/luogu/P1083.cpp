@@ -58,8 +58,6 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 2e6 + 10;
 
-
-
 class SegmentTree {
 public:
 	struct STNode {
@@ -93,7 +91,7 @@ public:
 
 	ll query(STNode* node, int l, int r, int start, int end) {
 		if (l == start && r == end) {
-			return node->val + node->lazy * (r-l+1);
+			return node->val + node->lazy;
 		}
 		pushdown(node);
 		int mid = l+r>>1;
@@ -103,8 +101,8 @@ public:
 		} elif (start > mid) {
 			res = query(node->right, mid+1, r, start, end);
 		} else {
-			res = query(node->left, l, mid, start, mid) +
-			query(node->right, mid+1, r, mid+1, end);
+			res = min(query(node->left, l, mid, start, mid),
+			query(node->right, mid+1, r, mid+1, end));
 		}
 		pushup(node, mid-l+1, r-mid);
 		return res;
@@ -117,7 +115,7 @@ public:
 		if (node->right == nullptr) {
 			node->right = new STNode();
 		}
-		if (node->lazy > 0) {
+		if (node->lazy != 0) {
 			node->left->lazy += node->lazy;
 			node->right->lazy += node->lazy;
 			node->lazy = 0;
@@ -125,7 +123,7 @@ public:
 	}
 
 	void pushup(STNode* node, int ln, int rn) {
-		node->val = node->left->val + node->right->val + node->left->lazy * ln + node->right->lazy * rn;
+		node->val = min(node->left->val + node->left->lazy, node->right->val + node->right->lazy);
 	}
 };
 
@@ -138,18 +136,20 @@ void solve() {
 		cin >> a;
 		st.add(st.root, 1, n, i, i, a);
 	}
-	int c, x, y;
-	ll k;
-	while (m--) {
-		cin >> c;
-		if (c == 1) {
-			cin >> x >> y >> k;
-			st.add(st.root, 1, n, x, y, k);
-		} else {
-			cin >> x >> y;
-			cout << st.query(st.root, 1, n, x, y) << endl;
+	int s, t;
+	ll d;
+	bool f = true;
+	rep(i, 1, m+1) {
+		cin >> d >> s >> t;
+		if (!f) continue;
+		st.add(st.root, 1, n, s, t, -d);
+		if (st.query(st.root, 1, n, s, t) < 0) {
+			cout << -1 << endl;
+			cout << i << endl;
+			f = false;
 		}
 	}
+	if (f) cout << 0 << endl;
 }
 
 signed main() {

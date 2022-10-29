@@ -51,30 +51,48 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
+
+int dp[500][500];
+int score[500];
+vi d[500];
+
+void dfs(int i, int rest) {
+	if (rest == 0) return;
+	dp[i][1] = score[i];
+	each(j, d[i]) {
+		dfs(j, rest-1);
+		per(f, rest, 0)
+			per(k, f-1, 0)
+				dp[i][f] = max(dp[i][f], dp[i][f-k] + dp[j][k]);
+	}
+}
 
 void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
+	mst(dp, 0);
+	mst(score, 0);
+	rep(i, 0, 500) d[i].clear();
+	int n, m;
+	cin >> n >> m;
+	m += 1;
+	int k, s;
+	rep(i, 1, n+1) {
+		cin >> k >> s;
+		score[i] = s;
+		d[k].pb(i);
 	}
-
+	dfs(0, m);
+	cout << dp[0][m] << endl;
 }
 
 signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

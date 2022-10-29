@@ -1,4 +1,4 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, threading
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
 from itertools import accumulate, combinations, permutations, product
@@ -17,10 +17,40 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
+import gc
 def solve():
     n = II()
-    arr = LII()
-    
+    arr = []
+    for _ in range(n):
+        arr.append(LII())
+    ans = -INF
+    for f in range(3):
+        dp = [[-INF] * 3 for _ in range(n)]
+        dp[0][f] = arr[0][f]
+        for i in range(1, n):
+            for j in range(3):
+                if i % 2:
+                    for k in range(2, j, -1):
+                        dp[i][j] = max(dp[i][j], dp[i-1][k] + arr[i][j])
+                else:
+                    for k in range(j):
+                        dp[i][j] = max(dp[i][j], dp[i-1][k] + arr[i][j])
+        ans = max(ans, max([0] + dp[-1][:f]))
+        gc.collect()
+    for f in range(3):
+        dp = [[-INF] * 3 for _ in range(n)]
+        dp[0][f] = arr[0][f]
+        for i in range(1, n):
+            for j in range(3):
+                if i % 2 == 0:
+                    for k in range(2, j, -1):
+                        dp[i][j] = max(dp[i][j], dp[i-1][k] + arr[i][j])
+                else:
+                    for k in range(j):
+                        dp[i][j] = max(dp[i][j], dp[i-1][k] + arr[i][j])
+        ans = max(ans, max([0] + dp[-1][f+1:]))
+        gc.collect()
+    print(ans)
     return
 
 def main():
@@ -79,9 +109,6 @@ def perm(n, r):
 def comb(n, r):
     return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
 
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

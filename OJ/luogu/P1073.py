@@ -1,4 +1,4 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, threading
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
 from itertools import accumulate, combinations, permutations, product
@@ -14,13 +14,46 @@ BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
 INF = float('inf')
-D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
-    
+    n, m = LII()
+    arr = [0] + LII()
+    d = defaultdict(list)
+    for _ in range(m):
+        x, y, z = LII()
+        d[x].append(y)
+        if z == 2:
+            d[y].append(x)
+    low = [INF] * (n+1)
+    low[1] = arr[1]
+    pq = [[low[1], 1]]
+    while pq:
+        s, t = heappop(pq)
+        if s != low[t]:
+            continue
+        for nxt in d[t]:
+            if low[t] < low[nxt]:
+                low[nxt] = min(low[t], arr[nxt])
+                heappush(pq, [low[nxt], nxt])
+    gd = defaultdict(list)
+    for i in d:
+        for j in d[i]:
+            gd[j].append(i)
+    high = [-INF] * (n+1)
+    high[n] = arr[n]
+    pq = [[-high[n], n]]
+    while pq:
+        s, t = heappop(pq)
+        if -s != high[t]:
+            continue
+        for nxt in gd[t]:
+            if high[t] > high[nxt]:
+                high[nxt] = max(high[t], arr[nxt])
+                heappush(pq, [-high[nxt], nxt])
+    ans = 0
+    for i, j in zip(low, high):
+        ans = max(ans, j-i)
+    print(ans)
     return
 
 def main():
@@ -62,26 +95,6 @@ def lcm(x, y):
 def lowbit(x):
     return x & -x
 
-@bootstrap
-def exgcd(a: int, b: int):
-    if b == 0:
-        d, x, y = a, 1, 0
-    else:
-        (d, p, q) = yield exgcd(b, a % b)
-        x = q
-        y = p - q * (a // b)
- 
-    yield d, x, y
-
-def perm(n, r):
-    return factorial(n) // factorial(n - r) if n >= r else 0
- 
-def comb(n, r):
-    return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
-
-def probabilityMod(x, y, mod):
-    return x * pow(y, mod-2, mod) % mod
-    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""
