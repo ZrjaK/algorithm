@@ -51,6 +51,9 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
+ll probabilityMod(ll x, ll y, ll mod) {
+	return x * pow(y, mod-2, mod) % mod;
+}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
@@ -58,32 +61,47 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-int parent[N], _size[N];
-int part;
+ll r, c, n, sx, sy;
+string arr[50][50];
+ll memo[1000][50][50];
+vector<pll> h;
 
-void uf_init(int n) {
-    part = n;
-    rep(i, 0, n) parent[i] = i, _size[i] = 1;
-}
-
-int find(int i) {
-    if (parent[i] != i) parent[i] = find(parent[i]);
-    return parent[i];
-}
-
-void _union(int i, int j) {
-    int x = find(i), y = find(j);
-    if (x != y) {
-        _size[y] += _size[x];
-        parent[x] = parent[y];
-        part -= 1;
-    }
+ll check(ll i, ll x, ll y) {
+	if (i == -1) return x == sx && y == sy;
+	if (memo[i][x][y] != -1) return memo[i][x][y];
+	ll dx = h[i].fi, dy = h[i].se, tx = x, ty = y;
+	ll res = 0;
+	while (0<=tx-dx && tx-dx<r && 0<=ty-dy && ty-dy<c && arr[tx-dx][ty-dy] != "X") {
+		tx -= dx;
+		ty -= dy;
+		res += check(i-1, tx, ty);
+	}
+	memo[i][x][y] = res;
+	return res;
 }
 
 void solve() {
-	int n;
+	mst(memo, -1);
+	cin >> r >> c;
+	string t;
+	rep(i, 0, r) {
+		cin >> t;
+		rep(j, 0, c) arr[i][j] = t[j];
+	}
 	cin >> n;
 	rep(i, 0, n) {
+		cin >> t;
+		if (t[0] == 'S') h.pb({1, 0});
+		if (t[0] == 'N') h.pb({-1, 0});
+		if (t[0] == 'E') h.pb({0, 1});
+		if (t[0] == 'W') h.pb({0, -1});
+	}
+	rep(i, 0, r) rep(j, 0, c) if (arr[i][j] == "*")
+		arr[i][j] = '.', sx = i, sy = j;
+	rep(i, 0, r) rep(j, 0, c) if (arr[i][j] != "X" && check(n-1, i, j)) arr[i][j] = "*";
+	rep(i, 0, r) {
+		rep(j, 0, c) cout << arr[i][j];
+		cout << endl;
 	}
 
 }
@@ -93,7 +111,7 @@ signed main() {
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

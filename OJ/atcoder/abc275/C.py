@@ -18,11 +18,27 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    h = []
+    arr = []
     for _ in range(9):
-        h.append(I())
-    
-    
+        arr.append(I())
+    h = []
+    for i in range(9):
+        for j in range(9):
+            if arr[i][j] == "#":
+                h.append((i, j))
+    ans = 0
+    for i in range(len(h)):
+        for j in range(len(h)):
+            x1, y1 = h[i]
+            x2, y2 = h[j]
+            dx = x2-x1
+            dy = y2-y1
+            if not (dx >= 0 and dy > 0):
+                continue
+            if 0<=x1-dy<9 and 0<=y1+dx<9 and arr[x1-dy][y1+dx] == "#" and \
+                0<=x2-dy<9 and 0<=y2+dx<9 and arr[x2-dy][y2+dx] == "#":
+                ans += 1
+    print(ans)
     return
 
 def main():

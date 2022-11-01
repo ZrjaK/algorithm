@@ -10,7 +10,7 @@ from math import factorial, ceil, floor, gcd
 from operator import mul, xor
 from types import GeneratorType
 # sys.setrecursionlimit(2*10**5)
-BUFSIZE = 8192
+BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
 INF = float('inf')
@@ -18,9 +18,37 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
-    
+    d, g = LII()
+    arr = []
+    for _ in range(g):
+        arr.append(LII())
+    arr.sort()
+    arr = [[0, 0, 0]] + arr
+    memo = {}
+    @bootstrap
+    def p(i, cur, health):
+        if i == len(arr):
+            yield INF
+        if (i, cur, health) in memo:
+            yield memo[i, cur, health]
+        t, f, h = arr[i]
+        if health < t:
+            yield INF
+        if cur + h >= d:
+            yield t
+        memo[i, cur, health] = min((yield p(i+1, cur+h, health)), (yield p(i+1, cur, health+f)))
+        yield memo[i, cur, health]
+    res = p(0, 0, 10)
+    if res != INF:
+        print(res)
+        return
+    health = 10
+    for i in range(1, len(arr)):
+        t, f, _ = arr[i]
+        if health < t:
+            break
+        health += f
+    print(health)
     return
 
 def main():
@@ -81,26 +109,7 @@ def comb(n, r):
 
 def probabilityMod(x, y, mod):
     return x * pow(y, mod-2, mod) % mod
-
-class UnionFind:
-    def __init__(self, n):
-        self.parent = list(range(n))
-        self.size = [1] * n
-        self.part = n
-
-    @bootstrap
-    def find(self, i):
-        if self.parent[i] != i:
-            self.parent[i] = yield self.find(self.parent[i])
-        yield self.parent[i]
-
-    def union(self, i, j):
-        x, y = self.find(i), self.find(j)
-        if x != y:
-            self.size[y] += self.size[x]
-            self.parent[x] = self.parent[y]
-            self.part -= 1
-
+    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

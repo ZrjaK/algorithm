@@ -56,7 +56,7 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 2e5 + 10;
+const int N = 1e6 + 10;
 
 class ODT {
 public:

@@ -19,24 +19,19 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    p = LII()
+    parent = [-1] + [i-1 for i in LII()]
     d = defaultdict(list)
-    for i in range(2, n+1):
-        d[p[i-2]].append(i)
-    ans = 0
-    @bootstrap
-    def p(i):
-        nonlocal ans
-        if not d[i]:
-            yield 0
-        h = []
+    for i in range(1, n):
+        d[parent[i]].append(i)
+    
+    dp = [0] * n
+    depth = [1] * n
+    for i in range(n-1, -1, -1):
         for j in d[i]:
-            h.append((yield p(j)))
-        ans += sum(h) + len(h) - 1
-        print(i, h)
-        yield max(h) + 1
-    p(1)
-    print(ans)
+            depth[i] = max(depth[i], depth[j] + 1)
+        dp[i] = depth[i]
+        dp[i] = max(dp[i], sum(dp[j] for j in d[i]))
+    print(dp[0])    
     return
 
 def main():

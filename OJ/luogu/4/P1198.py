@@ -9,8 +9,8 @@ from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
 from math import factorial, ceil, floor, gcd
 from operator import mul, xor
 from types import GeneratorType
-# sys.setrecursionlimit(2*10**5)
-BUFSIZE = 8192
+# sys.setrecursionlimit(3*10**4+10)
+BUFSIZE = 4096
 MOD = 10**9 + 7
 MODD = 998244353
 INF = float('inf')
@@ -18,10 +18,26 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
+    m, D = LII()
+    t = 0
+    a = []
+    q = []
+    for i in range(m):
+        op, f = LI()
+        f = int(f)
+        if op == "A":
+            f = (f + t) % D
+            while q and a[q[-1]] <= f:
+                q.pop()
+            q.append(len(a))
+            a.append(f)
+        else:
+            idx = bisect_left(q, len(a)-f)
+            t = a[q[idx]]
+            print(t)
     
     return
+
 
 def main():
     t = 1
@@ -46,6 +62,31 @@ def bootstrap(f, stack=[]):
                     to = stack[-1].send(to)
             return to
     return wrappedfunc
+
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.dist = [0] * n
+        self.size = [1] * n
+        self.part = n
+
+    @bootstrap
+    def find(self, i):
+        if self.parent[i] != i:
+            fa = self.parent[i]
+            self.parent[i] = yield self.find(self.parent[i])
+            self.dist[i] += self.dist[fa]
+            self.size[i] = self.size[self.parent[i]]
+        yield self.parent[i]
+
+    def union(self, i, j):
+        x, y = self.find(i), self.find(j)
+        if x != y:
+            self.parent[x] = self.parent[y]
+            self.dist[x] = self.dist[y] + self.size[y]
+            self.size[y] += self.size[x]
+            self.size[x] = self.size[y]
+            self.part -= 1
 
 def bitcnt(n):
     c = (n & 0x5555555555555555) + ((n >> 1) & 0x5555555555555555)
@@ -81,26 +122,7 @@ def comb(n, r):
 
 def probabilityMod(x, y, mod):
     return x * pow(y, mod-2, mod) % mod
-
-class UnionFind:
-    def __init__(self, n):
-        self.parent = list(range(n))
-        self.size = [1] * n
-        self.part = n
-
-    @bootstrap
-    def find(self, i):
-        if self.parent[i] != i:
-            self.parent[i] = yield self.find(self.parent[i])
-        yield self.parent[i]
-
-    def union(self, i, j):
-        x, y = self.find(i), self.find(j)
-        if x != y:
-            self.size[y] += self.size[x]
-            self.parent[x] = self.parent[y]
-            self.part -= 1
-
+    
 class SortedList:
     def __init__(self, iterable=[], _load=200):
         """Initialize sorted list instance."""

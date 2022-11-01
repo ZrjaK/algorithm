@@ -58,6 +58,9 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
+int n, m;
+vi d[N];
+vi h;
 int parent[N], _size[N];
 int part;
 
@@ -81,11 +84,23 @@ void _union(int i, int j) {
 }
 
 void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
+	cin >> n >> m;
+	int x, y, k;
+	rep(i, 0, m) cin >> x >> y, d[x].pb(y), d[y].pb(x);
+	cin >> k;
+	rep(i, 0, k) cin >> x, h.pb(x);
+	unordered_set<int> s(all(h));
+	uf_init(n);
+	rep(i, 0, n) if (s.find(i) == s.end()) each(j, d[i]) if (s.find(j) == s.end()) _union(i, j);
+	vi ans;
+	per(i, len(h)-1, -1) {
+		ans.pb(part-i-1);
+		each(j, d[h[i]]) if (s.find(j) == s.end()) _union(h[i], j);
+		s.erase(h[i]);
 	}
-
+	ans.pb(part);
+	reverse(all(ans));
+	each(i, ans) cout << i << endl;
 }
 
 signed main() {
@@ -93,7 +108,7 @@ signed main() {
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

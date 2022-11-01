@@ -51,6 +51,9 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
+ll probabilityMod(ll x, ll y, ll mod) {
+	return x * pow(y, mod-2, mod) % mod;
+}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
@@ -58,34 +61,49 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-int parent[N], _size[N];
-int part;
-
-void uf_init(int n) {
-    part = n;
-    rep(i, 0, n) parent[i] = i, _size[i] = 1;
-}
-
-int find(int i) {
-    if (parent[i] != i) parent[i] = find(parent[i]);
-    return parent[i];
-}
-
-void _union(int i, int j) {
-    int x = find(i), y = find(j);
-    if (x != y) {
-        _size[y] += _size[x];
-        parent[x] = parent[y];
-        part -= 1;
-    }
-}
+ll d[9][9] = {0, 1, 3, 4, -1, -1, -1, -1, -1,
+				0, 1, 2, -1, -1, -1, -1, -1, -1,
+				1, 2, 4, 5, -1, -1, -1, -1, -1,
+				0, 3, 6, -1, -1, -1, -1, -1, -1,
+				1, 3, 4, 5, 7, -1, -1, -1, -1,
+				2, 5, 8, -1, -1, -1, -1, -1, -1,
+				3, 4, 6, 7, -1, -1, -1, -1, -1,
+				6, 7, 8, -1, -1, -1, -1, -1, -1,
+				4, 5, 7, 8, -1, -1, -1, -1, -1};
+ll h[9];
 
 void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
-	}
+	ll x;
+	rep(i, 0, 3) rep(j, 0, 3) cin >> x, h[i*3+j] = x % 12;
+	deque<pair<string, ll> > q;
+	ll t = 0;
+	rep(i, 0, 9) t *= 10, t += h[i];
+	q.eb(mp("", t));
+	unordered_set<ll> v;
+	while (!q.empty()) {
+		auto c = q.front();
+		q.pop_front();
+		string s = c.fi;
+		ll t = c.se;
+		if (t == 0) {
+			rep(i, 0, len(s)) cout << s[i] << " ";
+			cout << endl;
+			return;
+		}
+		if (v.find(t) != v.end()) continue;
+		v.insert(t);
+		ll cc[9];
+		per(i, 8, -1) cc[i] = t % 10, t /= 10;
+		rep(i, 0, 9) {
+			ll f[9];
+			rep(j, 0, 9) f[j] = cc[j];
+			each(j, d[i]) if (j != -1) f[j] = (f[j] + 3) % 12;
+			t = 0;
+			rep(j, 0, 9) t *= 10, t += f[j];
+			q.pb(mp(s + to_string(i+1), t));
+		}
 
+	}
 }
 
 signed main() {
@@ -93,7 +111,7 @@ signed main() {
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }
