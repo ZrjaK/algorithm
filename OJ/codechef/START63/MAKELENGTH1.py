@@ -19,19 +19,21 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    h = []
-    for _ in range(n):
-        h.append(LII())
-    f = abs(sum(i[0] for i in h) - sum(i[1] for i in h))
-    h.sort(key=lambda x: -abs(x[0]-x[1]))
-
-
-
+    s = I()
+    if s == "1":
+        print("YES")
+        return
+    t = [i for i in s.split("0") if i]
+    if all(len(i) % 2 == 0 for i in t):
+        print("YES")
+    else:
+        print("NO")
+    
     return
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
