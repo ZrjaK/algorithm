@@ -60,13 +60,51 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e3 + 10;
+
+vector<pll> d[N];
+deque<int> q;
+ll n, m;
+ll vis[N];
+ll cnt[N];
+ll dist[N];
+
+bool spfa(int s) {
+	q.pb(s);
+	vis[s] = 1, cnt[s]++, dist[s] = 0;
+	while (!q.empty()) {
+		ll u = q.front();
+		q.pop_front();
+		vis[u] = 0;
+		for(auto& [v, w] : d[u]) {
+			if (dist[u] + w < dist[v]) {
+				dist[v] = dist[u] + w;
+				if (vis[v] == 0) {
+					q.pb(v);
+					vis[v] = 1, cnt[v]++;
+					if (cnt[v] > n) return true;
+				}
+			}
+		}
+	}
+	return false;
+}
 
 void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
+	rep(i, 0, N) d[i].clear();
+	q.clear();
+	mst(vis, 0);
+	mst(cnt, 0);
+	rep(i, 0, N) dist[i] = LINF;
+	cin >> n >> m;
+	ll u, v, w;
+	rep(i, 0, m) {
+		cin >> u >> v >> w;
+		d[u].pb({v, w});
+		if (w >= 0) d[v].pb({u, w});
 	}
+	if (spfa(1)) cout << "YES" << endl;
+	else cout << "NO" << endl;
 
 }
 
@@ -75,7 +113,7 @@ signed main() {
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	// cin >> t;
+	cin >> t;
     while (t--) {
         solve();
     }

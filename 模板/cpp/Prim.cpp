@@ -60,14 +60,39 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 5e3 + 10;
+
+ll n;
+ll x[N], y[N], vis[N];
+ld dist[N];
+
+ld calc(ll i, ll j) {
+	return sqrt((x[i]-x[j])*(x[i]-x[j]) + (y[i]-y[j])*(y[i]-y[j]));
+}
+
+void prim() {
+	ld ans = 0;
+	dist[0] = 0;
+	vis[0] = 1;
+	ll cur;
+	ld mi;
+	rep(i, 0, n) {
+		cur = 0;
+		mi = LINF;
+		rep(j, 0, n) if (vis[j] == 0 && dist[j] < mi) mi = dist[j], cur = j;
+		vis[cur] = 1;
+		ans += dist[cur];
+		rep(j, 0, n) dist[j] = min(dist[j], calc(cur, j));
+	}
+	cout << fixed << setprecision(2);
+	cout << ans << endl;
+}
 
 void solve() {
-	int n;
+	mst(vis, 0);
 	cin >> n;
-	rep(i, 0, n) {
-	}
-
+	rep(i, 0, n) cin >> x[i] >> y[i], dist[i] = LINF;
+	prim();
 }
 
 signed main() {
@@ -81,3 +106,5 @@ signed main() {
     }
 	return 0;
 }
+
+// https://www.luogu.com.cn/problem/P1265
