@@ -26,18 +26,17 @@ using namespace std;
 #define len(x) x.size()
 #define elif else if
 #define all(x) begin(x), end(x)
-#define mst(x, a) memset(x, a, sizeof(x))
+#define mst(x, a) memset(x,a,sizeof(x))
 #ifndef lowbit
 #define lowbit(x) (x & (-x))
 #endif
 #define bitcnt(x) (__builtin_popcountll(x))
 #define _up(x) (int)ceil(1.0*x)
 #define _down(x) (int)floor(1.0*x)
-#define endl "\n"
 template <class T>
 using pq = priority_queue<T>;
 template <class T>
-using pqg = priority_queue<T, vector<T>, greater<T> >;
+using pqg = priority_queue<T, vector<T>, greater<T>>;
 ll gcd(ll x, ll y) { return !y ? x : gcd(y, x%y); }
 ll lcm(ll x, ll y) { return x * y / gcd(x, y); }
 ll max(ll x, ll y) { return x > y ? x : y; }
@@ -52,22 +51,19 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e6 + 10;
 
 
 
 class SegmentTree {
 public:
 	struct STNode {
-		STNode () : left(nullptr), right(nullptr), val(0), lazy(0) {}
+		STNode () : left(nullptr), right(nullptr), val(INF), lazy(INF) {}
 		STNode* left;
 		STNode* right;
 		ll val;
@@ -79,7 +75,8 @@ public:
 
 	void add(STNode* node, int l, int r, int start, int end, ll x){
 		if (l == start && r == end) {
-			node->lazy += x;
+			node->lazy = x;
+			node->val = x;
 			return;
 		}
 		pushdown(node);
@@ -97,7 +94,7 @@ public:
 
 	ll query(STNode* node, int l, int r, int start, int end) {
 		if (l == start && r == end) {
-			return node->val + node->lazy * (r-l+1);
+			return node->val;
 		}
 		pushdown(node);
 		int mid = l+r>>1;
@@ -107,8 +104,8 @@ public:
 		} elif (start > mid) {
 			res = query(node->right, mid+1, r, start, end);
 		} else {
-			res = query(node->left, l, mid, start, mid) +
-			query(node->right, mid+1, r, mid+1, end);
+			res = min(query(node->left, l, mid, start, mid),
+			query(node->right, mid+1, r, mid+1, end));
 		}
 		pushup(node, mid-l+1, r-mid);
 		return res;
@@ -121,39 +118,36 @@ public:
 		if (node->right == nullptr) {
 			node->right = new STNode();
 		}
-		if (node->lazy > 0) {
-			node->left->lazy += node->lazy;
-			node->right->lazy += node->lazy;
-			node->lazy = 0;
+		if (node->lazy != INF) {
+			node->left->lazy = node->lazy;
+			node->right->lazy = node->lazy;
+			node->lazy = INF;
 		}
 	}
 
 	void pushup(STNode* node, int ln, int rn) {
-		node->val = node->left->val + node->right->val + node->left->lazy * ln + node->right->lazy * rn;
+		node->val = min(node->left->val, node->right->val);
 	}
 };
 
 SegmentTree st;
+int n, k, p;
+vi d[51];
+ll dp;
+
 void solve() {
-	int n, m;
-	cin >> n >> m;
-	ll a;
-	rep(i, 1, n+1) {
-		cin >> a;
-		st.add(st.root, 1, n, i, i, a);
-	}
-	int c, x, y;
-	ll k;
-	while (m--) {
-		cin >> c;
-		if (c == 1) {
-			cin >> x >> y >> k;
-			st.add(st.root, 1, n, x, y, k);
-		} else {
-			cin >> x >> y;
-			cout << st.query(st.root, 1, n, x, y) << endl;
+	cin >> n >> k >> p;
+	int a, b;
+	rep(i, 0, n) cin >> a >> b, d[a].pb(i), st.add(st.root, 0, n-1, i, i, b);
+	ll ans = 0;
+	rep(i, 0, k) {
+        dp = 0;
+		rep(j, 1, len(d[i])) {
+			if (st.query(st.root, 0, n-1, d[i][j-1], d[i][j]) <= p) dp = j;
+            ans += dp;
 		}
 	}
+	cout << ans << endl;
 }
 
 signed main() {

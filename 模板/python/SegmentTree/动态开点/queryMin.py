@@ -1,5 +1,5 @@
 class STNode:
-    def __init__(self, left=None, right=None, val=0, lazy=0):
+    def __init__(self, left=None, right=None, val=1e99, lazy=1e99):
         self.left = left
         self.right = right
         self.val = val
@@ -12,6 +12,7 @@ class SegmentTree:
     def assign(self, node, l, r, start, end, x):
         if l == start and r == end:
             node.lazy = x
+            node.val = x
             return
         mid = l+r>>1
         self.pushdown(node)
@@ -26,7 +27,7 @@ class SegmentTree:
 
     def query(self, node, l, r, start, end):
         if l == start and r == end:
-            return node.lazy + node.val
+            return node.val
         mid = l+r>>1
         self.pushdown(node)
         if end <= mid:
@@ -44,13 +45,13 @@ class SegmentTree:
             node.left = STNode()
         if not node.right:
             node.right = STNode()
-        if node.lazy:
+        if node.lazy != 1e99:
             node.left.lazy = node.lazy
             node.right.lazy = node.lazy
-            node.lazy = 0
+            node.lazy = 1e99
     
     def pushup(self, node):
-        node.val = min(node.left.val + node.left.lazy, node.right.val + node.right.lazy)
+        node.val = min(node.left.val, node.right.val)
 
 
 if __name__ == "__main__":
