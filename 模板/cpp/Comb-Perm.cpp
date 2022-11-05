@@ -1,9 +1,3 @@
-// 题目：1668.最大重复子字符串
-// 难度：EASY
-// 最后提交：2022-11-03 12:19:06 +0800 CST
-// 语言：cpp
-// 作者：ZrjaK
-
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
@@ -39,6 +33,7 @@ using namespace std;
 #define bitcnt(x) (__builtin_popcountll(x))
 #define _up(x) (int)ceil(1.0*x)
 #define _down(x) (int)floor(1.0*x)
+#define endl "\n"
 template <class T>
 using pq = priority_queue<T>;
 template <class T>
@@ -57,19 +52,58 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
+ll probabilityMod(ll x, ll y, ll mod) {
+	return x * pow(y, mod-2, mod) % mod;
+}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e6 + 10;
 
-class Solution {
-public:
-    int maxRepeating(string sequence, string word) {
-        int ans = 0;
-        string c = word;
-        while (sequence.find(word) != sequence.npos) word += c, ans++;
-        return ans;
+ll mul[N];
+ll inv[N];
+
+void init() {
+    mul[0] = 1;
+    for (int i = 1; i < N; i++) {
+        mul[i] = (mul[i - 1] * i) % MOD;
     }
-};
+    inv[0] = inv[1] = 1;
+    for (int i = 2; i < N; i++) {
+        inv[i] = (ll) (MOD - MOD / i) * inv[MOD % i] % MOD;
+    }
+    for (int i = 1; i < N; i++) {
+        inv[i] = (inv[i - 1] * inv[i]) % MOD;
+    }
+}
+
+ll C(int n, int m) {
+    return mul[n] * inv[m] % MOD * inv[n - m] % MOD;
+}
+
+ll P(int n, int m) {
+    return mul[n] * inv[n - m] % MOD;
+}
+
+void solve() {
+	ll n;
+	cin >> n;
+	ll ans = C(2*n, n+1);
+	cout << ans << " " << (C(2*n, n) - ans + MOD) % MOD << endl;
+
+}
+
+signed main() {
+	init();
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	cout.tie(0);
+    int t = 1;
+	cin >> t;
+    while (t--) {
+        solve();
+    }
+	return 0;
+}

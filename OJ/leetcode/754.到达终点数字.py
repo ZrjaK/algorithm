@@ -1,6 +1,6 @@
 # 题目：754.到达终点数字
 # 难度：MEDIUM
-# 最后提交：2022-05-02 09:40:03 +0800 CST
+# 最后提交：2022-11-04 22:04:05 +0800 CST
 # 语言：python3
 # 作者：ZrjaK
 
@@ -18,4 +18,3 @@ class Solution:
                 return k+1
             else:
                 return k+2
-        

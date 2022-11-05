@@ -1,9 +1,3 @@
-// 题目：1668.最大重复子字符串
-// 难度：EASY
-// 最后提交：2022-11-03 12:19:06 +0800 CST
-// 语言：cpp
-// 作者：ZrjaK
-
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
@@ -39,6 +33,7 @@ using namespace std;
 #define bitcnt(x) (__builtin_popcountll(x))
 #define _up(x) (int)ceil(1.0*x)
 #define _down(x) (int)floor(1.0*x)
+#define endl "\n"
 template <class T>
 using pq = priority_queue<T>;
 template <class T>
@@ -57,19 +52,60 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
+ll probabilityMod(ll x, ll y, ll mod) {
+	return x * pow(y, mod-2, mod) % mod;
+}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
 
-class Solution {
-public:
-    int maxRepeating(string sequence, string word) {
-        int ans = 0;
-        string c = word;
-        while (sequence.find(word) != sequence.npos) word += c, ans++;
-        return ans;
+ll n, m ,s;
+ll w[N], v[N], h[N], c[N];
+pii q[N];
+
+void solve() {
+	cin >> n >> m >> s;
+	rep(i, 1, n+1) cin >> w[i] >> v[i];
+	int l, r;
+	rep(i, 0, m) cin >> l >> r, q[i] = {l, r};
+	l = 0, r = 1e6;
+	auto calc = [&] (int W) {
+		mst(h, 0);
+		rep(i, 1, n+1) {
+			h[i] = h[i-1] + (w[i] >= W ? v[i] : 0);
+			c[i] = c[i-1] + (w[i] >= W ? 1: 0);
+		}
+		ll t = 0;
+		rep(i, 0, m) {
+			int l = q[i].fi, r = q[i].se;
+			t += (h[r]-h[l-1]) * (c[r]-c[l-1]);
+		}
+		return t;
+	};
+	ll ans = LINF;
+	while (l + 1 < r) {
+		int mid = l+r>>1;
+		ll f = calc(mid);
+		ans = min(ans, abs(s-f));
+		if (f == s) { break; }
+		if (f < s) r = mid;
+		else l = mid;
+	}
+	cout << ans << endl;
+
+}
+
+signed main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	cout.tie(0);
+    int t = 1;
+	// cin >> t;
+    while (t--) {
+        solve();
     }
-};
+	return 0;
+}

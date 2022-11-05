@@ -1,6 +1,6 @@
-// 题目：1668.最大重复子字符串
-// 难度：EASY
-// 最后提交：2022-11-03 12:19:06 +0800 CST
+// 题目：149.直线上最多的点数
+// 难度：HARD
+// 最后提交：2022-11-01 12:38:18 +0800 CST
 // 语言：cpp
 // 作者：ZrjaK
 
@@ -57,6 +57,9 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
+ll probabilityMod(ll x, ll y, ll mod) {
+	return x * pow(y, mod-2, mod) % mod;
+}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
@@ -66,10 +69,17 @@ const int N = 1e6 + 10;
 
 class Solution {
 public:
-    int maxRepeating(string sequence, string word) {
+    int maxPoints(vector<vector<int>>& points) {
+        int n = len(points);
+        if (n == 1) return 1;
         int ans = 0;
-        string c = word;
-        while (sequence.find(word) != sequence.npos) word += c, ans++;
+        rep(i, 0, n) rep(j, i+1, n) {
+            int t = 0;
+            rep(k, 0, n) {
+                if ((points[i][1]-points[k][1]) * (points[i][0]-points[j][0]) == (points[i][1] - points[j][1]) * (points[i][0]-points[k][0])) t++;
+            }
+            ans = max(ans, t);
+        }
         return ans;
     }
 };

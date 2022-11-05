@@ -1,6 +1,6 @@
-// 题目：1668.最大重复子字符串
-// 难度：EASY
-// 最后提交：2022-11-03 12:19:06 +0800 CST
+// 题目：470.用 Rand7() 实现 Rand10()
+// 难度：MEDIUM
+// 最后提交：2022-11-03 19:08:24 +0800 CST
 // 语言：cpp
 // 作者：ZrjaK
 
@@ -39,6 +39,7 @@ using namespace std;
 #define bitcnt(x) (__builtin_popcountll(x))
 #define _up(x) (int)ceil(1.0*x)
 #define _down(x) (int)floor(1.0*x)
+#define endl "\n"
 template <class T>
 using pq = priority_queue<T>;
 template <class T>
@@ -57,19 +58,29 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
+ll probabilityMod(ll x, ll y, ll mod) {
+	return x * pow(y, mod-2, mod) % mod;
+}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 1e3 + 10;
+
+// The rand7() API is already defined for you.
+// int rand7();
+// @return a random integer in the range 1 to 7
 
 class Solution {
 public:
-    int maxRepeating(string sequence, string word) {
-        int ans = 0;
-        string c = word;
-        while (sequence.find(word) != sequence.npos) word += c, ans++;
-        return ans;
+    int rand10() {
+        int ans = INF;
+        while (ans >= 40) {
+            int x = rand7();
+            int y = rand7();
+            ans = (x - 1) * 7 + (y - 1);
+        }
+        return 1 + ans % 10;
     }
 };
