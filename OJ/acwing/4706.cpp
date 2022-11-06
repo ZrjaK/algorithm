@@ -20,8 +20,8 @@ using namespace std;
 #define mt make_tuple
 #define fi first
 #define se second
-#define rep(i, a, b) for(ll i = a; i < b; ++i)
-#define per(i, a, b) for(ll i = a; i > b; --i)
+#define rep(i, a, b) for(int i = a; i < b; ++i)
+#define per(i, a, b) for(int i = a; i > b; --i)
 #define each(x, v) for(auto& x: v)
 #define len(x) x.size()
 #define elif else if
@@ -60,13 +60,38 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
+
+int n;
+vector<pii> d[N];
+ll dp[N][2];
+
+void dfs(int i, int fa) {
+	vector<pii> h;
+	for(auto& [j, w]: d[i]) {
+		if (j == fa) continue;
+		dfs(j, i);
+		h.pb({j, w});
+	}
+	if (len(h) == 0) dp[i][0] = dp[i][1] = 0;
+	elif (len(h) == 1) {int j = h[0].fi, w = h[0].se; dp[i][0] = w + dp[j][0];}
+	else {
+		ll t = 0;
+		for(auto& [j, w]: h) t += dp[j][1] + w * 2;
+		for(auto& [j, w]: h) dp[i][0] = min(dp[i][0], t - dp[j][1] - w + dp[j][0]);
+	}
+	ll t = 0;
+	for(auto& [j, w]: h) t += dp[j][1] + w * 2;
+	dp[i][1] = t;
+}
 
 void solve() {
-	int n;
 	cin >> n;
-	rep(i, 0, n) {
-	}
+	rep(i, 1, n+1) rep(j, 0, 2) dp[i][j] = LINF;
+	int x, y, w;
+	rep(i, 0, n-1) cin >> x >> y >> w, d[x].pb({y, w}), d[y].pb({x, w});
+	dfs(1, -1);
+	cout << dp[1][0] << endl;
 
 }
 

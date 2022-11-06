@@ -20,8 +20,8 @@ using namespace std;
 #define mt make_tuple
 #define fi first
 #define se second
-#define rep(i, a, b) for(ll i = a; i < b; ++i)
-#define per(i, a, b) for(ll i = a; i > b; --i)
+#define rep(i, a, b) for(int i = a; i < b; ++i)
+#define per(i, a, b) for(int i = a; i > b; --i)
 #define each(x, v) for(auto& x: v)
 #define len(x) x.size()
 #define elif else if
@@ -33,7 +33,6 @@ using namespace std;
 #define bitcnt(x) (__builtin_popcountll(x))
 #define _up(x) (int)ceil(1.0*x)
 #define _down(x) (int)floor(1.0*x)
-#define endl "\n"
 template <class T>
 using pq = priority_queue<T>;
 template <class T>
@@ -52,9 +51,6 @@ ll pow(ll x, ll y, ll mod){
 	}
 	return res % mod;
 }
-ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y % mod, mod-2, mod) % mod;
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
@@ -62,22 +58,30 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
-	}
-
-}
-
-signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
-    int t = 1;
-	// cin >> t;
-    while (t--) {
-        solve();
+struct ODT {
+    const int n;
+    map<int, int> mp;
+    ODT(int n) : n(n) { mp[-1] = 0; }
+    void split(int x) {
+        auto it = prev(mp.upper_bound(x)); //找到左端点小于等于x的区间
+        mp[x] = it->second; //设立新的区间，并将上一个区间储存的值复制给本区间。
     }
-	return 0;
-}
+    void assign(int l, int r, int v) { // 注意，这里的r是区间右端点+1
+        split(l);
+        split(r);
+        auto it = mp.find(l);
+        while (it->first != r) {
+            it = mp.erase(it);
+        }
+        mp[l] = v;
+    }
+    void update(int l, int r, int c) { // 其他操作
+        split(l);
+        split(r);
+        auto it = mp.find(l);
+        while (it->first != r) {
+            // 根据题目需要做些什么
+            it = next(it);
+        }
+    }
+};
