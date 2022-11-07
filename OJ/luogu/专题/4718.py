@@ -19,35 +19,10 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    a = list(I())
-    b = list(I())
-    c = 0
-    for i, j in zip(a, b):
-        if i != j:
-            c += 1
-    if c != 0 and c != n:
-        print("NO")
+    if isprime(n):
+        print("Prime")
         return
-    ans = []
-    if c == n:
-        a = b
-        ans.append([1, n])
-    d = defaultdict(int)
-    for i in range(n):
-        if a[i] == "1":
-            if i == 0:
-                ans.append([1, n])
-                ans.append([2, n])
-            else:
-                d[i] += 1
-                d[i-1] += 1
-    for i in range(n):
-        if d[i] % 2:
-            ans.append([1, i+1])
-    print("YES")
-    print(len(ans))
-    for i in ans:
-        print(*i)
+    print(primefact(n)[-1])
     return
 
 def main():
@@ -55,6 +30,67 @@ def main():
     t = II()
     for _ in range(t):
         solve()
+
+def isprime(n):
+    if n <= 1:
+        return False
+    elif n == 2:
+        return True
+    elif n % 2 == 0:
+        return False
+    
+    A = [2, 325, 9375, 28178, 450775, 9780504, 1795265022]
+    s = 0
+    d = n - 1
+    while d % 2 == 0:
+        s += 1
+        d >>= 1
+    
+    for a in A:
+        if a % n == 0:
+            return True
+        x = pow(a, d, n)
+        if x != 1:
+            for t in range(s):
+                if x == n - 1:
+                    break
+                x = x * x % n
+            else:
+                return False
+    return True
+        
+def pollard(n):
+    if n % 2 == 0:
+        return 2
+    if isprime(n):
+        return n
+    
+    f = lambda x:(x * x + 1) % n
+    
+    step = 0
+    while 1:
+        step += 1
+        x = step
+        y = f(x)
+        while 1:
+            p = gcd(y - x + n, n)
+            if p == 0 or p == n:
+                break
+            if p != 1:
+                return p
+            x = f(x)
+            y = f(f(y))
+
+def primefact(n):
+    if n == 1:
+        return []
+    p = pollard(n)
+    if p == n:
+        return [p]
+    left = primefact(p)
+    right = primefact(n // p)
+    left += right
+    return sorted(left)
 
 def bootstrap(f, stack=[]):
     def wrappedfunc(*args, **kwargs):

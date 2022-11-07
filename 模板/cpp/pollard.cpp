@@ -52,22 +52,74 @@ ll Mod(ll x, int mod) { return (x % mod + mod) % mod; }
 ll pow(ll x, ll y, ll mod){
 	ll res = 1, cur = x;
 	while (y) {
-		if (y & 1)	res = res * cur % mod;
+		if (y & 1)	res = ONE * res * cur % mod;
 		cur = ONE * cur * cur % mod;
 		y >>= 1;
 	}
 	return res % mod;
 }
 ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
+	return x * pow(y % mod, mod-2, mod) % mod;
 }
 const int N = 1e6 + 10;
 
-void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) {
+bool isprime(ll n) {
+	if (n <= 1) return false;
+	elif (n == 2) return true;
+	elif (n % 2 == 0) return false;
+	ll A[7] = {2, 325, 9375, 28178, 450775, 9780504, 1795265022};
+	ll s = 0, d = n-1;
+	while (d % 2 == 0) s++, d >>= 1;
+	each(a, A) {
+		if (a % n == 0) return true;
+		ll x = pow(a, d, n);
+		if (x != 1) {
+			bool f = true;
+			rep(i, 0, s) {
+				if (x == n-1) { f = false; break; }
+				x = ONE * x * x % n;
+			}
+			if (f) return false; 
+		}
 	}
+	return true;
+}
+
+ll pollard(ll n) {
+	if (n % 2 == 0) return 2;
+	if (isprime(n)) return n;
+	auto f = [&] (ll x) { return (ONE * x * x % n + 1) % n;};
+	ll step = 0;
+	while(1) {
+		step++;
+		ll x = step;
+		ll y = f(x);
+		while(1) {
+			ll p = gcd(y - x + n, n);
+			if (p == 0 || p == n) break;
+			if (p != 1) return p;
+			x = f(x);
+			y = f(f(y));
+		}
+	}
+}
+
+vll primefact(ll n) {
+	if (n == 1) return vll{};
+	ll p = pollard(n);
+	if (p == n) { return vll{p}; }
+	vll left = primefact(p), right = primefact(n / p);
+	left.insert(left.end(), all(right));
+	sort(all(left));
+	return left;
+}
+
+void solve() {
+	ll n;
+	cin >> n;
+	if (isprime(n)) { cout << "Prime" << endl; return; }
+	vll pfact = primefact(n);
+	cout << *(pfact.end()-1) << endl;
 
 }
 
@@ -76,7 +128,7 @@ signed main() {
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	// cin >> t;
+	cin >> t;
     while (t--) {
         solve();
     }
