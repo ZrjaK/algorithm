@@ -44,7 +44,21 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const __int128 ONE = 1;
-ll gcd(ll x, ll y) { return !y ? x : gcd(y, x%y); }
+// ll gcd(ll x, ll y) { return !y ? x : gcd(y, x%y); }
+ll gcd(ll x,ll y)
+{
+	if(!x) return y;
+	if(!y) return x;
+	int t = __builtin_ctzll(x|y);
+	x >>= __builtin_ctzll(x);
+	do
+	{
+		y >>= __builtin_ctzll(y);
+		if(x > y) swap(x,y);
+		y -= x;
+	} while(y);
+	return x<<t;
+}
 ll lcm(ll x, ll y) { return x * y / gcd(x, y); }
 ll max(ll x, ll y) { return x > y ? x : y; }
 ll min(ll x, ll y) { return x < y ? x : y; }
@@ -103,23 +117,23 @@ ll pollard(ll n) {
 		}
 	}
 }
+ll ans;
 
-vll primefact(ll n) {
-	if (n == 1) return vll{};
+void primefact(ll n) {
+	if (n == 1) return;
 	ll p = pollard(n);
-	if (p == n) { return vll{p}; }
-	vll left = primefact(p), right = primefact(n / p);
-	left.insert(left.end(), all(right));
-	sort(all(left));
-	return left;
+	if (p == n) { ans = max(ans, p); return; }
+	primefact(p);
+	primefact(n / p);
 }
 
 void solve() {
+	ans = 0;
 	ll n;
 	cin >> n;
 	if (isprime(n)) { cout << "Prime" << endl; return; }
-	vll pfact = primefact(n);
-	cout << *(pfact.end()-1) << endl;
+	primefact(n);
+	cout << ans << endl;
 
 }
 
