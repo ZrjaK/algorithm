@@ -81,15 +81,40 @@ const int N = 1e5 + 10;
 class SegmentTree {
 public:
 	struct STNode {
-		STNode () : left(nullptr), right(nullptr), val(0), lazy(0) {}
+		STNode () : left(nullptr), right(nullptr), val(0), maxval(0), minval(0), lazy(0), mlazy(LINF) {}
 		STNode* left;
 		STNode* right;
 		ll val;
+		ll maxval;
+		ll minval;
 		ll lazy;
+		ll mlazy;
 	};
 	STNode* root;
 	SegmentTree() { root = new STNode(); }
 	~SegmentTree() {}
+
+	void assign(STNode* node, int l, int r, int start, int end, ll x) {
+		if (l == start && r == end) {
+			node->val = 0;
+			node->maxval = 0;
+			node->minval = 0;
+			node->lazy = 0;
+			node->mlazy = x;
+			return;
+		}
+		pushdown(node);
+		int mid = l+r>>1;
+		if (end <= mid) {
+			assign(node->left, l, mid, start, end, x);
+		} elif (start > mid) {
+			assign(node->right, mid+1, r, start, end, x);
+		} else {
+			assign(node->left, l, mid, start, mid , x);
+			assign(node->right, mid+1, r, mid+1, end, x);
+		}
+		pushup(node, mid-l+1, r-mid);
+	}
 
 	void add(STNode* node, int l, int r, int start, int end, ll x){
 		if (l == start && r == end) {
@@ -109,20 +134,58 @@ public:
 		pushup(node, mid-l+1, r-mid);
 	}
 
-	ll query(STNode* node, int l, int r, int start, int end) {
+	ll querySum(STNode* node, int l, int r, int start, int end) {
 		if (l == start && r == end) {
-			return node->val + node->lazy * (r-l+1);
+			return node->val + node->lazy * (r-l+1) + (node->mlazy == LINF ? 0 : node->mlazy * (r-l+1));
 		}
 		pushdown(node);
 		int mid = l+r>>1;
 		ll res;
 		if (end <= mid) {
-			res = query(node->left, l, mid, start, end);
+			res = querySum(node->left, l, mid, start, end);
 		} elif (start > mid) {
-			res = query(node->right, mid+1, r, start, end);
+			res = querySum(node->right, mid+1, r, start, end);
 		} else {
-			res = query(node->left, l, mid, start, mid) +
-			query(node->right, mid+1, r, mid+1, end);
+			res = querySum(node->left, l, mid, start, mid) +
+			querySum(node->right, mid+1, r, mid+1, end);
+		}
+		pushup(node, mid-l+1, r-mid);
+		return res;
+	}
+
+	ll queryMax(STNode* node, int l, int r, int start, int end) {
+		if (l == start && r == end) {
+			return node->maxval + node->lazy + (node->mlazy == LINF ? 0 : node->mlazy);
+		}
+		pushdown(node);
+		int mid = l+r>>1;
+		ll res;
+		if (end <= mid) {
+			res = queryMax(node->left, l, mid, start, end);
+		} elif (start > mid) {
+			res = queryMax(node->right, mid+1, r, start, end);
+		} else {
+			res = max(queryMax(node->left, l, mid, start, mid),
+			queryMax(node->right, mid+1, r, mid+1, end));
+		}
+		pushup(node, mid-l+1, r-mid);
+		return res;
+	}
+
+	ll queryMin(STNode* node, int l, int r, int start, int end) {
+		if (l == start && r == end) {
+			return node->minval + node->lazy + (node->mlazy == LINF ? 0 : node->mlazy);
+		}
+		pushdown(node);
+		int mid = l+r>>1;
+		ll res;
+		if (end <= mid) {
+			res = queryMin(node->left, l, mid, start, end);
+		} elif (start > mid) {
+			res = queryMin(node->right, mid+1, r, start, end);
+		} else {
+			res = min(queryMin(node->left, l, mid, start, mid),
+			queryMin(node->right, mid+1, r, mid+1, end));
 		}
 		pushup(node, mid-l+1, r-mid);
 		return res;
@@ -135,7 +198,22 @@ public:
 		if (node->right == nullptr) {
 			node->right = new STNode();
 		}
-		if (node->lazy > 0) {
+		if (node->mlazy != LINF) {
+			node->left->lazy = 0;
+			node->left->val = 0;
+			node->left->maxval = 0;
+			node->left->minval = 0;
+		
+			node->right->lazy = 0;
+			node->right->val = 0;
+			node->right->maxval = 0;
+			node->right->minval = 0;
+			
+			node->left->mlazy = node->mlazy;
+			node->right->mlazy = node->mlazy;
+			node->mlazy = LINF;
+		}
+		if (node->lazy) {
 			node->left->lazy += node->lazy;
 			node->right->lazy += node->lazy;
 			node->lazy = 0;
@@ -143,30 +221,24 @@ public:
 	}
 
 	void pushup(STNode* node, int ln, int rn) {
-		node->val = node->left->val + node->right->val + node->left->lazy * ln + node->right->lazy * rn;
+		node->val = node->left->val + node->left->lazy * ln + node->right->val + node->right->lazy * rn;
+
+		node->maxval = max(node->left->maxval + node->left->lazy + (node->left->mlazy == LINF ? 0 : node->left->mlazy),
+						node->right->maxval + node->right->lazy + (node->right->mlazy == LINF ? 0 : node->right->mlazy));
+
+		node->minval = min(node->left->minval + node->left->lazy + (node->left->mlazy == LINF ? 0 : node->left->mlazy),
+						node->right->minval + node->right->lazy + (node->right->mlazy == LINF ? 0 : node->right->mlazy));
+
 	}
 };
 
 SegmentTree st;
+ll n, q, m, a, b;
+
 void solve() {
-	int n, m;
-	cin >> n >> m;
-	ll a;
-	rep(i, 1, n+1) {
-		cin >> a;
-		st.add(st.root, 1, n, i, i, a);
-	}
-	int c, x, y;
-	ll k;
-	while (m--) {
-		cin >> c;
-		if (c == 1) {
-			cin >> x >> y >> k;
-			st.add(st.root, 1, n, x, y, k);
-		} else {
-			cin >> x >> y;
-			cout << st.query(st.root, 1, n, x, y) << endl;
-		}
+	cin >> n >> q;
+	rep(i, 0, q) {
+		
 	}
 }
 
