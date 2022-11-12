@@ -74,48 +74,75 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e5 + 10;
+const int N = 1e6 + 10;
 
-ll mul[N];
-ll inv[N];
+int parent[N], _size[N];
+int part;
 
+void uf_init(int n) {
+    part = n;
+    rep(i, 0, n) parent[i] = i, _size[i] = 1;
+}
+
+int find(int i) {
+    if (parent[i] != i) parent[i] = find(parent[i]);
+    return parent[i];
+}
+
+void _union(int i, int j) {
+    int x = find(i), y = find(j);
+    if (x != y) {
+        _size[y] += _size[x];
+        parent[x] = parent[y];
+        part -= 1;
+    }
+}
+
+vector<int> isPrime(N, 1);
+int ans = 0;
+vi p;
 void init() {
-    mul[0] = 1;
-    for (int i = 1; i < N; i++) {
-        mul[i] = (mul[i - 1] * i) % MOD;
-    }
-    inv[0] = inv[1] = 1;
-    for (int i = 2; i < N; i++) {
-        inv[i] = (ll) (MOD - MOD / i) * inv[MOD % i] % MOD;
-    }
-    for (int i = 1; i < N; i++) {
-        inv[i] = (inv[i - 1] * inv[i]) % MOD;
-    }
+	for (int i = 2; i < 2300; ++i) {
+		if (isPrime[i]) {
+			p.pb(i);
+			if ((long long)i * i < 2300) {
+				for (int j = i * i; j < 2300; j += i) {
+					isPrime[j] = 0;
+				}
+			}
+		}
+	}
 }
-
-ll C(int n, int m) {
-    return n < m ? 0 : mul[n] * inv[m] % MOD * inv[n - m] % MOD;
-}
-
-ll P(int n, int m) {
-    return n < m ? 0 : mul[n] * inv[n - m] % MOD;
-}
+int a[N];
 
 void solve() {
-	ll n;
+	init();
+	int n;
 	cin >> n;
-	ll ans = C(2*n, n+1);
-	cout << ans << " " << (C(2*n, n) - ans + MOD) % MOD << endl;
-
+	uf_init(n);
+	rep(i, 0, n) cin >> a[i];
+	int x, y;
+	rep(i, 0, n-1) {
+		cin >> x >> y;
+		x--;y--;
+		int g = gcd(a[x], a[y]);
+		int c = 0;
+		each(j, p) {
+			if (g % j == 0) c++;
+			if (c == 2) { _union(x, y); break;}
+		}
+	}
+	int ans = 0;
+	rep(i, 0, n) ans = max(ans, _size[i]);
+	cout << ans << endl;
 }
 
 signed main() {
-	init();
 	ios::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

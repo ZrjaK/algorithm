@@ -72,9 +72,9 @@ ll probabilityMod(ll x, ll y, ll mod) {
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
-const int MOD = 1000000007;
-const int MODD = 998244353;
-const int N = 1e5 + 10;
+// const int MOD = 1000000007;
+const int MOD = 998244353;
+const int N = 1e4 + 10;
 
 ll mul[N];
 ll inv[N];
@@ -101,11 +101,35 @@ ll P(int n, int m) {
     return n < m ? 0 : mul[n] * inv[n - m] % MOD;
 }
 
+int c[2];
+int dp[N][N/2];
+
 void solve() {
 	ll n;
 	cin >> n;
-	ll ans = C(2*n, n+1);
-	cout << ans << " " << (C(2*n, n) - ans + MOD) % MOD << endl;
+	ll x;
+	rep(i, 0, n) {
+		cin >> x;
+		if (x == 1) c[1]++;
+		else c[0]++;
+	}
+	if (c[1] <= c[0]) {
+		rep(i, 0, n+2) dp[i][0] = 1;
+		per(i, n-1, -1) {
+			rep(j, 1, c[1]+1) {
+				dp[i][j] = max(dp[i+1][j], dp[i+2][j-1] + 1);
+				dp[i][j] %= MOD;
+			}
+		}
+		cout << dp[0][c[1]] << endl;
+	} else {
+		ll ans = 0;
+		rep(i, 1, c[0]) {
+			
+			ans %= MOD;
+		}
+		cout << ans << endl;
+	}
 
 }
 
@@ -115,7 +139,7 @@ signed main() {
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

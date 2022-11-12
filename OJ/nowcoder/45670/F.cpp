@@ -104,8 +104,13 @@ ll P(int n, int m) {
 void solve() {
 	ll n;
 	cin >> n;
-	ll ans = C(2*n, n+1);
-	cout << ans << " " << (C(2*n, n) - ans + MOD) % MOD << endl;
+	ll ans = 0;
+	rep(i, 1, n+1) {
+		ans += (n-i+1) * (i * (i+1) % MOD * inv[2] % MOD) % MOD;
+		ans %= MOD;
+	}
+	ans = mul[n] * inv[2] % MOD * ans % MOD * C(n, 2) % MOD;
+	cout << ans << endl;
 
 }
 

@@ -74,48 +74,35 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e5 + 10;
+const int N = 110;
 
-ll mul[N];
-ll inv[N];
-
-void init() {
-    mul[0] = 1;
-    for (int i = 1; i < N; i++) {
-        mul[i] = (mul[i - 1] * i) % MOD;
-    }
-    inv[0] = inv[1] = 1;
-    for (int i = 2; i < N; i++) {
-        inv[i] = (ll) (MOD - MOD / i) * inv[MOD % i] % MOD;
-    }
-    for (int i = 1; i < N; i++) {
-        inv[i] = (inv[i - 1] * inv[i]) % MOD;
-    }
-}
-
-ll C(int n, int m) {
-    return n < m ? 0 : mul[n] * inv[m] % MOD * inv[n - m] % MOD;
-}
-
-ll P(int n, int m) {
-    return n < m ? 0 : mul[n] * inv[n - m] % MOD;
-}
+ll a[N][N];
+ll n;
+set<ll> s;
 
 void solve() {
-	ll n;
 	cin >> n;
-	ll ans = C(2*n, n+1);
-	cout << ans << " " << (C(2*n, n) - ans + MOD) % MOD << endl;
-
+	rep(i, 1, n+1) rep(j, 1, n+1) cin >> a[i][j];
+	rep(i, 1, n+1) rep(j, 1, n+1) a[i][j] += a[i-1][j] + a[i][j-1] - a[i-1][j-1];
+	ll ans = -LINF;
+	rep(i1, 1, n+1) rep(i2, i1, n+1) {
+		s.clear();
+		s.insert(0);
+		rep(j, 1, n+1) {
+			ll f = a[i2][j] - a[i1-1][j];
+			ans = max(ans, f - *s.begin());
+			s.insert(f);
+		}
+	}
+	cout << ans << endl;
 }
 
 signed main() {
-	init();
 	ios::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }
