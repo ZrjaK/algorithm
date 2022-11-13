@@ -101,36 +101,31 @@ ll P(int n, int m) {
     return n < m ? 0 : mul[n] * inv[n - m] % MOD;
 }
 
-int c[2];
-int dp[N][N/2];
+ll dp1[N];
+ll dp2[N];
 
 void solve() {
 	ll n;
 	cin >> n;
 	ll x;
+	ll cnt = 0;
+	ll s = 0;
 	rep(i, 0, n) {
 		cin >> x;
-		if (x == 1) c[1]++;
-		else c[0]++;
+		s += x;
+		if (x == -1) cnt++;
 	}
-	if (c[1] <= c[0]) {
-		rep(i, 0, n+2) dp[i][0] = 1;
-		per(i, n-1, -1) {
-			rep(j, 1, c[1]+1) {
-				dp[i][j] = max(dp[i+1][j], dp[i+2][j-1] + 1);
-				dp[i][j] %= MOD;
-			}
-		}
-		cout << dp[0][c[1]] << endl;
+	if (s <= 0) {
+		cout << C(cnt+1, n-cnt) << endl;
 	} else {
-		ll ans = 0;
-		rep(i, 1, c[0]) {
-			
-			ans %= MOD;
+		dp2[0] = 1;
+		rep(i, 1, n+1) {
+			dp1[0] = dp2[1];
+			rep(j, 1, s+1) dp1[j] = (dp2[j-1] + dp2[j+1]) % MOD;
+			rep(j, 0, s+1) dp2[j] = dp1[j];
 		}
-		cout << ans << endl;
+		cout << dp1[s] << endl;
 	}
-
 }
 
 signed main() {
