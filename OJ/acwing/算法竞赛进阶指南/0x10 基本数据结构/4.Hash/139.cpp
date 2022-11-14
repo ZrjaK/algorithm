@@ -74,14 +74,38 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e6 + 10;
 
-int a[N];
+ull hl[N], hr[N], p[N];
+string s;
 
 void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) cin >> a[i];
+	p[0] = 1;
+	rep(i, 1, N) p[i] = p[i-1] * 131;
+	int T = 0;
+	while(cin >> s, s != "END") {
+		mst(hl, 0);
+		mst(hr, 0);
+		string t = "#";
+		rep(i, 0, len(s)) t += s[i], t += '#';
+		int n = len(t);
+		rep(i, 0, n) hl[i] = hl[i-1] * 131 + t[i] - 'a';
+		per(i, n-1, -1) hr[i] = hr[i+1] * 131 + t[i] - 'a';
+		ll ans = 0;
+		rep(i, 0, n) {
+			ll l = 0, r = min(i, n-1-i);
+			while(l + 1 < r) {
+				ll mid = l+r>>1;
+				ull c1 = hl[i-1] - hl[i-mid-1] * p[mid];
+                ull c2 = hr[i+1] - hr[i+mid+1] * p[mid];
+				if (c1 == c2) l = mid;
+				else r = mid;
+			}
+			if(t[i-l] == '#') ans = max(ans, l);
+			else ans = max(ans, l+1);
+		}
+		printf("Case %d: %lld\n", ++T, ans);
+	}
 
 }
 

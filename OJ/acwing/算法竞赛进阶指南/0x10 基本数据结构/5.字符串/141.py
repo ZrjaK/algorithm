@@ -18,8 +18,20 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
+    T = 0
+    while 1:
+        T += 1
+        n = II()
+        if not n:
+            return
+        print(f"Test case #{T}")
+        s = I()
+        nxt = prefix_function(s)
+        for i in range(n):
+            t = (i+1) - nxt[i]
+            if (i+1) != t and (i+1) % t == 0:
+                print(i+1, (i+1) // t)
+        print()
     
 
 def main():
@@ -27,6 +39,18 @@ def main():
     # t = II()
     for _ in range(t):
         solve()
+
+def prefix_function(s):
+    n = len(s)
+    pi = [0] * n
+    for i in range(1, n):
+        j = pi[i - 1]
+        while j > 0 and s[i] != s[j]:
+            j = pi[j - 1]
+        if s[i] == s[j]:
+            j += 1
+        pi[i] = j
+    return pi
 
 def bootstrap(f, stack=[]):
     def wrappedfunc(*args, **kwargs):

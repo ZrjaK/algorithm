@@ -18,8 +18,12 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
+    n, m = LII()
+    trie = Trie()
+    for _ in range(n):
+        trie.insert(I())
+    for _ in range(m):
+        print(trie.search(I()))
     
 
 def main():
@@ -27,6 +31,42 @@ def main():
     # t = II()
     for _ in range(t):
         solve()
+
+class Trie:
+    def __init__(self):
+        self.children = [None] * 26
+        self.isEnd = 0
+    
+    def searchPrefix(self, prefix: str) -> "Trie":
+        node = self
+        for ch in prefix:
+            ch = ord(ch) - ord("a")
+            if not node.children[ch]:
+                return None
+            node = node.children[ch]
+        return node
+
+    def insert(self, word: str) -> None:
+        node = self
+        for ch in word:
+            ch = ord(ch) - ord("a")
+            if not node.children[ch]:
+                node.children[ch] = Trie()
+            node = node.children[ch]
+        node.isEnd += 1
+
+    def search(self, s):
+        res = 0
+        node = self
+        for ch in s:
+            ch = ord(ch) - 97
+            if not node.children[ch]:
+                return res
+            node = node.children[ch]
+            res += node.isEnd
+        return res
+    
+
 
 def bootstrap(f, stack=[]):
     def wrappedfunc(*args, **kwargs):

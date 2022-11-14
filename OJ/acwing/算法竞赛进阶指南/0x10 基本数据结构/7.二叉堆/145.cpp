@@ -74,14 +74,25 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 1e4 + 10;
 
-int a[N];
+int n;
+pii a[N];
+pqg<int> q;
 
 void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) cin >> a[i];
+	while(cin >> n) {
+		rep(i, 0, n) cin >> a[i].se >> a[i].fi;
+		sort(a, a+n);
+		rep(i, 0, n) {
+			if(a[i].fi > len(q)) q.push(a[i].se);
+			elif(a[i].fi == len(q) && a[i].se > q.top()) 
+				q.pop(), q.push(a[i].se);
+		}
+		ll ans = 0;
+		while(!q.empty()) ans += q.top(), q.pop();
+		cout << ans << endl;
+	}
 
 }
 
