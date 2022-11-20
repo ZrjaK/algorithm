@@ -108,14 +108,31 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 20;
 
-int a[N];
+string a[N];
+int n;
+unordered_map<int, bool> memo[N];
+
+bool dfs(int mask, int pre) {
+    if(mask + 1 == 1<<n) return false;
+    if(memo[pre].find(mask) != memo[pre].end()) return memo[pre][mask];
+    bool res = false;
+    rep(i, 0, n) {
+        if (mask>>i & 1) continue;
+        if (a[i][0] == a[pre][len(a[pre])-1]) res |= !dfs(mask|1<<i, i);
+    }
+    memo[pre][mask] = res;
+    return res;
+}
 
 void solve() {
-	int n;
 	cin >> n;
 	rep(i, 0, n) cin >> a[i];
+    bool res = false;
+    rep(i, 0, n) res |= !dfs(1<<i, i);
+    if(res) cout << "First";
+    else cout << "Second";
 
 }
 

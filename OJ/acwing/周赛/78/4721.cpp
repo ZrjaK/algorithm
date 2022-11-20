@@ -234,13 +234,23 @@ public:
 };
 
 SegmentTree st;
-ll n, q, m, a, b;
+int n;
+int a[N];
+int ans[N];
 
 void solve() {
-	cin >> n >> q;
-	rep(i, 0, q) {
-		
+	mst(ans, -1);
+	cin >> n;
+	rep(i, 0, n) cin >> a[i];
+	per(i, n-1, -1) {
+		if (st.querySum(st.root, 0, 1e9, 0, a[i]-1) > 0) {
+			ans[i] = st.queryMax(st.root, 0, 1e9, 0, a[i]-1) - i - 1;
+		}
+		ll t = st.querySum(st.root, 0, 1e9, a[i], a[i]);
+		st.assign(st.root, 0, 1e9, a[i], a[i], max(i, t));
 	}
+	rep(i, 0, n) cout << ans[i] << " ";
+	cout << endl;
 }
 
 signed main() {

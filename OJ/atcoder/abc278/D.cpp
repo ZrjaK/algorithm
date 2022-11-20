@@ -234,12 +234,17 @@ public:
 };
 
 SegmentTree st;
-ll n, q, m, a, b;
+ll n, x, f, ii, q;
 
 void solve() {
-	cin >> n >> q;
-	rep(i, 0, q) {
-		
+	cin >> n;
+	rep(i, 0, n) cin >> x, st.assign(st.root, 0, n, i, i, x);
+	cin >> q;
+	rep(_, 0, q) {
+		cin >> f;
+		if(f == 1) cin >> x, st.assign(st.root, 0, n, 0, n, x);
+		elif(f == 2) cin >> ii >> x, st.add(st.root, 0, n, ii-1, ii-1, x);
+		else cin >> ii, cout << st.querySum(st.root, 0, n, ii-1, ii-1) << endl;
 	}
 }
 

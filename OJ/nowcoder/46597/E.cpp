@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
-#define i128 __int128
+// #define ll __int128
 #define ld long double
 #define ui unsigned int
 #define ull unsigned long long
@@ -27,8 +27,7 @@ using namespace std;
 #define each(x, v) for(auto& x: v)
 #define len(x) x.size()
 #define elif else if
-#define all(x) (x).begin(), (x).end()
-#define rall(x) (x).rbegin(), (x).rend()
+#define all(x) begin(x), end(x)
 #define mst(x, a) memset(x, a, sizeof(x))
 #ifndef lowbit
 #define lowbit(x) (x & (-x))
@@ -41,40 +40,7 @@ template <class T>
 using pq = priority_queue<T>;
 template <class T>
 using pqg = priority_queue<T, vector<T>, greater<T> >;
-const i128 ONE = 1;
-istream &operator>>(istream &in, i128 &x) {
-    string s;
-    in >> s;
-    bool minus = false;
-    if (s[0] == '-') {
-        minus = true;
-        s.erase(s.begin());
-    }
-    x = 0;
-    for (auto i : s) {
-        x *= 10;
-        x += i - '0';
-    }
-    if (minus) x = -x;
-    return in;
-}
-ostream &operator<<(ostream &out, i128 x) {
-    string s;
-    bool minus = false;
-    if (x < 0) {
-        minus = true;
-        x = -x;
-    }
-    while (x) {
-        s.push_back(x % 10 + '0');
-        x /= 10;
-    }
-    if (s.empty()) s = "0";
-    if (minus) out << '-';
-    reverse(s.begin(), s.end());
-    out << s;
-    return out;
-}
+const __int128 ONE = 1;
 ll gcd(ll x,ll y) {
 	if(!x) return y;
 	if(!y) return x;
@@ -108,18 +74,51 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 1e5 + 10;
 
-int a[N];
+ll mul[N];
+ll inv[N];
+
+void init() {
+    mul[0] = 1;
+    for (int i = 1; i < N; i++) {
+        mul[i] = (mul[i - 1] * i) % MOD;
+    }
+    inv[0] = inv[1] = 1;
+    for (int i = 2; i < N; i++) {
+        inv[i] = (ll) (MOD - MOD / i) * inv[MOD % i] % MOD;
+    }
+    for (int i = 1; i < N; i++) {
+        inv[i] = (inv[i - 1] * inv[i]) % MOD;
+    }
+}
+
+ll C(int n, int m) {
+    return n < m ? 0 : mul[n] * inv[m] % MOD * inv[n - m] % MOD;
+}
+
+ll P(int n, int m) {
+    return n < m ? 0 : mul[n] * inv[n - m] % MOD;
+}
+
+ll c[N];
 
 void solve() {
-	int n;
+	ll n;
 	cin >> n;
-	rep(i, 0, n) cin >> a[i];
+	ll x;
+	rep(i, 0, n) cin >> x, c[x]++;
+	ll ans = C(n, 2);
+	rep(i, 1, N) {
+		if(c[i]) ans -= C(c[i], 2), ans %= MOD;
+	}
+	cout << mul[n] * inv[2] % MOD * ans % MOD << endl;
+
 
 }
 
 signed main() {
+	init();
 	ios::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
