@@ -1,0 +1,24 @@
+from copy import deepcopy
+
+
+def gauss(m):
+    a = deepcopy(m)
+    n = len(a)
+    for r in range(n):
+        c = r
+        t = r
+        for i in range(r+1, n):
+            if abs(a[i][c]) > abs(a[t][c]):
+                t = i
+        for i in range(c, n+1):
+            a[r][i], a[t][i] = a[t][i], a[r][i]
+        for i in range(n, c-1, -1):
+            a[r][i] /= a[r][c]
+        for i in range(r+1, n):
+            for j in range(n, c-1, -1):
+                a[i][j] -= a[r][j] * a[i][c]
+    for i in range(n-1, 0, -1):
+        for j in range(i-1, -1, -1):
+            a[j][n] -= a[i][n] * a[j][i]
+            a[j][i] = 0
+    return a

@@ -72,7 +72,7 @@ ll probabilityMod(ll x, ll y, ll mod) {
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
-const int MOD = 1000000007;
+const int MOD = 1000000009;
 const int MODD = 998244353;
 const int N = 1e5 + 10;
 
@@ -101,12 +101,25 @@ ll P(int n, int m) {
     return n < m ? 0 : fac[n] * inv[n - m] % MOD;
 }
 
-void solve() {
-	ll n;
-	cin >> n;
-	ll ans = C(2*n, n+1);
-	cout << ans << " " << (C(2*n, n) - ans + MOD) % MOD << endl;
+ll n;
+ll a[N];
+int vis[N];
 
+int dfs(int i) {
+	vis[i] = 1;
+	if(vis[a[i]]) return 1;
+	return 1 + dfs(a[i]);
+}
+
+void solve() {
+	mst(vis, 0);
+	cin >> n;
+	rep(i, 0, n) cin >> a[i], a[i]--;
+	vi l;
+	rep(i, 0, n) if(!vis[i]) l.pb(dfs(i));
+	ll ans = fac[n-len(l)];
+	each(i, l) ans = ans * pow(i, abs(i-2), MOD) % MOD * inv[i-1] % MOD;
+	cout << ans << endl;
 }
 
 signed main() {
