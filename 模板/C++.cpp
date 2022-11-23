@@ -37,6 +37,8 @@ using namespace std;
 #define _up(x) (int)ceil(1.0*x)
 #define _down(x) (int)floor(1.0*x)
 #define endl "\n"
+mt19937 rng( chrono::steady_clock::now().time_since_epoch().count() );
+#define Ran(a, b) rng() % ( (b) - (a) + 1 ) + (a)
 template <class T>
 using pq = priority_queue<T>;
 template <class T>
@@ -88,6 +90,14 @@ ll gcd(ll x,ll y) {
 	return x<<t;
 }
 ll lcm(ll x, ll y) { return x * y / gcd(x, y); }
+ll exgcd(ll a, ll b, ll &x, ll &y) {
+    if(!b) return x = 1, y = 0, a;
+    ll d = exgcd(b, a % b, x, y);
+    ll t = x;
+    x = y;
+    y = t - a / b * x;
+    return d;
+}
 ll max(ll x, ll y) { return x > y ? x : y; }
 ll min(ll x, ll y) { return x < y ? x : y; }
 ll Mod(ll x, int mod) { return (x % mod + mod) % mod; }
