@@ -74,7 +74,7 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e5 + 10;
+const int N = 30;
 
 ll fac[N];
 ll inv[N];
@@ -93,26 +93,28 @@ void init(ll mod) {
     }
 }
 
-ll C(ll n, ll m, ll mod) {
-    return n < m ? 0 : fac[n] * inv[m] % mod * inv[n - m] % mod;
-}
-
-ll P(ll n, ll m, ll mod) {
-    return n < m ? 0 : fac[n] * inv[n - m] % mod;
-}
-
-ll lucas(ll n, ll m, ll mod)
+ll C(ll n,ll m)
 {
-    if(n < m) return 0;
-    else if(n < mod) return C(n, m, mod);
-    else return lucas(n / mod, m / mod, mod) * lucas(n % mod, m % mod, mod) % mod;
+    if(n<m)return 0;
+	ll t = 1;
+	per(i, n, n-m) t = ONE * t * i % MOD;
+	return t * inv[m] % MOD;
 }
+
+ll a[N];
 
 void solve() {
-	ll n;
-	cin >> n;
-	
-
+	ll n, m;
+	cin >> n >> m;
+	rep(i, 0, n) cin >> a[i];
+	ll ans = 0;
+	rep(i, 0, 1<<n) {
+		ll t = m+n-1, sign = 1;
+		rep(j, 0, n) if(i>>j & 1) t -= a[j] + 1, sign *= -1;
+		ans += C(t, n-1) * sign;
+		ans %= MOD;
+	}
+	cout << Mod(ans, MOD) << endl;
 }
 
 signed main() {
@@ -121,7 +123,7 @@ signed main() {
 	cin.tie(0);
 	cout.tie(0);
     int t = 1;
-	cin >> t;
+	// cin >> t;
     while (t--) {
         solve();
     }

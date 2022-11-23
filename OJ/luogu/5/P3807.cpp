@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
-// #define ll __int128
+#define i128 __int128
 #define ld long double
 #define ui unsigned int
 #define ull unsigned long long
@@ -27,7 +27,8 @@ using namespace std;
 #define each(x, v) for(auto& x: v)
 #define len(x) x.size()
 #define elif else if
-#define all(x) begin(x), end(x)
+#define all(x) (x).begin(), (x).end()
+#define rall(x) (x).rbegin(), (x).rend()
 #define mst(x, a) memset(x, a, sizeof(x))
 #ifndef lowbit
 #define lowbit(x) (x & (-x))
@@ -36,11 +37,46 @@ using namespace std;
 #define _up(x) (int)ceil(1.0*x)
 #define _down(x) (int)floor(1.0*x)
 #define endl "\n"
+mt19937 rng( chrono::steady_clock::now().time_since_epoch().count() );
+#define Ran(a, b) rng() % ( (b) - (a) + 1 ) + (a)
 template <class T>
 using pq = priority_queue<T>;
 template <class T>
 using pqg = priority_queue<T, vector<T>, greater<T> >;
-const __int128 ONE = 1;
+const i128 ONE = 1;
+istream &operator>>(istream &in, i128 &x) {
+    string s;
+    in >> s;
+    bool minus = false;
+    if (s[0] == '-') {
+        minus = true;
+        s.erase(s.begin());
+    }
+    x = 0;
+    for (auto i : s) {
+        x *= 10;
+        x += i - '0';
+    }
+    if (minus) x = -x;
+    return in;
+}
+ostream &operator<<(ostream &out, i128 x) {
+    string s;
+    bool minus = false;
+    if (x < 0) {
+        minus = true;
+        x = -x;
+    }
+    while (x) {
+        s.push_back(x % 10 + '0');
+        x /= 10;
+    }
+    if (s.empty()) s = "0";
+    if (minus) out << '-';
+    reverse(s.begin(), s.end());
+    out << s;
+    return out;
+}
 ll gcd(ll x,ll y) {
 	if(!x) return y;
 	if(!y) return x;
@@ -54,6 +90,14 @@ ll gcd(ll x,ll y) {
 	return x<<t;
 }
 ll lcm(ll x, ll y) { return x * y / gcd(x, y); }
+ll exgcd(ll a, ll b, ll &x, ll &y) {
+    if(!b) return x = 1, y = 0, a;
+    ll d = exgcd(b, a % b, x, y);
+    ll t = x;
+    x = y;
+    y = t - a / b * x;
+    return d;
+}
 ll max(ll x, ll y) { return x > y ? x : y; }
 ll min(ll x, ll y) { return x < y ? x : y; }
 ll Mod(ll x, int mod) { return (x % mod + mod) % mod; }
@@ -74,7 +118,7 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e5 + 10;
+const int N = 1e6 + 10;
 
 ll fac[N];
 ll inv[N];
@@ -93,30 +137,30 @@ void init(ll mod) {
     }
 }
 
-ll C(ll n, ll m, ll mod) {
+ll C(int n, int m, int mod) {
     return n < m ? 0 : fac[n] * inv[m] % mod * inv[n - m] % mod;
 }
 
-ll P(ll n, ll m, ll mod) {
+ll P(int n, int m, int mod) {
     return n < m ? 0 : fac[n] * inv[n - m] % mod;
 }
 
-ll lucas(ll n, ll m, ll mod)
+// 当与mod不互质，逆元不存在，需要使用Lucas定理
+long long lucas(int x, int y, int mod)
 {
-    if(n < m) return 0;
-    else if(n < mod) return C(n, m, mod);
-    else return lucas(n / mod, m / mod, mod) * lucas(n % mod, m % mod, mod) % mod;
+    if(x < y) return 0;
+    else if(x < mod) return fac[x] * inv[y] % mod * inv[x-y] % mod;
+    else return lucas(x / mod, y / mod, mod) * lucas(x % mod, y % mod, mod) % mod;
 }
 
 void solve() {
-	ll n;
-	cin >> n;
-	
-
+	ll n, m, p;
+	cin >> n >> m >> p;
+    init(p);
+    cout << lucas(n+m, n, p) << endl;
 }
 
 signed main() {
-	init(MOD);
 	ios::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
