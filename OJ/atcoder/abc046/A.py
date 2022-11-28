@@ -18,21 +18,7 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    h, w, n = LII()
-    d = defaultdict(int)
-    for _ in range(n):
-        a, b = LII()
-        for i in range(3):
-            for j in range(3):
-                if 2<i+a<=h and 2<j+b<=w:
-                    d[(i+a, j+b)] += 1
-    print((h-2)*(w-2) - len(d.values()))
-    c = Counter(d.values())
-    for i in range(1, 10):
-        print(c[i])
-
-
-
+    print(len(set(LII())))
     
 
 def main():
