@@ -136,7 +136,8 @@ public:
 
 	ll querySum(STNode* node, int l, int r, int start, int end) {
 		if (l == start && r == end) {
-			return node->val + node->lazy * (r-l+1) + (node->mlazy == LINF ? 0 : node->mlazy * (r-l+1));
+			return node->val + node->lazy * (r-l+1) + \
+				(node->mlazy == LINF ? 0 : node->mlazy * (r-l+1));
 		}
 		pushdown(node);
 		int mid = l+r>>1;
@@ -155,7 +156,8 @@ public:
 
 	ll queryMax(STNode* node, int l, int r, int start, int end) {
 		if (l == start && r == end) {
-			return node->maxval + node->lazy + (node->mlazy == LINF ? 0 : node->mlazy);
+			return node->maxval + node->lazy + \
+				(node->mlazy == LINF ? 0 : node->mlazy);
 		}
 		pushdown(node);
 		int mid = l+r>>1;
@@ -174,7 +176,8 @@ public:
 
 	ll queryMin(STNode* node, int l, int r, int start, int end) {
 		if (l == start && r == end) {
-			return node->minval + node->lazy + (node->mlazy == LINF ? 0 : node->mlazy);
+			return node->minval + node->lazy + \
+				(node->mlazy == LINF ? 0 : node->mlazy);
 		}
 		pushdown(node);
 		int mid = l+r>>1;
@@ -221,14 +224,20 @@ public:
 	}
 
 	void pushup(STNode* node, int ln, int rn) {
-		node->val = node->left->val + node->left->lazy * ln + (node->left->mlazy == LINF ? 0 : node->left->mlazy * ln) + \ 
-					node->right->val + node->right->lazy * rn + (node->right->mlazy == LINF ? 0 : node->right->mlazy * rn);
+		node->val = node->left->val + node->left->lazy * ln + \
+					(node->left->mlazy == LINF ? 0 : node->left->mlazy * ln) + \ 
+					node->right->val + node->right->lazy * rn + \
+					(node->right->mlazy == LINF ? 0 : node->right->mlazy * rn);
 
-		node->maxval = max(node->left->maxval + node->left->lazy + (node->left->mlazy == LINF ? 0 : node->left->mlazy),
-						node->right->maxval + node->right->lazy + (node->right->mlazy == LINF ? 0 : node->right->mlazy));
+		node->maxval = max(node->left->maxval + node->left->lazy + \
+						(node->left->mlazy == LINF ? 0 : node->left->mlazy),
+						node->right->maxval + node->right->lazy + \
+						(node->right->mlazy == LINF ? 0 : node->right->mlazy));
 
-		node->minval = min(node->left->minval + node->left->lazy + (node->left->mlazy == LINF ? 0 : node->left->mlazy),
-						node->right->minval + node->right->lazy + (node->right->mlazy == LINF ? 0 : node->right->mlazy));
+		node->minval = min(node->left->minval + node->left->lazy + \
+						(node->left->mlazy == LINF ? 0 : node->left->mlazy),
+						node->right->minval + node->right->lazy + \
+						(node->right->mlazy == LINF ? 0 : node->right->mlazy));
 
 	}
 };

@@ -1,6 +1,7 @@
 from copy import deepcopy
 
-
+# m 为 n行 n + 1列的增广矩阵
+# a[i][n] for i in range(n)即为各个未知数的解
 def gauss(m):
     a = deepcopy(m)
     n = len(a)

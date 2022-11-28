@@ -76,27 +76,31 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e5 + 10;
 
-int parent[N], _size[N];
-int part;
+class UnionFind {
+public:
+	int parent[N], size[N];
+	int part;
+	UnionFind (int n) : part(n) {
+		rep(i, 0, n) parent[i] = i, size[i] = 1;
+	};
+	~UnionFind() {}
 
-void uf_init(int n) {
-    part = n;
-    rep(i, 0, n) parent[i] = i, _size[i] = 1;
-}
+	int find(int i) {
+		if (parent[i] != i) {
+			parent[i] = find(parent[i]);
+		}
+		return parent[i];
+	}
 
-int find(int i) {
-    if (parent[i] != i) parent[i] = find(parent[i]);
-    return parent[i];
-}
-
-void _union(int i, int j) {
-    int x = find(i), y = find(j);
-    if (x != y) {
-        _size[y] += _size[x];
-        parent[x] = parent[y];
-        part -= 1;
-    }
-}
+	void _union(int i, int j) {
+		int x = find(i), y = find(j);
+		if (x != y) {
+			size[y] += size[x];
+			parent[x] = parent[y];
+			part -= 1;
+		}
+	}
+};
 
 void solve() {
 	int n;
