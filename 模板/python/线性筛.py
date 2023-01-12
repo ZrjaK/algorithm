@@ -3,7 +3,8 @@ N = 10**6+10
 # 对正整数n，欧拉函数是小于n的正整数中与n互质的数的数目
 phi = [0] * N
 phi[1] = 1
-
+pfact = [0] * N
+fact = [[] for _ in range(N)]
 primes = []
 
 # 1）莫比乌斯函数μ(n)的定义域是N；
@@ -14,12 +15,15 @@ primes = []
 mobious = [0] * N
 mobious[1] = 1
 
-for i in range(2, N):
+for i in range(1, N):
     if not phi[i]:
         primes.append(i)
         phi[i] = i-1
         mobious[i] = -1
-    j = 0
+        for j in range(1, N):
+            if i * j >= N:
+                break
+            pfact[i*j] = i
     for j in primes:
         if i * j >= N:
             break
@@ -29,3 +33,29 @@ for i in range(2, N):
             break
         phi[i*j] = phi[i] * (j-1)
         mobious[i*j] = mobious[i] * mobious[j]
+    
+    if N < int(1e6):
+        for j in range(i, N, i):
+            fact[j].append(i)
+
+def getfact(x):
+    res = defaultdict(int)
+    while x != 1:
+        res[pfact[x]] += 1
+        x //= pfact[x]
+    return res
+
+def factlist(x):
+    res = [1]
+    while x != 1:
+        k = pfact[x]
+        c = 0
+        while x % k == 0:
+            c += 1
+            x //= k
+        tmp = []
+        for i in res:
+            for j in range(1, c+1):
+                tmp.append(i * pow(k, j))
+        res += tmp
+    return res

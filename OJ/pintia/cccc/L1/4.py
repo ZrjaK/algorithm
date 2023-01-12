@@ -1,0 +1,1 @@
+print(f"Celsius = {5 * (int(input()) - 32) // 9}")

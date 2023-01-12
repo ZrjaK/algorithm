@@ -1,14 +1,16 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, gc
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
 from itertools import accumulate, combinations, permutations, product
 from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
-from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
+from bisect import bisect_left, bisect_right
 from math import factorial, ceil, floor, gcd
 from operator import mul, xor
 from types import GeneratorType
+if "PyPy" in sys.version:
+    import pypyjit; pypyjit.set_param('max_unroll_recursion=-1')
 # sys.setrecursionlimit(2*10**5)
 BUFSIZE = 8192
 MOD = 10**9 + 7
@@ -80,25 +82,6 @@ def comb(n, r):
 
 def probabilityMod(x, y, mod):
     return x * pow(y, mod-2, mod) % mod
-
-class UnionFind:
-    def __init__(self, n):
-        self.parent = list(range(n))
-        self.size = [1] * n
-        self.part = n
-
-    @bootstrap
-    def find(self, i):
-        if self.parent[i] != i:
-            self.parent[i] = yield self.find(self.parent[i])
-        yield self.parent[i]
-
-    def union(self, i, j):
-        x, y = self.find(i), self.find(j)
-        if x != y:
-            self.size[y] += self.size[x]
-            self.parent[x] = self.parent[y]
-            self.part -= 1
 
 class SortedList:
     def __init__(self, iterable=[], _load=200):
@@ -376,7 +359,8 @@ class IOWrapper(IOBase):
         self.read = lambda: self.buffer.read().decode("ascii")
         self.readline = lambda: self.buffer.readline().decode("ascii")
 
-sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
+if sys.platform != "win32":
+    sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
 input = lambda: sys.stdin.readline().rstrip("\r\n")
 
 def I():
@@ -399,6 +383,11 @@ def GMI():
 
 def LGMI():
     return list(map(lambda x: int(x) - 1, input().split()))
+
+def debug(*args):
+    print('\033[92m', end='')
+    print(*args)
+    print('\033[0m', end='')
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,6 @@
 # 题目：1764.通过连接另一个数组的子数组得到一个数组
 # 难度：MEDIUM
-# 最后提交：2022-08-22 02:03:59 +0800 CST
+# 最后提交：2022-12-17 01:51:01 +0800 CST
 # 语言：python3
 # 作者：ZrjaK
 
@@ -15,4 +15,3 @@ class Solution:
                 return False
             j += len(i)
         return True
-        

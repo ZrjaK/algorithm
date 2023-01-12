@@ -1,27 +1,39 @@
-import random, sys, os, math, threading
+import random, sys, os, math, threading, gc
 from collections import Counter, defaultdict, deque
-from functools import lru_cache, reduce
-from itertools import accumulate, combinations, permutations
+from functools import lru_cache, reduce, cmp_to_key
+from itertools import accumulate, combinations, permutations, product
 from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
 from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
+from math import factorial, ceil, floor, gcd
+from operator import mul, xor
 from types import GeneratorType
-# sys.setrecursionlimit(2*10**6)
-BUFSIZE = 4096
+# sys.setrecursionlimit(2*10**5)
+BUFSIZE = 8192
 MOD = 10**9 + 7
 MODD = 998244353
 INF = float('inf')
+D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n, x = LII()
+    n = II()
     arr = LII()
+    c0 = arr.count(0)
+    ans = 0
+    t = sum(arr[:c0])
+    for i in range(1, t+1):
+        ans += pow(i*i, MODD-2, MODD)
+        ans %= MODD
+    ans = ans * n * (n-1) * pow(2, MODD-2, MODD) % MODD
+    print(ans)
     
-    
-    return
 
 def main():
-    for _ in range(1):
+    t = 1
+    t = II()
+    for _ in range(t):
         solve()
 
 def bootstrap(f, stack=[]):
@@ -50,6 +62,51 @@ def bitcnt(n):
     c = (c & 0x0000FFFF0000FFFF) + ((c >> 16) & 0x0000FFFF0000FFFF)
     c = (c & 0x00000000FFFFFFFF) + ((c >> 32) & 0x00000000FFFFFFFF)
     return c
+
+def lcm(x, y):
+    return x * y // gcd(x, y)
+
+def lowbit(x):
+    return x & -x
+
+@bootstrap
+def exgcd(a: int, b: int):
+    if b == 0:
+        d, x, y = a, 1, 0
+    else:
+        (d, p, q) = yield exgcd(b, a % b)
+        x = q
+        y = p - q * (a // b)
+ 
+    yield d, x, y
+
+def perm(n, r):
+    return factorial(n) // factorial(n - r) if n >= r else 0
+ 
+def comb(n, r):
+    return factorial(n) // (factorial(r) * factorial(n - r)) if n >= r else 0
+
+def probabilityMod(x, y, mod):
+    return x * pow(y, mod-2, mod) % mod
+
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.part = n
+
+    @bootstrap
+    def find(self, i):
+        if self.parent[i] != i:
+            self.parent[i] = yield self.find(self.parent[i])
+        yield self.parent[i]
+
+    def union(self, i, j):
+        x, y = self.find(i), self.find(j)
+        if x != y:
+            self.size[y] += self.size[x]
+            self.parent[x] = self.parent[y]
+            self.part -= 1
 
 class SortedList:
     def __init__(self, iterable=[], _load=200):
@@ -350,6 +407,11 @@ def GMI():
 
 def LGMI():
     return list(map(lambda x: int(x) - 1, input().split()))
+
+def debug(*args):
+    print('\033[92m', end='')
+    print(*args)
+    print('\033[0m', end='')
 
 if __name__ == "__main__":
     main()
