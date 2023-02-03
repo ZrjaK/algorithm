@@ -1,10 +1,11 @@
 N = 10**6+10
 
 # 对正整数n，欧拉函数是小于n的正整数中与n互质的数的数目
+# x = d∣x ∑ φ(d)
 phi = [0] * N
 phi[1] = 1
 pfact = [0] * N
-fact = [[] for _ in range(N)]
+# fact = [[] for _ in range(N)]
 primes = []
 
 # 1）莫比乌斯函数μ(n)的定义域是N；
@@ -12,14 +13,20 @@ primes = []
 # 3）当n存在平方因子时，μ(n)=0；
 # 4）当n是素数或奇数个不同素数之积时，μ(n)=-1；
 # 5）当n是偶数个不同素数之积时，μ(n)=1。
-mobious = [0] * N
-mobious[1] = 1
+# d∣n ∑ μ(d) = [n == 1]
+
+# d∣n ∑ μ(d) * (n / d) = φ(n)
+
+# g(n) = d∣n ∑ f(d) <---> f(n) = d∣n ∑ μ(d) g(n/d)
+# g(n) = d∣n ∑ f(n) <---> f(n) = d∣n ∑ μ(n/d) g(n)
+# mobious = [0] * N
+# mobious[1] = 1
 
 for i in range(1, N):
     if not phi[i]:
         primes.append(i)
         phi[i] = i-1
-        mobious[i] = -1
+        # mobious[i] = -1
         for j in range(1, N):
             if i * j >= N:
                 break
@@ -29,14 +36,13 @@ for i in range(1, N):
             break
         if i % j == 0:
             phi[i*j] = phi[i] * j
-            mobious[i*j] = 0
+            # mobious[i*j] = 0
             break
         phi[i*j] = phi[i] * (j-1)
-        mobious[i*j] = mobious[i] * mobious[j]
+        # mobious[i*j] = mobious[i] * mobious[j]
     
-    if N < int(1e6):
-        for j in range(i, N, i):
-            fact[j].append(i)
+    # for j in range(i, N, i):
+    #     fact[j].append(i)
 
 def getfact(x):
     res = defaultdict(int)

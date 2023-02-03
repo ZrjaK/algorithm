@@ -76,11 +76,11 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e5 + 10;
 
-class UnionFind {
-public:
-	int parent[N], size[N];
+struct UnionFind {
+    vi parent, size;
 	int part;
 	UnionFind (int n) : part(n) {
+        parent = vi(n), size = vi(n);
 		rep(i, 0, n) parent[i] = i, size[i] = 1;
 	};
 	~UnionFind() {}

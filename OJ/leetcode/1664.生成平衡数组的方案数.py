@@ -1,6 +1,6 @@
 # 题目：1664.生成平衡数组的方案数
 # 难度：MEDIUM
-# 最后提交：2022-07-19 19:16:15 +0800 CST
+# 最后提交：2023-01-28 01:25:01 +0800 CST
 # 语言：python3
 # 作者：ZrjaK
 
@@ -26,4 +26,3 @@ class Solution:
                     ans += 1
                 sumOdd += nums[i]
         return ans
-        

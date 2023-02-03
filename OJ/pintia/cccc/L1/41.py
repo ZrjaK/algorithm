@@ -1,0 +1,1 @@
+print(list(map(int, input().split())).index(250) + 1)

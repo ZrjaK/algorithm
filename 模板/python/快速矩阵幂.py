@@ -20,7 +20,7 @@ def powMatrix(m, p):
 def mulMatrix(m1, m2):
     res = [[0] * len(m2[0]) for _ in range(len(m1))]
     for i in range(len(m1)):
-        for j in range(len(m2[0])):
-            for k in range(len(m2)):
-                res[i][j] += m1[i][k] * m2[k][j]
+        for j in range(len(m2)):
+            for k in range(len(m2[0])):
+                res[i][k] += m1[i][j] * m2[j][k]
     return res

@@ -1,6 +1,6 @@
 # 题目：1129.颜色交替的最短路径
 # 难度：MEDIUM
-# 最后提交：2022-08-06 02:26:58 +0800 CST
+# 最后提交：2023-02-02 01:12:18 +0800 CST
 # 语言：python3
 # 作者：ZrjaK
 
@@ -31,4 +31,3 @@ class Solution:
                 if res[i][j] > 1e9:
                     res[i][j] = -1
         return [i[0] for i in res]
-            

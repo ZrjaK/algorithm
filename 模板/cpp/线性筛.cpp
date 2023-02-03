@@ -1,3 +1,5 @@
+#pragma GCC optimize("O3,unroll-loops")
+#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
@@ -118,18 +120,20 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e5 + 10;
+const int N = 1e6 + 10;
 
-int phi[N], pfact[N], mobious[N];
-vi primes, fact[N];
+int phi[N], pfact[N];
+// int mobious[N];
+vi primes;
+// vi fact[N];
 void init() {
     phi[1] = 1;
-    mobious[1] = 1;
+    // mobious[1] = 1;
     rep(i, 1, N) {
         if(!phi[i]) {
             primes.pb(i);
             phi[i] = i-1;
-            mobious[i] = -1;
+            // mobious[i] = -1;
             rep(j, 1, N) {
                 if(i * j >= N) break;
                 pfact[i*j] = i;
@@ -139,18 +143,18 @@ void init() {
             if(i * j >= N) break;
             if(i % j == 0) {
                 phi[i*j] = phi[i] * j;
-                mobious[i*j] = 0;
+                // mobious[i*j] = 0;
                 break;
             }
             phi[i*j] = phi[i] * (j - 1);
-            mobious[i*j] = mobious[i] * mobious[j];
+            // mobious[i*j] = mobious[i] * mobious[j];
         }
-        if(N < (int)1e6) for(int j = i; j < N; j += i) fact[j].pb(i);
+        // for(int j = i; j < N; j += i) fact[j].pb(i);
     }
 }
 
-unordered_map<int, int> getfact(int x) {
-    unordered_map<int, int> res;
+map<int, int> getfact(int x) {
+    map<int, int> res;
     while(x != 1) res[pfact[x]]++, x /= pfact[x];
     return res;
 }

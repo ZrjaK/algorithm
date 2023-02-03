@@ -1,3 +1,5 @@
+#pragma GCC optimize("O3,unroll-loops")
+#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long
@@ -39,10 +41,6 @@ using namespace std;
 #define endl "\n"
 mt19937 rng( chrono::steady_clock::now().time_since_epoch().count() );
 #define Ran(a, b) rng() % ( (b) - (a) + 1 ) + (a)
-template <class T>
-using pq = priority_queue<T>;
-template <class T>
-using pqg = priority_queue<T, vector<T>, greater<T> >;
 const i128 ONE = 1;
 istream &operator>>(istream &in, i128 &x) {
     string s;
@@ -78,16 +76,16 @@ ostream &operator<<(ostream &out, i128 x) {
     return out;
 }
 ll gcd(ll x,ll y) {
-	if(!x) return y;
-	if(!y) return x;
-	int t = __builtin_ctzll(x | y);
-	x >>= __builtin_ctzll(x);
-	do {
-		y >>= __builtin_ctzll(y);
-		if(x > y) swap(x, y);
-		y -= x;
-	} while(y);
-	return x<<t;
+    if(!x) return y;
+    if(!y) return x;
+    int t = __builtin_ctzll(x | y);
+    x >>= __builtin_ctzll(x);
+    do {
+        y >>= __builtin_ctzll(y);
+        if(x > y) swap(x, y);
+        y -= x;
+    } while(y);
+    return x<<t;
 }
 ll lcm(ll x, ll y) { return x * y / gcd(x, y); }
 ll exgcd(ll a, ll b, ll &x, ll &y) {
@@ -102,16 +100,51 @@ ll max(ll x, ll y) { return x > y ? x : y; }
 ll min(ll x, ll y) { return x < y ? x : y; }
 ll Mod(ll x, int mod) { return (x % mod + mod) % mod; }
 ll pow(ll x, ll y, ll mod){
-	ll res = 1, cur = x;
-	while (y) {
-		if (y & 1)	res = res * cur % mod;
-		cur = ONE * cur * cur % mod;
-		y >>= 1;
-	}
-	return res % mod;
+    ll res = 1, cur = x;
+    while (y) {
+        if (y & 1) res = res * cur % mod;
+        cur = ONE * cur * cur % mod;
+        y >>= 1;
+    }
+    return res % mod;
 }
 ll probabilityMod(ll x, ll y, ll mod) {
-	return x * pow(y, mod-2, mod) % mod;
+    return x * pow(y, mod-2, mod) % mod;
+}
+template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
+    for(auto it = begin(v); it != end(v); ++it) {
+        if(it == begin(v)) os << *it;
+        else os << " " << *it;
+    }
+    return os;
+}
+template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p) {
+    os << p.first << " " << p.second;
+    return os;
+}
+vvi getGraph(int n, int m, bool directed = false) {
+    vvi res(n);
+    rep(_, 0, m) {
+        int u, v;
+        cin >> u >> v;
+        u--, v--;
+        res[u].emplace_back(v);
+        if(!directed) res[v].emplace_back(u);
+    }
+    return res;
+}
+template <class T>
+vector<vector<pair<int, T>>> getWeightedGraph(int n, int m, bool directed = false) {
+    vector<vector<pair<int, T>> res(n);
+    rep(_, 0, m) {
+        int u, v;
+        T w;
+        cin >> u >> v >> w;
+        u--, v--;
+        res[u].emplace_back(v, w);
+        if(!directed) res[v].emplace_back(u, w);
+    }
+    return res;
 }
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
@@ -120,23 +153,22 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-int a[N];
-
 void solve() {
-	int n;
-	cin >> n;
-	rep(i, 0, n) cin >> a[i];
+    int n;
+    cin >> n;
+    vi a(n);
+    each(i, a) cin >> i;
 
 }
 
 signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
     int t = 1;
-	// cin >> t;
+    // cin >> t;
     while (t--) {
         solve();
     }
-	return 0;
+    return 0;
 }
