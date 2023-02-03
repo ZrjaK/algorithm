@@ -135,7 +135,7 @@ vvi getGraph(int n, int m, bool directed = false) {
 }
 template <class T>
 vector<vector<pair<int, T>>> getWeightedGraph(int n, int m, bool directed = false) {
-    vector<vector<pair<int, T>> res(n);
+    vector<vector<pair<int, T>>> res(n);
     rep(_, 0, m) {
         int u, v;
         T w;
