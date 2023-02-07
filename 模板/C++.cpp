@@ -1,11 +1,19 @@
 #pragma GCC optimize("O3,unroll-loops")
 #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
-using namespace std;
+#include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/hash_policy.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
+#include <ext/pb_ds/trie_policy.hpp>
+#include <ext/pb_ds/priority_queue.hpp>
+using namespace std;
+using namespace __gnu_cxx;
 using namespace __gnu_pbds;
 template <class T> using Tree = tree<T, null_type, less<T>, rb_tree_tag,tree_order_statistics_node_update>;
+using Trie = trie<string, null_type, trie_string_access_traits<>, pat_trie_tag, trie_prefix_search_node_update>;
+// template <class T> using heapq = __gnu_pbds::priority_queue<T, greater<T>, pairing_heap_tag>;
+template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define ll long long
 #define i128 __int128
 #define ld long double
@@ -40,6 +48,25 @@ template <class T> using Tree = tree<T, null_type, less<T>, rb_tree_tag,tree_ord
 #define endl "\n"
 mt19937 rng( chrono::steady_clock::now().time_since_epoch().count() );
 #define Ran(a, b) rng() % ( (b) - (a) + 1 ) + (a)
+struct custom_hash {
+    static uint64_t splitmix64(uint64_t x) {
+        // http://xorshift.di.unimi.it/splitmix64.c
+        x += 0x9e3779b97f4a7c15;
+        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
+        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
+        return x ^ (x >> 31);
+    }
+
+    size_t operator()(uint64_t x) const {
+        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+        return splitmix64(x + FIXED_RANDOM);
+    }
+
+    size_t operator()(pair<uint64_t,uint64_t> x) const {
+		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+		return splitmix64(x.first + FIXED_RANDOM) ^ (splitmix64(x.second + FIXED_RANDOM) >> 1);
+	}
+};
 const i128 ONE = 1;
 istream &operator>>(istream &in, i128 &x) {
     string s;
