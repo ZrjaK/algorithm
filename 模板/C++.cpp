@@ -2,6 +2,10 @@
 #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
 using namespace std;
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+template <class T> using Tree = tree<T, null_type, less<T>, rb_tree_tag,tree_order_statistics_node_update>;
 #define ll long long
 #define i128 __int128
 #define ld long double
@@ -11,33 +15,28 @@ using namespace std;
 #define pll pair<ll, ll>
 #define pdd pair<ld, ld>
 #define vi vector<int>
-#define vvi vector<vector<int> >
+#define vvi vector<vector<int>>
 #define vll vector<ll>
-#define vvll vector<vector<ll> >
+#define vvll vector<vector<ll>>
+#define vpii vector<vector<pii>>
+#define vpll vector<vector<pll>>
 #define lb lower_bound
 #define ub upper_bound
 #define pb push_back
 #define pf push_front
-#define ppf pop_front
 #define eb emplace_back
-#define mp make_pair
-#define mt make_tuple
 #define fi first
 #define se second
-#define rep(i, a, b) for(ll i = a; i < b; ++i)
-#define per(i, a, b) for(ll i = a; i > b; --i)
+#define rep(i, a, b) for(int i = a; i < b; ++i)
+#define per(i, a, b) for(int i = a; i > b; --i)
 #define each(x, v) for(auto& x: v)
-#define len(x) x.size()
+#define len(x) (int)x.size()
 #define elif else if
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
 #define mst(x, a) memset(x, a, sizeof(x))
-#ifndef lowbit
 #define lowbit(x) (x & (-x))
-#endif
 #define bitcnt(x) (__builtin_popcountll(x))
-#define _up(x) (int)ceil(1.0*x)
-#define _down(x) (int)floor(1.0*x)
 #define endl "\n"
 mt19937 rng( chrono::steady_clock::now().time_since_epoch().count() );
 #define Ran(a, b) rng() % ( (b) - (a) + 1 ) + (a)
@@ -75,6 +74,17 @@ ostream &operator<<(ostream &out, i128 x) {
     out << s;
     return out;
 }
+template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
+    for(auto it = begin(v); it != end(v); ++it) {
+        if(it == begin(v)) os << *it;
+        else os << " " << *it;
+    }
+    return os;
+}
+template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p) {
+    os << p.first << " " << p.second;
+    return os;
+}
 ll gcd(ll x,ll y) {
     if(!x) return y;
     if(!y) return x;
@@ -110,17 +120,6 @@ ll pow(ll x, ll y, ll mod){
 }
 ll probabilityMod(ll x, ll y, ll mod) {
     return x * pow(y, mod-2, mod) % mod;
-}
-template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
-    for(auto it = begin(v); it != end(v); ++it) {
-        if(it == begin(v)) os << *it;
-        else os << " " << *it;
-    }
-    return os;
-}
-template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p) {
-    os << p.first << " " << p.second;
-    return os;
 }
 vvi getGraph(int n, int m, bool directed = false) {
     vvi res(n);
