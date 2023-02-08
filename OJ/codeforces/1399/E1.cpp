@@ -184,11 +184,11 @@ void solve() {
     ld S;
     cin >> n >> S;
     vector<vpii> d(n, vpii());
-    vi c(n-1), ww(n-1);
+    vi ww(n-1);
     gp_hash_table<pii, int, custom_hash> no;
     rep(i, 0, n-1) {
         int u, v, w;
-        cin >> u >> v >> w >> c[i];
+        cin >> u >> v >> w;
         u--, v--;
         ww[i] = w;
         d[u].pb({v, w});
@@ -198,37 +198,32 @@ void solve() {
     }
     vi sz(n);
     vll h(n-1);
-    auto dfs = [&] (auto dfs, int i, int fa) -> void {
+    auto dfs = [&] (auto dfs, int i, int fa, int dep) -> void {
         sz[i] = len(d[i]) == 1;
         for (auto [j, w] : d[i]) {
             if (j == fa) continue;
-            dfs(dfs, j, i);
+            dfs(dfs, j, i, dep + 1);
             h[no[{i, j}]] += sz[j];
             sz[i] += sz[j];
         }
     };
-    dfs(dfs, 0, -1);
+    dfs(dfs, 0, -1, 1);
     ll s = 0;
-    vll cost1, cost2;
+    vll cost;
     rep(i, 0, n-1) {
         s += h[i] * ww[i];
         for ( ; ww[i]; ww[i] /= 2) {
-            if (c[i] == 1) cost1.pb(h[i] * (ww[i] - ww[i] / 2));
-            else cost2.pb(h[i] * (ww[i] - ww[i] / 2));
+            cost.pb(h[i] * (ww[i] - ww[i] / 2));
         }
     }
-    sort(rall(cost1));
-    sort(rall(cost2));
-    ll s1 = 0, s2 = accumulate(all(cost2), 0ll);
-    int ans = len(cost1) + 2 * len(cost2);
-    for (int i = 0, j = len(cost2); i <= len(cost1); i++) {
-        while (j && s1 + s2 - cost2[j-1] >= s - S) {
-            s2 -= cost2[--j];
+    sort(rall(cost));
+    ll s1 = 0;
+    int ans = len(cost);
+    for (int i = 0; i <= len(cost); i++) {
+        if (s1 >= s - S) {
+            ans = min(ans, i);
         }
-        if (s1 + s2 >= s - S) {
-            ans = min(ans, i + 2 * j);
-        }
-        if (i < len(cost1)) s1 += cost1[i];
+        if (i < len(cost)) s1 += cost[i];
     }
     cout << ans << endl;
     
