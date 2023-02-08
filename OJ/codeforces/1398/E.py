@@ -265,7 +265,7 @@ def solve():
             double.delete(-d)
         s += d
         m = len(tree[1])
-        x, y = double.kth_sum_big(m - 1), tree[1].kth_sum_big(m - 1)
+        x, y = double.kth_sum_big(m - 1), tree[1].sum
         if m and x == y:
             ans.append(s + x - tree[1].min + tree[0].max)
         else:
