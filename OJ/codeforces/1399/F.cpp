@@ -1,5 +1,5 @@
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+// #pragma GCC optimize("O3,unroll-loops")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
 #include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -177,13 +177,42 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 6e3 + 10;
+
+short c[N][N], dp[N][N];
+vi d[N];
 
 void solve() {
     int n;
     cin >> n;
-    vi a(n);
-    each(i, a) cin >> i;
+    vi nums;
+    vpii a(n);
+    each(i, a) cin >> i.fi >> i.se, nums.pb(i.fi), nums.pb(i.se);
+    sort(all(nums));
+    nums.erase(unique(all(nums)), nums.end());
+    int m = len(nums);
+    rep(i, 0, m) {
+        d[i].clear();
+        rep(j, 0, m) c[i][j] = dp[i][j] = 0;
+    }
+    rep(i, 0, n) {
+        a[i].fi = lb(all(nums), a[i].fi) - nums.begin();
+        a[i].se = lb(all(nums), a[i].se) - nums.begin();
+        d[a[i].fi].pb(a[i].se);
+        c[a[i].fi][a[i].se]++;
+    }
+    rep(i, 0, m) sort(all(d[i]));
+    per(i, m-1, -1) rep(j, i, m) {
+        if (i + 1 < m) dp[i][j] = max(dp[i][j], dp[i+1][j]);
+        if (j) dp[i][j] = max(dp[i][j], dp[i][j-1]);
+        each(k, d[i]) {
+            if (k >= j) break;
+            dp[i][j] = max(dp[i][j], dp[i][k] + dp[k+1][j]);
+        }
+        dp[i][j] += c[i][j];
+    }
+    cout << dp[0][m-1] << endl;
+
 
 }
 
@@ -192,7 +221,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

@@ -1,5 +1,5 @@
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+// #pragma GCC optimize("O3,unroll-loops")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
 #include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -181,10 +181,59 @@ const int N = 1e6 + 10;
 
 void solve() {
     int n;
-    cin >> n;
-    vi a(n);
-    each(i, a) cin >> i;
-
+    ld S;
+    cin >> n >> S;
+    vector<vpii> d(n, vpii());
+    vi c(n-1), ww(n-1);
+    gp_hash_table<pii, int, custom_hash> no;
+    rep(i, 0, n-1) {
+        int u, v, w;
+        cin >> u >> v >> w >> c[i];
+        u--, v--;
+        ww[i] = w;
+        d[u].pb({v, w});
+        d[v].pb({u, w});
+        no[{u, v}] = i;
+        no[{v, u}] = i;
+    }
+    vll h(n-1);
+    vi cnt(n);
+    auto dfs = [&] (auto dfs, int i, int fa) -> void {
+        cnt[i]++;
+        for (auto [j, w] : d[i]) {
+            if (j == fa) continue;
+            dfs(dfs, j, i);
+            h[no[{i, j}]] += cnt[j];
+            cnt[i] += cnt[j];
+        }
+    };
+    dfs(dfs, 0, -1);
+    ll s = 0;
+    vll cost1, cost2;
+    rep(i, 0, n-1) {
+        s += h[i] * ww[i];
+        if (c[i] == 1) cost1.pb(h[i] * (ww[i] - ww[i] / 2));
+        else cost2.pb(h[i] * (ww[i] - ww[i] / 2));
+    }
+    sort(all(cost1));
+    sort(all(cost2));
+    if (s <= S) {
+        cout << 0 << endl;
+        return;
+    }
+    ll s1 = 0, s2 = accumulate(all(cost2), 0ll);
+    int ans = len(cost1) + 2 * len(cost2);
+    for (int i = 0, j = len(cost2); i <= len(cost1); i++) {
+        while (j && s1 + s2 - cost2[j-1] >= s - S) {
+            s2 -= cost2[--j];
+        }
+        if (s1 + s2 >= s - S) {
+            ans = min(ans, i + 2 * j);
+        }
+        if (i < len(cost1)) s1 += cost1[i];
+    }
+    cout << ans << endl;
+    
 }
 
 signed main() {
@@ -192,7 +241,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }
