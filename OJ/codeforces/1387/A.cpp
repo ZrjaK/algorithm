@@ -1,5 +1,5 @@
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+// #pragma GCC optimize("O3,unroll-loops")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
 #include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -178,11 +178,42 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    int n;
-    cin >> n;
-    vi a(n);
-    each(i, a) cin >> i;
-
+    int n, m;
+    cin >> n >> m;
+    auto d = getWeightedGraph(n, m);
+    rep(i, 0, n) for (auto& [j, w] : d[i]) w *= 2;
+    vi vis(n), a(n), b(n), s;
+    int flag = 0, xx = 0;
+    auto dfs = [&] (auto dfs, int i) -> void {
+        vis[i] = 1;
+        s.pb(i);
+        for (auto [j, w] : d[i]) {
+            if (vis[j]) {
+                if (a[i] + a[j] == 0 && b[i] + b[j] != w) { cout << "NO" << endl; exit(0); }
+                if (a[i] + a[j]) {
+                    int nx = (w - b[i] - b[j]) / (a[i] + a[j]);
+                    if (flag) {
+                        if (nx != xx) { cout << "NO" << endl; exit(0); }
+                    } else flag = 1, xx = nx;
+                }
+            } else a[j] = -a[i], b[j] = w - b[i], dfs(dfs, j);
+        }
+    };
+    vi ans(n);
+    rep(i, 0, n) if (!vis[i]) {
+        a[i] = 1, b[i] = flag = 0, s.clear();
+        dfs(dfs, i);
+        vi h;
+        if (!flag) {
+            each(j, s) h.pb(-b[j] / a[j]);
+            sort(all(h));
+            xx = h[len(h)/2];
+        }
+        each(j, s) ans[j] = xx * a[j] + b[j];
+    }
+    cout << "YES" << endl;
+    each(i, ans) cout << 1.0 * i / 2 << " ";
+    cout << endl;
 }
 
 signed main() {

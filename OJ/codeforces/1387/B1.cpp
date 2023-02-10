@@ -1,5 +1,5 @@
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+// #pragma GCC optimize("O3,unroll-loops")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
 #include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -159,10 +159,12 @@ vvi getGraph(int n, int m, bool directed = false) {
     }
     return res;
 }
-vector<vpii> getWeightedGraph(int n, int m, bool directed = false) {
-    vector<vpii> res(n);
+template <class T>
+vector<vector<pair<int, T>>> getWeightedGraph(int n, int m, bool directed = false) {
+    vector<vector<pair<int, T>>> res(n);
     rep(_, 0, m) {
-        int u, v, w;
+        int u, v;
+        T w;
         cin >> u >> v >> w;
         u--, v--;
         res[u].emplace_back(v, w);
@@ -180,9 +182,26 @@ const int N = 1e6 + 10;
 void solve() {
     int n;
     cin >> n;
-    vi a(n);
-    each(i, a) cin >> i;
-
+    vvi d = getGraph(n, n-1);
+    ll ans = 0;
+    vi ansl(n, -1);
+    auto dfs = [&] (auto dfs, int i, int fa) -> void {
+        each(j, d[i]) {
+            if (j == fa) continue;
+            dfs(dfs, j, i);
+            if (ansl[i] == -1 && ansl[j] == -1) ansl[i] = j, ansl[j] = i;
+        }
+    };
+    dfs(dfs, 0, -1);
+    rep(i, 0, n) {
+        if (ansl[i] != -1) { ans++; continue; }
+        ans += 2;
+        int j = d[i][0];
+        ansl[i] = ansl[j], ansl[j] = i;
+    }
+    each(i, ansl) i++;
+    cout << ans << endl;
+    cout << ansl << endl;
 }
 
 signed main() {
