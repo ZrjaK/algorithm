@@ -108,6 +108,27 @@ template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
     }
     return os;
 }
+template <class T> ostream &operator<<(ostream &os, const set<T> &v) {
+    for(auto it = begin(v); it != end(v); ++it) {
+        if(it == begin(v)) os << *it;
+        else os << " " << *it;
+    }
+    return os;
+}
+template <class T> ostream &operator<<(ostream &os, const multiset<T> &v) {
+    for(auto it = begin(v); it != end(v); ++it) {
+        if(it == begin(v)) os << *it;
+        else os << " " << *it;
+    }
+    return os;
+}
+template <class T> ostream &operator<<(ostream &os, const Tree<T> &v) {
+    for(auto it = begin(v); it != end(v); ++it) {
+        if(it == begin(v)) os << *it;
+        else os << " " << *it;
+    }
+    return os;
+}
 template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p) {
     os << p.first << " " << p.second;
     return os;
