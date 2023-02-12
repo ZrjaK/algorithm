@@ -1,5 +1,5 @@
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+// #pragma GCC optimize("O3,unroll-loops")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
 #include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -10,7 +10,7 @@
 using namespace std;
 using namespace __gnu_cxx;
 using namespace __gnu_pbds;
-template <class T> using Tree = tree<T, null_type, less_equal<T>, rb_tree_tag,tree_order_statistics_node_update>;
+template <class T> using Tree = tree<T, null_type, less<T>, rb_tree_tag,tree_order_statistics_node_update>;
 using Trie = trie<string, null_type, trie_string_access_traits<>, pat_trie_tag, trie_prefix_search_node_update>;
 // template <class T> using heapq = __gnu_pbds::priority_queue<T, greater<T>, pairing_heap_tag>;
 template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
@@ -108,27 +108,6 @@ template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
     }
     return os;
 }
-template <class T> ostream &operator<<(ostream &os, const set<T> &v) {
-    for(auto it = begin(v); it != end(v); ++it) {
-        if(it == begin(v)) os << *it;
-        else os << " " << *it;
-    }
-    return os;
-}
-template <class T> ostream &operator<<(ostream &os, const multiset<T> &v) {
-    for(auto it = begin(v); it != end(v); ++it) {
-        if(it == begin(v)) os << *it;
-        else os << " " << *it;
-    }
-    return os;
-}
-template <class T> ostream &operator<<(ostream &os, const Tree<T> &v) {
-    for(auto it = begin(v); it != end(v); ++it) {
-        if(it == begin(v)) os << *it;
-        else os << " " << *it;
-    }
-    return os;
-}
 template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p) {
     os << p.first << " " << p.second;
     return os;
@@ -180,10 +159,12 @@ vvi getGraph(int n, int m, bool directed = false) {
     }
     return res;
 }
-vector<vpii> getWeightedGraph(int n, int m, bool directed = false) {
-    vector<vpii> res(n);
+template <class T>
+vector<vector<pair<int, T>>> getWeightedGraph(int n, int m, bool directed = false) {
+    vector<vector<pair<int, T>>> res(n);
     rep(_, 0, m) {
-        int u, v, w;
+        int u, v;
+        T w;
         cin >> u >> v >> w;
         u--, v--;
         res[u].emplace_back(v, w);
@@ -199,11 +180,52 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    int n;
-    cin >> n;
-    vi a(n);
-    each(i, a) cin >> i;
+    int n, m, k;
+    cin >> n >> m >> k;
+    vvi a(n, vi(m));
+    rep(i, 0, n) rep(j, 0, m) cin >> a[i][j];
+    vpii h(k);
+    rep(i, 0, k) cin >> h[i].fi >> h[i].se, h[i].fi--, h[i].se--;
+    auto bfs = [&] (int sx, int sy) ->vvi {
+        vpii q;
+        q.pb({sx, sy});
+        vvi dist(n, vi(m, INF));
+        dist[sx][sy] = 0;
+        rep(i, 0, len(q)) {
+            auto [x, y] = q[i];
+            for (auto [dx, dy] : {pii{1, 0}, pii{0, 1}, pii{-1, 0}, pii{0, -1}}) {
+                int nx = x + dx, ny = y + dy;
+                if (0<=nx && nx<n && 0<=ny && ny<m && a[nx][ny]) {
+                    if (dist[nx][ny] > dist[x][y] + 1) {
+                        dist[nx][ny] = dist[x][y] + 1;
+                        q.pb({nx, ny});
+                    }
+                }
+            }
+        }
+        return dist;
+    };
+    vvi dist1 = bfs(0, 0);
+    vvi dist2 = bfs(n-1, m-1);
+    int ans = dist1[n-1][m-1];
 
+    if (k) {
+        sort(all(h), [&] (const pii a, const pii b) {
+            return dist1[a.fi][a.se] < dist1[b.fi][b.se];
+        });
+        int d1 = dist1[h[0].fi][h[0].se];
+        vpii h1;
+        for (auto [x, y] : h) if (dist1[x][y] == d1) h1.pb({x, y});
+        sort(all(h), [&] (const pii a, const pii b) {
+            return dist2[a.fi][a.se] < dist2[b.fi][b.se];
+        });
+        int d2 = dist2[h[0].fi][h[0].se];
+        vpii h2;
+        for (auto [x, y] : h) if (dist2[x][y] == d2) h2.pb({x, y});
+        for (auto [x1, y1] : h1) for (auto [x2, y2] : h2)
+            ans = min(ans, dist1[x1][y1] + dist2[x2][y2] + int(a[x1][y1] != a[x2][y2]) + 1);
+    }
+    cout << (ans < n * m ? ans : -1) << endl;
 }
 
 signed main() {
