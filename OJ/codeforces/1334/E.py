@@ -112,10 +112,9 @@ def solve():
     def calc(x):
         pr = Counter(primefact(x))
         s = sum(pr.values())
-        res = 1
+        res = fac[s]
         for i in pr.values():
-            res = res * C(s, i) % MODD
-            s -= i
+            res = res * inv[i] % MODD
         return res
     ans = []
     for _ in range(II()):
