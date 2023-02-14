@@ -58,5 +58,4 @@ def primefact(n):
         return [p]
     left = primefact(p)
     right = primefact(n // p)
-    left += right
-    return sorted(left)
+    return sorted(left + right)
