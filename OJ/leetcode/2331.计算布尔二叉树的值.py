@@ -1,6 +1,6 @@
 # 题目：2331.计算布尔二叉树的值
 # 难度：EASY
-# 最后提交：2022-07-09 22:34:43 +0800 CST
+# 最后提交：2023-02-06 08:13:42 +0800 CST
 # 语言：python3
 # 作者：ZrjaK
 
@@ -23,4 +23,3 @@ class Solution:
                 return l and r
             
         return p(root)
-            
