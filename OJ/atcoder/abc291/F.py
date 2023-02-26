@@ -20,8 +20,33 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
+    n, m = LII()
+    s = [I() for _ in range(n)]
+    dist1 = [INF] * n
+    dist1[0] = 0
+    for i in range(n):
+        for j in range(m):
+            if s[i][j] == "1":
+                dist1[i + j + 1] = min(dist1[i + j + 1], dist1[i] + 1)
+    dist2 = [INF] * n
+    dist2[-1] = 0
+    for i in range(n-1, -1, -1):
+        for j in range(m):
+            if s[i][j] == "1":
+                dist2[i] = min(dist2[i], dist2[i + j + 1] + 1)
+    ans = [INF] * n
+    for i in range(n):
+        for j in range(m):
+            if s[i][j] == "1":
+                for k in range(i+1, i+j+1):
+                    ans[k] = min(ans[k], dist1[i] + dist2[i+j+1] + 1)
+    for i in range(n):
+        if ans[i] == INF:
+            ans[i] = -1
+    print(*ans[1:-1])
+    
+
+
     
 
 def main():

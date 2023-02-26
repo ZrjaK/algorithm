@@ -19,9 +19,46 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
+def topological_sort(E):
+    n = len(E)
+    ind = [0] * n
+    for i in range(n):
+        for j in E[i]:
+            ind[j] += 1
+    q = deque([i for i in range(n) if not ind[i]])
+    g = []
+    while q:
+        if len(q) > 1:
+            return []
+        i = q.popleft()
+        g.append(i)
+        for j in E[i]:
+            ind[j] -= 1
+            if not ind[j]:
+                q.append(j)
+    return g
+
 def solve():
-    n = II()
-    arr = LII()
+    n, m = LII()
+    d = getGraph(n, m, 1)
+    for i in range(n):
+        d[i] = sorted(set(d[i]))
+    ind = [0] * n
+    for i in range(n):
+        for j in d[i]:
+            ind[j] += 1
+    if ind.count(0) != 1:
+        return print("No")
+    g = topological_sort(d)
+    if len(g) != n:
+        return print("No")
+    ans = [0] * n
+    t = 1
+    for i in g:
+        ans[i] = t
+        t += 1
+    print("Yes")
+    print(*ans)
     
 
 def main():

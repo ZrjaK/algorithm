@@ -20,9 +20,22 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
-    
+    a = [int(i) for i in I()]
+    b = [int(i) for i in I()]
+    for i in range(len(a)):
+        for _  in range(1):
+            a[i] = (a[i] + 1) % 2
+            na = int("".join(map(str, a)), 2)
+            for j in range(len(b)):
+                for _ in range(2):
+                    b[j] = (b[j] + 1) % 3
+                    nb = int("".join(map(str, b)), 3)
+                    if na == nb:
+                        return print(na)
+                b[j] = (b[j] + 1) % 3
+        a[i] = (a[i] + 1) % 2
+        
+
 
 def main():
     t = 1
@@ -351,7 +364,6 @@ class IOWrapper(IOBase):
 sys.stdin = IOWrapper(sys.stdin)
 # sys.stdout = IOWrapper(sys.stdout)
 input = lambda: sys.stdin.readline().rstrip("\r\n")
-# input = BytesIO(os.read(0, os.fstat(0).st_size)).readline
 
 def I():
     return input()

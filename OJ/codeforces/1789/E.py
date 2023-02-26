@@ -22,11 +22,39 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 def solve():
     n = II()
     arr = LII()
+    s = arr[-1]
+    x = [0] * (s + 2)
+    for i in arr:
+        x[i] = 1
+    for i in range(s, -1, -1):
+        x[i] += x[i+1]
+    ll = rr = -1
+    ans = 0
+    f = 0
+    for i in range(1, s+1):
+        l, r = s // i, (s - 1) // i + 1
+        if not (l == ll and r == rr):
+            if l == r:
+                f = 0
+                for j in range(l, s+1, l):
+                    f += x[j] - x[j+1]
+            else:
+                f = x[min(s + 1, l * r + 1)]
+                k = 1
+                for j in range(r, l * r + 1, r):
+                    f += x[min(j - k, s + 1)] - x[min(j + 1, s + 1)]
+                    k += 1
+        ans += i * f
+        ans %= MODD
+        ll = l
+        rr = r
+    print(ans)
+
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 

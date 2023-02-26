@@ -22,6 +22,9 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 def solve():
     n = II()
     arr = LII()
+    arr.sort()
+    arr = arr[n:-n]
+    print(sum(arr) / (3 * n))
     
 
 def main():

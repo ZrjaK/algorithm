@@ -19,9 +19,57 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
+class DisjointSetUnion:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.num_sets = n
+ 
+    def find(self, a):
+        acopy = a
+        while a != self.parent[a]:
+            a = self.parent[a]
+        while acopy != a:
+            self.parent[acopy], acopy = a, self.parent[acopy]
+        return a
+ 
+    def union(self, a, b):
+        a, b = self.find(a), self.find(b)
+        if a != b:
+            if self.size[a] < self.size[b]:
+                a, b = b, a
+ 
+            self.num_sets -= 1
+            self.parent[b] = a
+            self.size[a] += self.size[b]
+ 
+    def set_size(self, a):
+        return self.size[self.find(a)]
+ 
+    def __len__(self):
+        return self.num_sets
+
 def solve():
-    n = II()
-    arr = LII()
+    n, m = LII()
+    dsu = DisjointSetUnion(n)
+    cur = set()
+    f = 1
+    for i in range(m):
+        x, y = LGMI()
+        if dsu.find(x) == dsu.find(y):
+            f += 1
+        cur.add(x)
+        cur.add(y)
+        dsu.union(x, y)
+        d = {}
+        for x in cur:
+            d[dsu.find(x)] = dsu.size[dsu.find(x)]
+        h = list(d.values())
+        h.sort()
+        ans = sum(h[-f:]) - 1
+        ans += max(0, f - len(h))
+        print(ans)
+
     
 
 def main():

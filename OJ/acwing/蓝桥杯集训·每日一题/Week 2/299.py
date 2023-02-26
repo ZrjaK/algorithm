@@ -1,14 +1,16 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, gc
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
 from itertools import accumulate, combinations, permutations, product
 from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
-from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
-from math import factorial, ceil, floor, gcd
+from bisect import bisect_left, bisect_right
+from math import factorial, gcd
 from operator import mul, xor
 from types import GeneratorType
+# if "PyPy" in sys.version:
+#     import pypyjit; pypyjit.set_param('max_unroll_recursion=-1')
 # sys.setrecursionlimit(2*10**5)
 BUFSIZE = 8192
 MOD = 10**9 + 7
@@ -18,23 +20,34 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n, r = LII()
-    h = []
-    for _ in range(n):
-        h.append(LII())
-    n, m = max(i[0] for i in h) + 1, max(i[1] for i in h) + 1
-    arr = [[0] * (m+10) for _ in range(n+10)]
-    for x, y, w in h:
-        arr[x][y] += w
+    n, m = LII()
+    arr = LII()
+    if max(arr) > m:
+        return print(-1)
+    dp = [0] * n
+    q = deque()
+    l = 0
+    sl = SortedList()
+    h = list(accumulate(arr)) + [0]
     for i in range(n):
-        for j in range(m):
-            arr[i][j] += arr[i-1][j] + arr[i][j-1] - arr[i-1][j-1]
-    ans = 0
-    for i in range(min(n-1, r-1), n):
-        for j in range(min(m-1, r-1), m):
-            ans = max(ans, arr[i][j]-arr[max(i-r, -1)][j]-arr[i][max(j-r, -1)]+arr[max(i-r, -1)][max(j-r, -1)])
-    print(ans)
-    return
+        while h[i] - h[l-1] > m:
+            if q and q[0] == l:
+                t = q.popleft()
+                if q:
+                    sl.remove(dp[t] + arr[q[0]])
+            l += 1
+        while q and arr[q[-1]] < arr[i]:
+            t = q.pop()
+            if q:
+                sl.remove(dp[q[-1]] + arr[t])
+        if q:
+            sl.add(dp[q[-1]] + arr[i])
+        q.append(i)
+        dp[i] = dp[l-1] + arr[q[0]]
+        if sl:
+            dp[i] = min(dp[i], sl[0])
+    print(dp[-1])
+    
 
 def main():
     t = 1
@@ -75,17 +88,6 @@ def lcm(x, y):
 def lowbit(x):
     return x & -x
 
-@bootstrap
-def exgcd(a: int, b: int):
-    if b == 0:
-        d, x, y = a, 1, 0
-    else:
-        (d, p, q) = yield exgcd(b, a % b)
-        x = q
-        y = p - q * (a // b)
- 
-    yield d, x, y
-
 def perm(n, r):
     return factorial(n) // factorial(n - r) if n >= r else 0
  
@@ -94,25 +96,6 @@ def comb(n, r):
 
 def probabilityMod(x, y, mod):
     return x * pow(y, mod-2, mod) % mod
-
-class UnionFind:
-    def __init__(self, n):
-        self.parent = list(range(n))
-        self.size = [1] * n
-        self.part = n
-
-    @bootstrap
-    def find(self, i):
-        if self.parent[i] != i:
-            self.parent[i] = yield self.find(self.parent[i])
-        yield self.parent[i]
-
-    def union(self, i, j):
-        x, y = self.find(i), self.find(j)
-        if x != y:
-            self.size[y] += self.size[x]
-            self.parent[x] = self.parent[y]
-            self.part -= 1
 
 class SortedList:
     def __init__(self, iterable=[], _load=200):
@@ -390,8 +373,10 @@ class IOWrapper(IOBase):
         self.read = lambda: self.buffer.read().decode("ascii")
         self.readline = lambda: self.buffer.readline().decode("ascii")
 
-sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
+sys.stdin = IOWrapper(sys.stdin)
+# sys.stdout = IOWrapper(sys.stdout)
 input = lambda: sys.stdin.readline().rstrip("\r\n")
+# input = BytesIO(os.read(0, os.fstat(0).st_size)).readline
 
 def I():
     return input()
@@ -413,6 +398,25 @@ def GMI():
 
 def LGMI():
     return list(map(lambda x: int(x) - 1, input().split()))
+
+def getGraph(n, m, directed=False):
+    d = [[] for _ in range(n)]
+    for _ in range(m):
+        u, v = LGMI()
+        d[u].append(v)
+        if not directed:
+            d[v].append(u)
+    return d
+
+def getWeightedGraph(n, m, directed=False):
+    d = [[] for _ in range(n)]
+    for _ in range(m):
+        u, v, w = LII()
+        u -= 1; v -= 1
+        d[u].append((v, w))
+        if not directed:
+            d[v].append((u, w))
+    return d
 
 if __name__ == "__main__":
     main()

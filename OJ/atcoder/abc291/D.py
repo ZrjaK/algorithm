@@ -21,7 +21,27 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
+    h = [LII() for _ in range(n)]
+    dp = [[0] * 2 for _ in range(n)]
+    dp[0] = [1, 1]
+    for i in range(1, n):
+        if h[i-1][0] != h[i][0]:
+            dp[i][0] += dp[i-1][0]
+        if h[i-1][1] != h[i][0]:
+            dp[i][0] += dp[i-1][1]
+        
+        if h[i-1][0] != h[i][1]:
+            dp[i][1] += dp[i-1][0]
+        if h[i-1][1] != h[i][1]:
+            dp[i][1] += dp[i-1][1]
+        
+            
+        dp[i][0] %= MODD
+        dp[i][1] %= MODD
+    print(sum(dp[-1]) % MODD)
+
+
+
     
 
 def main():

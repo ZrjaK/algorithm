@@ -21,7 +21,19 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
+    d = [0] + LII()
+    d[1:] = sorted([[v, i + 1] for i, v in enumerate(d[1:])], reverse=1)
+    h = [0] + [2 * i[1] for i in d[1:]]
+    for i in range(1, n):
+        print(h[i], h[i+1])
+    ans = []
+    for i in range(1, n+1):
+        x = h[i + d[i][0] - 1]
+        ans.append((2 * d[i][1] - 1, x))
+        if x == h[-1]:
+            h.append(2 * d[i][1] - 1)
+    for i in ans:
+        print(*i)
     
 
 def main():

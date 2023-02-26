@@ -21,7 +21,25 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
+    s = I()
+    x = y = 0
+    v = set()
+    v.add((x, y))
+    for i in s:
+        if i == "R":
+            y += 1
+        if i == "L":
+            y -= 1
+        if i == "D":
+            x += 1
+        if i == "U":
+            x -= 1
+        if (x, y) in v:
+            return print("Yes")
+        v.add((x, y))
+    print("No")
+        
+
     
 
 def main():

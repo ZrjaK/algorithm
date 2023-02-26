@@ -21,12 +21,22 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
+    s = I()
+    h = []
+    for i in range(n//2):
+        if s[i] != s[~i]:
+            h.append(i)
+    if not h:
+        return print("Yes")
+    if h[-1] - h[0] + 1 != len(h):
+        return print("No")
+    print("Yes")
+
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 

@@ -11,7 +11,7 @@ from operator import mul, xor
 from types import GeneratorType
 # if "PyPy" in sys.version:
 #     import pypyjit; pypyjit.set_param('max_unroll_recursion=-1')
-# sys.setrecursionlimit(2*10**5)
+# sys.setrecursionlimit(10**5)
 BUFSIZE = 8192
 MOD = 10**9 + 7
 MODD = 998244353
@@ -21,7 +21,29 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
+    arr = LI()
+    arr = arr[::-1]
+    ans = []
+    @bootstrap
+    def dfs():
+        nonlocal ans
+        if not arr:
+            exit(print("Error occurred"))
+        t = arr.pop()
+        if t == "pair":
+            ans.append("pair<")
+            yield dfs()
+            ans.append(",")
+            yield dfs()
+            ans.append(">")
+        else:
+            ans.append("int")
+        yield 0
+    dfs()
+    if arr:
+        return print("Error occurred")
+    print("".join(ans))
+
     
 
 def main():

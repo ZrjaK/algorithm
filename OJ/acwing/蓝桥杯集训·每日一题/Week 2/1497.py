@@ -21,7 +21,21 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
+    a = LII()
+    b = LII()
+    d = defaultdict(int)
+    def build(i, root, l, r):
+        if l > r:
+            return
+        t = b.index(a[root])
+        d[i] = a[root]
+        build(i << 1, root - 1 - (r - t), l, t - 1)
+        build(i << 1 | 1, root - 1, t + 1, r)
+    build(1, n-1, 0, n-1)
+    ans = []
+    for i in sorted(d):
+        ans.append(d[i])
+    print(*ans)
     
 
 def main():
@@ -351,7 +365,6 @@ class IOWrapper(IOBase):
 sys.stdin = IOWrapper(sys.stdin)
 # sys.stdout = IOWrapper(sys.stdout)
 input = lambda: sys.stdin.readline().rstrip("\r\n")
-# input = BytesIO(os.read(0, os.fstat(0).st_size)).readline
 
 def I():
     return input()

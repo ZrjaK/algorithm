@@ -20,8 +20,10 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
+    s = I()
+    for i in range(len(s)):
+        if ord(s[i]) < 97:
+            return print(i + 1)
     
 
 def main():

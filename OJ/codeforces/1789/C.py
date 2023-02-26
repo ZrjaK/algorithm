@@ -20,13 +20,31 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
+    n, m = LII()
     arr = LII()
+    h = [[] for _ in range(n+m+10)]
+    for i in arr:
+        h[i].append(0)
+    for i in range(1, m+1):
+        p, v = LII()
+        p -= 1
+        h[arr[p]].append(i)
+        arr[p] = v
+        h[v].append(i)
+    for i in arr:
+        h[i].append(m+1)
+    ans = m * (m + 1) * n
+    for lst in h:
+        s = 0
+        for i in range(0, len(lst), 2):
+            s += lst[i+1] - lst[i]
+        ans -= s * (s -1) // 2
+    print(ans)
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
