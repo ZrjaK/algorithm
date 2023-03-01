@@ -21,12 +21,6 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     x, y = LII()
-    if x == y:
-        if x % 2 == 0:
-            print("CHEFINA")
-        else:
-            print("CHEF")
-        return
     t = min(x, y)
     x -= t
     y -= t
