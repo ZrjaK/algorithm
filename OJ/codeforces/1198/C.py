@@ -20,51 +20,26 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n, m, k, q = LII()
-    a = [[] for _ in range(n)]
-    a[0].append(0)
-    for _ in range(k):
-        x, y = LGMI()
-        a[x].append(y)
-    for i in range(n):
-        a[i].sort()
-    while not a[-1]:
-        a.pop()
-    n = len(a)
-    b = sorted(LGMI())
-    def calc(pre, cur, j, k):
-        res = INF
-        t = bisect_left(b, a[pre][k])
-        if t < len(b):
-            res = min(res, abs(a[pre][k] - b[t]) + 
-                            abs(a[cur][~j] - b[t]) + 
-                            a[cur][-1] - a[cur][0])
-        if t:
-            res = min(res, abs(a[pre][k] - b[t-1]) + 
-                            abs(a[cur][~j] - b[t-1]) + 
-                            a[cur][-1] - a[cur][0])
-        return res
-        
-    dp = [[INF] * 2 for _ in range(n)]
-    dp[0][0] = a[0][-1] + a[0][-1] - a[0][0]
-    dp[0][1] = a[0][-1]
-    pre = 0
-    for i in range(1, n):
-        if a[i]:
-            for j in range(-1, 1):
-                for k in range(-1, 1):
-                    dp[i][j] = min(dp[i][j], dp[pre][k] + calc(pre, i, j, k) + i - pre)
-            pre = i
-    print(min(dp[-1]))
-    
-
-
-
+    n, m = LII()
+    v = set(range(1, 3*n+1))
+    e = []
+    for i in range(1, m+1):
+        x, y = LII()
+        if x in v and y in v:
+            v.remove(x)
+            v.remove(y)
+            e.append(i)
+    if len(v) >= n:
+        print("IndSet")
+        print(*list(v)[:n])
+    else:
+        print("Matching")
+        print(*e[:n])
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 

@@ -20,46 +20,65 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n, m, k, q = LII()
-    a = [[] for _ in range(n)]
-    a[0].append(0)
-    for _ in range(k):
-        x, y = LGMI()
-        a[x].append(y)
+    n, m, k = LII()
+    pq = []
+    for _ in range(m):
+        x, y, w = LII()
+        x -= 1; y -= 1
+        heappush(pq, (w, x, y))
+    d = [[] for _ in range(n)]
+    for _ in range(min(m, k)):
+        w, x, y = heappop(pq)
+        d[x].append((y, w))
+        d[y].append((x, w))
+    vis = [0] * n
+    def bfs(s):
+        q = [s]
+        vis[s] = 1
+        g = []
+        for i in q:
+            g.append(i)
+            for j, _ in d[i]:
+                if not vis[j]:
+                    vis[j] = 1
+                    q.append(j)
+        return g
+    def dis(s, g):
+        l = len(g)
+        f = {}
+        for i in range(l):
+            f[g[i]] = i
+        dist = [INF] * l
+        dist[f[s]] = 0
+        vis = [0] * l
+        pq = [(dist[f[s]], s)]
+        while pq:
+            s, i = heappop(pq)
+            ii = f[i]
+            if s != dist[ii]:
+                continue
+            vis[ii] = 1
+            for j, w in d[i]:
+                jj = f[j]
+                if not vis[jj] and dist[jj] > dist[ii] + w:
+                    dist[jj] = dist[ii] + w
+                    heappush(pq, (dist[jj], j))
+        return dist
+    ans = []
     for i in range(n):
-        a[i].sort()
-    while not a[-1]:
-        a.pop()
-    n = len(a)
-    b = sorted(LGMI())
-    def calc(pre, cur, j, k):
-        res = INF
-        t = bisect_left(b, a[pre][k])
-        if t < len(b):
-            res = min(res, abs(a[pre][k] - b[t]) + 
-                            abs(a[cur][~j] - b[t]) + 
-                            a[cur][-1] - a[cur][0])
-        if t:
-            res = min(res, abs(a[pre][k] - b[t-1]) + 
-                            abs(a[cur][~j] - b[t-1]) + 
-                            a[cur][-1] - a[cur][0])
-        return res
-        
-    dp = [[INF] * 2 for _ in range(n)]
-    dp[0][0] = a[0][-1] + a[0][-1] - a[0][0]
-    dp[0][1] = a[0][-1]
-    pre = 0
-    for i in range(1, n):
-        if a[i]:
-            for j in range(-1, 1):
-                for k in range(-1, 1):
-                    dp[i][j] = min(dp[i][j], dp[pre][k] + calc(pre, i, j, k) + i - pre)
-            pre = i
-    print(min(dp[-1]))
+        if not vis[i]:
+            g = bfs(i)
+            l = len(g)
+            for j in range(l):
+                dist = dis(g[j], g)
+                for m in range(j+1, l):
+                    heappush(ans, dist[m])
+    for _ in range(k-1):
+        heappop(ans)
+    print(ans[0])
+
     
-
-
-
+    
     
 
 def main():

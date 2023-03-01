@@ -19,45 +19,37 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
-def solve():
-    n, m, k, q = LII()
-    a = [[] for _ in range(n)]
-    a[0].append(0)
-    for _ in range(k):
-        x, y = LGMI()
-        a[x].append(y)
-    for i in range(n):
-        a[i].sort()
-    while not a[-1]:
-        a.pop()
-    n = len(a)
-    b = sorted(LGMI())
-    def calc(pre, cur, j, k):
-        res = INF
-        t = bisect_left(b, a[pre][k])
-        if t < len(b):
-            res = min(res, abs(a[pre][k] - b[t]) + 
-                            abs(a[cur][~j] - b[t]) + 
-                            a[cur][-1] - a[cur][0])
-        if t:
-            res = min(res, abs(a[pre][k] - b[t-1]) + 
-                            abs(a[cur][~j] - b[t-1]) + 
-                            a[cur][-1] - a[cur][0])
-        return res
-        
-    dp = [[INF] * 2 for _ in range(n)]
-    dp[0][0] = a[0][-1] + a[0][-1] - a[0][0]
-    dp[0][1] = a[0][-1]
-    pre = 0
+def z_function(s):
+    n = len(s)
+    z = [0] * n
+    l, r = 0, 0
     for i in range(1, n):
-        if a[i]:
-            for j in range(-1, 1):
-                for k in range(-1, 1):
-                    dp[i][j] = min(dp[i][j], dp[pre][k] + calc(pre, i, j, k) + i - pre)
-            pre = i
-    print(min(dp[-1]))
-    
+        if i <= r and z[i - l] < r - i + 1:
+            z[i] = z[i - l]
+        else:
+            z[i] = max(0, r - i + 1)
+            while i + z[i] < n and s[z[i]] == s[i + z[i]]:
+                z[i] += 1
+        if i + z[i] - 1 > r:
+            l = i
+            r = i + z[i] - 1
+    return z
 
+def solve():
+    n = II()
+    arr = LI()
+    ans = []
+    for i in arr:
+        i = list(i)
+        s = i + ans[-min(len(ans), len(i)):]
+        z = z_function(s)
+        for j in range(len(i), len(s)):
+            if j + z[j] == len(s):
+                ans += i[z[j]:]
+                break
+        else:
+            ans += i
+    print("".join(ans))
 
 
     

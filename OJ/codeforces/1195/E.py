@@ -20,46 +20,41 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n, m, k, q = LII()
-    a = [[] for _ in range(n)]
-    a[0].append(0)
-    for _ in range(k):
-        x, y = LGMI()
-        a[x].append(y)
+    n, m, a, b = LII()
+    g, x, y, z = LII()
+    h = []
+    t = []
+    for _ in range(n*m):
+        t.append(g)
+        g = (g * x + y) % z
+        if len(t) == m:
+            h.append(t)
+            t = []
+    mn = [[0] * m for _ in range(n)]
     for i in range(n):
-        a[i].sort()
-    while not a[-1]:
-        a.pop()
-    n = len(a)
-    b = sorted(LGMI())
-    def calc(pre, cur, j, k):
-        res = INF
-        t = bisect_left(b, a[pre][k])
-        if t < len(b):
-            res = min(res, abs(a[pre][k] - b[t]) + 
-                            abs(a[cur][~j] - b[t]) + 
-                            a[cur][-1] - a[cur][0])
-        if t:
-            res = min(res, abs(a[pre][k] - b[t-1]) + 
-                            abs(a[cur][~j] - b[t-1]) + 
-                            a[cur][-1] - a[cur][0])
-        return res
-        
-    dp = [[INF] * 2 for _ in range(n)]
-    dp[0][0] = a[0][-1] + a[0][-1] - a[0][0]
-    dp[0][1] = a[0][-1]
-    pre = 0
-    for i in range(1, n):
-        if a[i]:
-            for j in range(-1, 1):
-                for k in range(-1, 1):
-                    dp[i][j] = min(dp[i][j], dp[pre][k] + calc(pre, i, j, k) + i - pre)
-            pre = i
-    print(min(dp[-1]))
+        q = deque()
+        for j in range(m):
+            while q and q[0] <= j - b:
+                q.popleft()
+            while q and h[i][q[-1]] >= h[i][j]:
+                q.pop()
+            q.append(j)
+            mn[i][j] = h[i][q[0]]
+    ans = 0
+    for j in range(m):
+        q = deque()
+        for i in range(n):
+            while q and q[0] <= i - a:
+                q.popleft()
+            while q and mn[q[-1]][j] >= mn[i][j]:
+                q.pop()
+            q.append(i)
+            if i >= a-1 and j >= b-1:
+                ans += mn[q[0]][j]
+    print(ans)
+
+
     
-
-
-
     
 
 def main():

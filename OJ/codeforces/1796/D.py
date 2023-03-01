@@ -19,52 +19,43 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
-def solve():
-    n, m, k, q = LII()
-    a = [[] for _ in range(n)]
-    a[0].append(0)
-    for _ in range(k):
-        x, y = LGMI()
-        a[x].append(y)
-    for i in range(n):
-        a[i].sort()
-    while not a[-1]:
-        a.pop()
-    n = len(a)
-    b = sorted(LGMI())
-    def calc(pre, cur, j, k):
-        res = INF
-        t = bisect_left(b, a[pre][k])
-        if t < len(b):
-            res = min(res, abs(a[pre][k] - b[t]) + 
-                            abs(a[cur][~j] - b[t]) + 
-                            a[cur][-1] - a[cur][0])
-        if t:
-            res = min(res, abs(a[pre][k] - b[t-1]) + 
-                            abs(a[cur][~j] - b[t-1]) + 
-                            a[cur][-1] - a[cur][0])
-        return res
+class RangeQuery:
+    def __init__(self, data, func=min):
+        self.func = func
+        self._data = _data = [list(data)]
+        i, n = 1, len(_data[0])
+        while 2 * i <= n:
+            prev = _data[-1]
+            _data.append([func(prev[j], prev[j + i]) for j in range(n - 2 * i + 1)])
+            i <<= 1
+ 
+    def query(self, start, stop):
+        """func of data[start, stop)"""
+        depth = (stop - start).bit_length() - 1
+        return self.func(self._data[depth][start], self._data[depth][stop - (1 << depth)])
+ 
+    def __getitem__(self, idx):
+        return self._data[0][idx]
         
-    dp = [[INF] * 2 for _ in range(n)]
-    dp[0][0] = a[0][-1] + a[0][-1] - a[0][0]
-    dp[0][1] = a[0][-1]
-    pre = 0
-    for i in range(1, n):
-        if a[i]:
-            for j in range(-1, 1):
-                for k in range(-1, 1):
-                    dp[i][j] = min(dp[i][j], dp[pre][k] + calc(pre, i, j, k) + i - pre)
-            pre = i
-    print(min(dp[-1]))
-    
-
-
+def solve():
+    n, k, x = LII()
+    arr = LII()
+    arr = [i - x for i in arr]
+    h = [0] + list(accumulate(arr))
+    rmq = RangeQuery(h, min)
+    ans = 0
+    for i in range(k+1):
+        for j in range(n+1):
+            l, r = max(0, k - i - (n - j)), j - i
+            if l <= r:
+                ans = max(ans, h[j] - rmq.query(l, r+1) + 2 * i * x)
+    print(ans)
 
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
