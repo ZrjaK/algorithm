@@ -199,25 +199,45 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    int n;
-    cin >> n;
-    vector<string> a(n);
-    each(i, a) cin >> i;
-    ll ans = 0;
-    rep(ban, 0, 26) {
-        map<int, int> M1;
-        map<int, int> M2;
-        each(i, a) {
-            if (i.find(ban + 'a') != string::npos) continue;
-            int t = 0;
-            each(j, i) t ^= 1 << j - 'a';
-            int mask = (1 << 26) - 1 - (1 << ban);
-            if (len(i) % 2) ans += M2[mask ^ t], M1[t]++;
-            else ans += M1[mask ^ t], M2[t]++;
+    int m;
+    cin >> m;
+    ll base = rng(), p = 2333;
+    vvll M(m);
+    rep(i, 0, m) {
+        int n;
+        cin >> n;
+        vvi d(n+1, vi());
+        int root = -1;
+        rep(j, 1, n+1) {
+            int x;
+            cin >> x;
+            if (x) d[x].pb(j), d[j].pb(x);
+        }
+        auto dfs = [&] (auto dfs, int i, int fa) -> ll {
+            ll res = base;
+            vll h;
+            each(j, d[i]) {
+                if (j == fa) continue;
+                h.eb(dfs(dfs, j, i));
+            }
+            sort(all(h));
+            each(x, h) res = res * p + x;
+            return res * p;
+        };
+        vll h;
+        rep(x, 1, n+1) h.eb(dfs(dfs, x, -1));
+        sort(all(h));
+        M[i] = h;
+        rep(j, 0, i+1) {
+            if (len(M[i]) != len(M[j])) continue;
+            int f = 1;
+            rep(k, 0, len(h)) if (M[i][k] != M[j][k]) f = 0;
+            if (f) {
+                cout << j + 1 << endl;
+                break;
+            }
         }
     }
-    cout << ans << endl;
-
 }
 
 signed main() {
