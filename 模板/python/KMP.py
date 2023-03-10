@@ -9,3 +9,14 @@ def prefix_function(s):
             j += 1
         pi[i] = j
     return pi
+
+def kmp_automaton(s):
+    n = len(s)
+    s = [ord(i) - 97 for i in s]
+    nxt = [[0] * 26 for _ in range(n+1)]
+    j = 0
+    for i in range(1, n+1):
+        j = nxt[j][s[i-1]]
+        nxt[i-1][s[i-1]] = i
+        nxt[i] = deepcopy(nxt[j])
+    return nxt
