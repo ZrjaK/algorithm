@@ -196,147 +196,66 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
 
-struct SegTree_for_graph {
-    vector<vector<pair<int, int>>> G;
-    int rt1,rt2,tot;
-    int maxn;
-    vector<int> ls, rs;
-    vector<int> in, out;
-
-    SegTree_for_graph(int n) {
-        rt1 = rt2 = tot = 0;
-        maxn = n;
-        ls = vector<int>(maxn * 30);
-        rs = vector<int>(maxn * 30);
-        in = vector<int>(maxn * 30);
-        out = vector<int>(maxn * 30);
-        G = vector<vector<pair<int, int>>>(maxn * 30);
-        build_in(rt1, 1, maxn);
-        build_out(rt2, 1, maxn);
-        for (int i = 1; i <= n; i++) {
-            // _add(in[i], out[i], 0);
-            _add(out[i], in[i], 0);
-        }
+ll a[N], aans[N], cnt[N], cur;
+ll n, q, sq;
+struct query {
+    ll l, r, i;
+    bool operator<(const query &o) const {
+        if(l / sq != o.l / sq) return l < o.l;
+        if(l / sq & 1) return r < o.r;
+        else return r > o.r;
     }
+} Q[N];
 
-    void add(int u,int v,int val){
-        _add(in[u], out[v], val);
-    }
-
-    void _add(int u,int v,int val){
-        G[u].emplace_back(pair<int, int>{v, val});
-    }
-
-    #define ls ls[rt]
-    #define rs rs[rt]   
-
-    void build_in(int &rt,int l,int r){
-        rt=++tot;
-        if(l==r){
-            in[l]=rt;
-            return;
-        }
-
-        int mid=(l+r)>>1;
-        build_in(ls,l,mid);
-        build_in(rs,mid+1,r);
- 
-        _add(ls,rt,0);_add(rs,rt,0);
-    }
-
-    void build_out(int &rt,int l,int r){
-        rt=++tot;
-        if(l==r){
-            out[l]=rt;
-            return;
-        }
-
-        int mid=(l+r)>>1;
-        build_out(ls,l,mid);
-        build_out(rs,mid+1,r);
- 
-        _add(rt,ls,0);_add(rt,rs,0);
-    }
-
-    // 区间到点
-    // st.modify_in(l, r, v, w);
-    void modify_in(int ql, int qr, int pos, int val) {
-        _modify_in(rt1, 1, maxn, ql, qr, out[pos], val);
-    }
-
-    void _modify_in(int rt,int l,int r,int ql,int qr,int pos,int val){
-        if(ql>r||qr<l)return;
-        if(ql<=l&&qr>=r){
-            _add(rt,pos,val);
-            return;
-        }
-        int mid=(l+r)>>1;
-        _modify_in(ls,l,mid,ql,qr,pos,val);
-        _modify_in(rs,mid+1,r,ql,qr,pos,val);
-    }
-
-
-    // 点到区间
-    // st.modify_out(l, r, u, w);
-    void modify_out(int ql, int qr, int pos, int val) {
-        _modify_out(rt2, 1, maxn, ql, qr, in[pos], val);
-    }
-    void _modify_out(int rt,int l,int r,int ql,int qr,int pos,int val){
-        if(ql>r||qr<l)return;
-        if(ql<=l&&qr>=r){
-            _add(pos,rt,val);
-            return;
-        }
-        int mid=(l+r)>>1;
-        _modify_out(ls,l,mid,ql,qr,pos,val);
-        _modify_out(rs,mid+1,r,ql,qr,pos,val);
-    }
-};
+ll calc[N];
 
 void solve() {
-    int n, m, s;
-    cin >> n >> m >> s;
-    SegTree_for_graph st(n);
-    rep(_, 0, m) {
-        int op;
-        cin >> op;
-        if (op == 1) {
-            int u, v, w;
-            cin >> u >> v >> w;
-            st.add(u, v, w);
+	cin >> n >> q;
+    sq = sqrt(n);
+	rep(i, 1, n+1) cin >> a[i];
+    rep(i, 0, q) cin >> Q[i].l >> Q[i].r, Q[i].i = i;
+    sort(Q, Q+q);
+    int l = 1, r = 0;
+    ll ans = 0;
+    rep(i, 0, q) {
+        while(l < Q[i].l) {
+            ans -= calc[a[l]];
+            --cnt[a[l]];
+            if (cnt[a[l]] >= 3) calc[a[l]] = ONE * cnt[a[l]] * (cnt[a[l]] - 1) * (cnt[a[l]] - 2) / 6;
+            else calc[a[l]] = 0;
+            ans += calc[a[l]];
+            l++;
         }
-        if (op == 2) {
-            int u, l, r, w;
-            cin >> u >> l >> r >> w;
-            st.modify_out(l, r, u, w);
+        while(l > Q[i].l) {
+            l--;
+            ans -= calc[a[l]];
+            cnt[a[l]]++;
+            if (cnt[a[l]] >= 3) calc[a[l]] = ONE * cnt[a[l]] * (cnt[a[l]] - 1) * (cnt[a[l]] - 2) / 6;
+            else calc[a[l]] = 0;
+            ans += calc[a[l]];
         }
-        if(op==3){
-            int v, l, r, w;
-            cin >> v >> l >> r >> w;
-            st.modify_in(l, r, v, w);
+        while(r < Q[i].r) {
+            r++;
+            ans -= calc[a[r]];
+            cnt[a[r]]++;
+            if (cnt[a[r]] >= 3) calc[a[r]] = ONE * cnt[a[r]] * (cnt[a[r]] - 1) * (cnt[a[r]] - 2) / 6;
+            else calc[a[r]] = 0;
+            ans += calc[a[r]];
         }
+        while(r > Q[i].r) {
+            ans -= calc[a[r]];
+            cnt[a[r]]--;
+            if (cnt[a[r]] >= 3) calc[a[r]] = ONE * cnt[a[r]] * (cnt[a[r]] - 1) * (cnt[a[r]] - 2) / 6;
+            else calc[a[r]] = 0;
+            ans += calc[a[r]];
+            r--;
+        }
+        aans[Q[i].i] = ans;
     }
-    auto& d = st.G;
-    heapq<pair<ll, int>> pq;
-    vll dist(n * 30, LINF);
-    dist[st.out[s]] = dist[st.in[s]] = 0;
-    pq.push({0, st.in[s]});
-    while (!pq.empty()) {
-        auto [_, i] = pq.top();
-        pq.pop();
-        if (_ != dist[i]) continue;
-        for (auto& [j, w] : d[i]) {
-            if (dist[j] > dist[i] + w) {
-                dist[j] = dist[i] + w;
-                pq.push({dist[j], j});
-            }
-        }
-    }
-    rep(i, 1, n + 1) {
-        cout << (dist[st.out[i]] != LINF ? dist[st.out[i]] : -1) << " \n"[i==n];
-    }
+    rep(i, 0, q) cout << aans[i] << endl;
+
 }
 
 signed main() {

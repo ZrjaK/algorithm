@@ -1,6 +1,6 @@
 # 题目：2347.最好的扑克手牌
 # 难度：EASY
-# 最后提交：2022-07-23 22:57:14 +0800 CST
+# 最后提交：2023-02-20 09:35:59 +0800 CST
 # 语言：python3
 # 作者：ZrjaK
 
@@ -15,4 +15,3 @@ class Solution:
             if ranks.count(i) == 2:
                 return "Pair"
         return "High Card"
-    

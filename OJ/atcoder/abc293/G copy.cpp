@@ -196,147 +196,92 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 2e5 + 10;
 
-struct SegTree_for_graph {
-    vector<vector<pair<int, int>>> G;
-    int rt1,rt2,tot;
-    int maxn;
-    vector<int> ls, rs;
-    vector<int> in, out;
-
-    SegTree_for_graph(int n) {
-        rt1 = rt2 = tot = 0;
-        maxn = n;
-        ls = vector<int>(maxn * 30);
-        rs = vector<int>(maxn * 30);
-        in = vector<int>(maxn * 30);
-        out = vector<int>(maxn * 30);
-        G = vector<vector<pair<int, int>>>(maxn * 30);
-        build_in(rt1, 1, maxn);
-        build_out(rt2, 1, maxn);
-        for (int i = 1; i <= n; i++) {
-            // _add(in[i], out[i], 0);
-            _add(out[i], in[i], 0);
-        }
-    }
-
-    void add(int u,int v,int val){
-        _add(in[u], out[v], val);
-    }
-
-    void _add(int u,int v,int val){
-        G[u].emplace_back(pair<int, int>{v, val});
-    }
-
-    #define ls ls[rt]
-    #define rs rs[rt]   
-
-    void build_in(int &rt,int l,int r){
-        rt=++tot;
-        if(l==r){
-            in[l]=rt;
-            return;
-        }
-
-        int mid=(l+r)>>1;
-        build_in(ls,l,mid);
-        build_in(rs,mid+1,r);
+template <class T, class S>
+inline bool chmax(T &a, const S &b) {
+  return (a < b ? a = b, 1 : 0);
+}
+struct Mo {
+  vector<pair<int, int>> LR;
+  void add(int L, int R) { LR.emplace_back(L, R); }
  
-        _add(ls,rt,0);_add(rs,rt,0);
-    }
-
-    void build_out(int &rt,int l,int r){
-        rt=++tot;
-        if(l==r){
-            out[l]=rt;
-            return;
-        }
-
-        int mid=(l+r)>>1;
-        build_out(ls,l,mid);
-        build_out(rs,mid+1,r);
+  vector<int> get_mo_order() {
+    int N = 1;
+    for (auto &&[l, r]: LR) chmax(N, l), chmax(N, r);
+    int Q = len(LR);
+    int bs = N / min<int>(N, sqrt(Q));
+    vector<int> I(Q);
+    iota(all(I), 0);
+    sort(all(I), [&](int a, int b) {
+      int aa = LR[a].fi / bs, bb = LR[b].fi / bs;
+      if (aa != bb) return aa < bb;
+      return (aa & 1) ? LR[a].se > LR[b].se : LR[a].se < LR[b].se;
+    });
  
-        _add(rt,ls,0);_add(rt,rs,0);
+    auto cost = [&](int a, int b) -> int {
+      return abs(LR[I[a]].fi - LR[I[b]].fi) + abs(LR[I[a]].se - LR[I[b]].se);
+    };
+ 
+    // ランダムケースで数パーセント
+    for (int k = 0; k < Q - 5; k++) {
+      if (cost(k, k + 2) + cost(k + 1, k + 3)
+          < cost(k, k + 1) + cost(k + 2, k + 3)) {
+        swap(I[k + 1], I[k + 2]);
+      }
+      if (cost(k, k + 3) + cost(k + 1, k + 4)
+          < cost(k, k + 1) + cost(k + 3, k + 4)) {
+        swap(I[k + 1], I[k + 3]);
+      }
     }
-
-    // 区间到点
-    // st.modify_in(l, r, v, w);
-    void modify_in(int ql, int qr, int pos, int val) {
-        _modify_in(rt1, 1, maxn, ql, qr, out[pos], val);
+    return I;
+  }
+ 
+  template <typename F1, typename F2, typename F3, typename F4, typename F5>
+  void calc(F1 add_l, F2 add_r, F3 rm_l, F4 rm_r, F5 query) {
+    auto I = get_mo_order();
+    int l = 0, r = 0;
+    for (auto idx: I) {
+      while (l > LR[idx].fi) add_l(--l);
+      while (r < LR[idx].se) add_r(r++);
+      while (l < LR[idx].fi) rm_l(l++);
+      while (r > LR[idx].se) rm_r(--r);
+      query(idx);
     }
-
-    void _modify_in(int rt,int l,int r,int ql,int qr,int pos,int val){
-        if(ql>r||qr<l)return;
-        if(ql<=l&&qr>=r){
-            _add(rt,pos,val);
-            return;
-        }
-        int mid=(l+r)>>1;
-        _modify_in(ls,l,mid,ql,qr,pos,val);
-        _modify_in(rs,mid+1,r,ql,qr,pos,val);
-    }
-
-
-    // 点到区间
-    // st.modify_out(l, r, u, w);
-    void modify_out(int ql, int qr, int pos, int val) {
-        _modify_out(rt2, 1, maxn, ql, qr, in[pos], val);
-    }
-    void _modify_out(int rt,int l,int r,int ql,int qr,int pos,int val){
-        if(ql>r||qr<l)return;
-        if(ql<=l&&qr>=r){
-            _add(pos,rt,val);
-            return;
-        }
-        int mid=(l+r)>>1;
-        _modify_out(ls,l,mid,ql,qr,pos,val);
-        _modify_out(rs,mid+1,r,ql,qr,pos,val);
-    }
+  }
 };
 
 void solve() {
-    int n, m, s;
-    cin >> n >> m >> s;
-    SegTree_for_graph st(n);
-    rep(_, 0, m) {
-        int op;
-        cin >> op;
-        if (op == 1) {
-            int u, v, w;
-            cin >> u >> v >> w;
-            st.add(u, v, w);
-        }
-        if (op == 2) {
-            int u, l, r, w;
-            cin >> u >> l >> r >> w;
-            st.modify_out(l, r, u, w);
-        }
-        if(op==3){
-            int v, l, r, w;
-            cin >> v >> l >> r >> w;
-            st.modify_in(l, r, v, w);
-        }
+    int n, q;
+    cin >> n >> q;
+    vi a(n);
+    each(i, a) cin >> i;
+    Mo mo;
+    rep(_, 0, q) {
+        int l, r;
+        cin >> l >> r;
+        mo.add(--l, r);
     }
-    auto& d = st.G;
-    heapq<pair<ll, int>> pq;
-    vll dist(n * 30, LINF);
-    dist[st.out[s]] = dist[st.in[s]] = 0;
-    pq.push({0, st.in[s]});
-    while (!pq.empty()) {
-        auto [_, i] = pq.top();
-        pq.pop();
-        if (_ != dist[i]) continue;
-        for (auto& [j, w] : d[i]) {
-            if (dist[j] > dist[i] + w) {
-                dist[j] = dist[i] + w;
-                pq.push({dist[j], j});
-            }
-        }
-    }
-    rep(i, 1, n + 1) {
-        cout << (dist[st.out[i]] != LINF ? dist[st.out[i]] : -1) << " \n"[i==n];
-    }
+    vll F(n + 1);
+    rep(i, 3, n + 1) F[i] = ONE * i * (i - 1) * (i - 2) / 6;
+    vll cnt(N);
+    ll ans = 0;
+    vll ANS(q);
+    auto add = [&] (int i) -> void {
+        ans -= F[cnt[a[i]]];
+        cnt[a[i]]++;
+        ans += F[cnt[a[i]]];
+    };
+    auto rm = [&] (int i) -> void {
+        ans -= F[cnt[a[i]]];
+        cnt[a[i]]--;
+        ans += F[cnt[a[i]]];
+    };
+    auto calc = [&] (int i) -> void {
+        ANS[i] = ans;
+    };
+    mo.calc(add, add, rm, rm, calc);
+    each(i, ANS) cout << i << endl;
 }
 
 signed main() {

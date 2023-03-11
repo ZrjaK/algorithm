@@ -46,6 +46,8 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define lowbit(x) (x & (-x))
 #define bitcnt(x) (__builtin_popcountll(x))
 #define endl "\n"
+#define MIN(v) *min_element(all(v))
+#define MAX(v) *max_element(all(v))
 mt19937 rng( chrono::steady_clock::now().time_since_epoch().count() );
 #define Ran(a, b) rng() % ( (b) - (a) + 1 ) + (a)
 struct custom_hash {

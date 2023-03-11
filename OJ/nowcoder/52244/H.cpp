@@ -4,14 +4,13 @@
 #include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/hash_policy.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
 #include <ext/pb_ds/trie_policy.hpp>
 #include <ext/pb_ds/priority_queue.hpp>
 using namespace std;
 using namespace __gnu_cxx;
-using namespace __gnu_pbds;
-template <class T> using Tree = tree<T, null_type, less_equal<T>, rb_tree_tag,tree_order_statistics_node_update>;
-using Trie = trie<string, null_type, trie_string_access_traits<>, pat_trie_tag, trie_prefix_search_node_update>;
+// using namespace __gnu_pbds;
+// template <class T> using Tree = tree1<T, null_type, less_equal<T>, rb_tree1_tag,tree1_order_statistics_node_update>;
+// using Trie = trie<string, null_type, trie_string_access_traits<>, pat_trie_tag, trie_prefix_search_node_update>;
 // template <class T> using heapq = __gnu_pbds::priority_queue<T, greater<T>, pairing_heap_tag>;
 template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define ll long long
@@ -122,13 +121,13 @@ template <class T> ostream &operator<<(ostream &os, const multiset<T> &v) {
     }
     return os;
 }
-template <class T> ostream &operator<<(ostream &os, const Tree<T> &v) {
-    for(auto it = begin(v); it != end(v); ++it) {
-        if(it == begin(v)) os << *it;
-        else os << " " << *it;
-    }
-    return os;
-}
+// template <class T> ostream &operator<<(ostream &os, const Tree<T> &v) {
+//     for(auto it = begin(v); it != end(v); ++it) {
+//         if(it == begin(v)) os << *it;
+//         else os << " " << *it;
+//     }
+//     return os;
+// }
 template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p) {
     os << p.first << " " << p.second;
     return os;
@@ -196,147 +195,97 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 1e5 + 10;
 
-struct SegTree_for_graph {
-    vector<vector<pair<int, int>>> G;
-    int rt1,rt2,tot;
-    int maxn;
-    vector<int> ls, rs;
-    vector<int> in, out;
+ll tree1[N<<1], tree2[N<<1];
+ll mark1[N<<1], mark2[N<<1];
 
-    SegTree_for_graph(int n) {
-        rt1 = rt2 = tot = 0;
-        maxn = n;
-        ls = vector<int>(maxn * 30);
-        rs = vector<int>(maxn * 30);
-        in = vector<int>(maxn * 30);
-        out = vector<int>(maxn * 30);
-        G = vector<vector<pair<int, int>>>(maxn * 30);
-        build_in(rt1, 1, maxn);
-        build_out(rt2, 1, maxn);
-        for (int i = 1; i <= n; i++) {
-            // _add(in[i], out[i], 0);
-            _add(out[i], in[i], 0);
-        }
+void update1(int l, int r, int d)
+{
+    int len = 1, cntl = 0, cntr = 0; // cntl、cntr是左、右两边分别实际修改的区间长度
+    for (l += N - 1, r += N + 1; l ^ r ^ 1; l >>= 1, r >>= 1, len <<= 1)
+    {
+        tree1[l] += cntl * d, tree1[r] += cntr * d;
+        if (~l & 1) tree1[l ^ 1] += d * len, mark1[l ^ 1] += d, cntl += len;
+        if (r & 1) tree1[r ^ 1] += d * len, mark1[r ^ 1] += d, cntr += len;
     }
+    for (; l; l >>= 1, r >>= 1)
+        tree1[l] += cntl * d, tree1[r] += cntr * d;
+}
 
-    void add(int u,int v,int val){
-        _add(in[u], out[v], val);
+ll query1(int l, int r)
+{
+    ll ans = 0, len = 1, cntl = 0, cntr = 0;
+    for (l += N - 1, r += N + 1; l ^ r ^ 1; l >>= 1, r >>= 1, len <<= 1)
+    {
+        ans += cntl * mark1[l] + cntr * mark1[r];
+        if (~l & 1) ans += tree1[l ^ 1], cntl += len;
+        if (r & 1) ans += tree1[r ^ 1], cntr += len;
     }
+    for (; l; l >>= 1, r >>= 1)
+        ans += cntl * mark1[l] + cntr * mark1[r];
+    return ans;
+}
 
-    void _add(int u,int v,int val){
-        G[u].emplace_back(pair<int, int>{v, val});
+void update2(int l, int r, int d)
+{
+    int len = 1, cntl = 0, cntr = 0; // cntl、cntr是左、右两边分别实际修改的区间长度
+    for (l += N - 1, r += N + 1; l ^ r ^ 1; l >>= 1, r >>= 1, len <<= 1)
+    {
+        tree2[l] += cntl * d, tree2[r] += cntr * d;
+        if (~l & 1) tree2[l ^ 1] += d * len, mark2[l ^ 1] += d, cntl += len;
+        if (r & 1) tree2[r ^ 1] += d * len, mark2[r ^ 1] += d, cntr += len;
     }
+    for (; l; l >>= 1, r >>= 1)
+        tree2[l] += cntl * d, tree2[r] += cntr * d;
+}
 
-    #define ls ls[rt]
-    #define rs rs[rt]   
-
-    void build_in(int &rt,int l,int r){
-        rt=++tot;
-        if(l==r){
-            in[l]=rt;
-            return;
-        }
-
-        int mid=(l+r)>>1;
-        build_in(ls,l,mid);
-        build_in(rs,mid+1,r);
- 
-        _add(ls,rt,0);_add(rs,rt,0);
+ll query2(int l, int r)
+{
+    ll ans = 0, len = 1, cntl = 0, cntr = 0;
+    for (l += N - 1, r += N + 1; l ^ r ^ 1; l >>= 1, r >>= 1, len <<= 1)
+    {
+        ans += cntl * mark2[l] + cntr * mark2[r];
+        if (~l & 1) ans += tree2[l ^ 1], cntl += len;
+        if (r & 1) ans += tree2[r ^ 1], cntr += len;
     }
-
-    void build_out(int &rt,int l,int r){
-        rt=++tot;
-        if(l==r){
-            out[l]=rt;
-            return;
-        }
-
-        int mid=(l+r)>>1;
-        build_out(ls,l,mid);
-        build_out(rs,mid+1,r);
- 
-        _add(rt,ls,0);_add(rt,rs,0);
-    }
-
-    // 区间到点
-    // st.modify_in(l, r, v, w);
-    void modify_in(int ql, int qr, int pos, int val) {
-        _modify_in(rt1, 1, maxn, ql, qr, out[pos], val);
-    }
-
-    void _modify_in(int rt,int l,int r,int ql,int qr,int pos,int val){
-        if(ql>r||qr<l)return;
-        if(ql<=l&&qr>=r){
-            _add(rt,pos,val);
-            return;
-        }
-        int mid=(l+r)>>1;
-        _modify_in(ls,l,mid,ql,qr,pos,val);
-        _modify_in(rs,mid+1,r,ql,qr,pos,val);
-    }
-
-
-    // 点到区间
-    // st.modify_out(l, r, u, w);
-    void modify_out(int ql, int qr, int pos, int val) {
-        _modify_out(rt2, 1, maxn, ql, qr, in[pos], val);
-    }
-    void _modify_out(int rt,int l,int r,int ql,int qr,int pos,int val){
-        if(ql>r||qr<l)return;
-        if(ql<=l&&qr>=r){
-            _add(pos,rt,val);
-            return;
-        }
-        int mid=(l+r)>>1;
-        _modify_out(ls,l,mid,ql,qr,pos,val);
-        _modify_out(rs,mid+1,r,ql,qr,pos,val);
-    }
-};
+    for (; l; l >>= 1, r >>= 1)
+        ans += cntl * mark2[l] + cntr * mark2[r];
+    return ans;
+}
 
 void solve() {
-    int n, m, s;
-    cin >> n >> m >> s;
-    SegTree_for_graph st(n);
-    rep(_, 0, m) {
-        int op;
-        cin >> op;
-        if (op == 1) {
-            int u, v, w;
-            cin >> u >> v >> w;
-            st.add(u, v, w);
-        }
-        if (op == 2) {
-            int u, l, r, w;
-            cin >> u >> l >> r >> w;
-            st.modify_out(l, r, u, w);
-        }
-        if(op==3){
-            int v, l, r, w;
-            cin >> v >> l >> r >> w;
-            st.modify_in(l, r, v, w);
-        }
+    int n, m;
+    cin >> n >> m;
+    vi a(n);
+    each(i, a) cin >> i;
+    set<int> S;
+    vi vis(n);
+    rep(i, 0, n) {
+        update2(i, i, a[i]);
+        if (a[i] >= 10) S.insert(i);
+        if (a[i] < 100) update1(i, i, 1), vis[i] = 1;
     }
-    auto& d = st.G;
-    heapq<pair<ll, int>> pq;
-    vll dist(n * 30, LINF);
-    dist[st.out[s]] = dist[st.in[s]] = 0;
-    pq.push({0, st.in[s]});
-    while (!pq.empty()) {
-        auto [_, i] = pq.top();
-        pq.pop();
-        if (_ != dist[i]) continue;
-        for (auto& [j, w] : d[i]) {
-            if (dist[j] > dist[i] + w) {
-                dist[j] = dist[i] + w;
-                pq.push({dist[j], j});
+    rep(_, 0, m) {
+        int op, l, r;
+        cin >> op >> l >> r;
+        l--, r--;
+        if (op == 1) {
+            auto t = S.lb(l);
+            while (t != S.end() && *t <= r) {
+                int i = *t;
+                auto nxt = next(t);
+                update2(i, i, -((a[i] - 1) / 3 + 1));
+                a[i] -= (a[i] - 1) / 3 + 1;
+                if (a[i] < 100 && !vis[i]) update1(i, i, 1), vis[i] = 1;
+                if (a[i] < 10) S.erase(t);
+                t = nxt;
             }
         }
+        if (op == 2) cout << query1(l, r) << endl;
+        if (op == 3) cout << query2(l, r) << endl;
     }
-    rep(i, 1, n + 1) {
-        cout << (dist[st.out[i]] != LINF ? dist[st.out[i]] : -1) << " \n"[i==n];
-    }
+
 }
 
 signed main() {
