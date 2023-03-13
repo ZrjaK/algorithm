@@ -1,5 +1,5 @@
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+// #pragma GCC optimize("O3,unroll-loops")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
 #include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -48,6 +48,25 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define endl "\n"
 #define MIN(v) *min_element(all(v))
 #define MAX(v) *max_element(all(v))
+#define UNIQUE(x) sort(all(x)), x.erase(unique(all(x)), x.end()), x.shrink_to_fit()
+template <class T, class S> T SUM(const vector<S> &A) {
+    T sum = 0;
+    for (auto &&a: A) sum += a;
+    return sum;
+}
+template <class T, class S> vector<T> cumsum(vector<S> &A, int off = 1) {
+    int N = A.size();
+    vector<T> B(N + 1);
+    for (int i = 0; i < N; i++) B[i + 1] = B[i] + A[i];
+    if (off == 0) B.erase(B.begin());
+    return B;
+}
+template <class T, class S> inline bool chmax(T &a, const S &b) {
+    return (a < b ? a = b, 1 : 0);
+}
+template <class T, class S> inline bool chmin(T &a, const S &b) {
+    return (a > b ? a = b, 1 : 0);
+}
 mt19937 rng( chrono::steady_clock::now().time_since_epoch().count() );
 #define Ran(a, b) rng() % ( (b) - (a) + 1 ) + (a)
 struct custom_hash {
@@ -203,8 +222,33 @@ const int N = 1e6 + 10;
 void solve() {
     int n;
     cin >> n;
-    vector a(n, vi(n));
-    accumulate(all(a), bit_xor<int>());
+    vector a(n, 0ull);
+    each(i, a) cin >> i;
+    vector h(n+1, 0ull);
+    rep(i, 1, n + 1) h[i] = rng();
+    vector num(all(h));
+    rep(i, 1, n + 1) num[i] ^= num[i-1];
+    int ans = 0;
+    auto calc = [&] () -> void {
+        vector cum(n + 1, 0ull);
+        rep(i, 0, n) cum[i+1] = cum[i] ^ h[a[i]];
+        rep(i, 0, n) if (a[i] == 1) {
+            int mx = 1;
+            rep(j, i + 1, n) {
+                if (a[j] == 1) break;
+                mx = max(mx, a[j]);
+                if (j + 1 >= mx && j - i + 1 <= mx && num[mx] == (cum[j + 1] ^ cum[j + 1 - mx])) 
+                    ans++;
+            }
+        }
+    };
+    calc();
+    reverse(all(a));
+    calc();
+    each(i, a) ans += i == 1;
+    cout << ans << endl;
+
+
 }
 
 signed main() {

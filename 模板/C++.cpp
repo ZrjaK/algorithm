@@ -48,6 +48,25 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define endl "\n"
 #define MIN(v) *min_element(all(v))
 #define MAX(v) *max_element(all(v))
+#define UNIQUE(x) sort(all(x)), x.erase(unique(all(x)), x.end()), x.shrink_to_fit()
+template <class T, class S> T SUM(const vector<S> &A) {
+    T sum = 0;
+    for (auto &&a: A) sum += a;
+    return sum;
+}
+template <class T, class S> vector<T> cumsum(vector<S> &A, int off = 1) {
+    int N = A.size();
+    vector<T> B(N + 1);
+    for (int i = 0; i < N; i++) B[i + 1] = B[i] + A[i];
+    if (off == 0) B.erase(B.begin());
+    return B;
+}
+template <class T, class S> inline bool chmax(T &a, const S &b) {
+    return (a < b ? a = b, 1 : 0);
+}
+template <class T, class S> inline bool chmin(T &a, const S &b) {
+    return (a > b ? a = b, 1 : 0);
+}
 mt19937 rng( chrono::steady_clock::now().time_since_epoch().count() );
 #define Ran(a, b) rng() % ( (b) - (a) + 1 ) + (a)
 struct custom_hash {

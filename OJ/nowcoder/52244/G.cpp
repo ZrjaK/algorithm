@@ -12,9 +12,9 @@ void solve() {
         cin >> x;
         cnt[x]++;
     }
-    vector<long long> f(N + 1, cnt[0]);
+    vector<long long> f(N + 1);
     for (int i = 0; i <= N; i++) {
-        for (int j = i; j; j = (j - 1) & i) 
+        for (int j = i; j >= 0; j = (j != 0 ? (j - 1) & i : -1)) 
             f[i] += cnt[j];
     }
     long long ans = 0;
