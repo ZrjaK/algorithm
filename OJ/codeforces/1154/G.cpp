@@ -219,13 +219,34 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 1e7 + 10;
 
 void solve() {
     int n;
     cin >> n;
     vi a(n);
     each(i, a) cin >> i;
+    vector pos(N, vi());
+    rep(i, 0, n) pos[a[i]].pb(i + 1);
+    array<ll, 3> ans = {LINF, LINF, LINF};
+    rep(i, 1, N) {
+        vll h;
+        for (int j = i; j < N; j += i) {
+            rep(_, 0, min(2, len(pos[j]))) h.pb(j);
+            if (len(h) == 2) break;
+        }
+        if (len(h) == 2) ans = min(ans, {h[0] * h[1] / i, h[0], h[1]});
+    }
+    int x, y;
+    if (ans[1] == ans[2]) {
+        x = pos[ans[1]][0];
+        y = pos[ans[1]][1];
+    } else {
+        x = pos[ans[1]][0];
+        y = pos[ans[2]][0];
+    }
+    if (x > y) swap(x, y);
+    cout << pair{x, y} << endl;
 
 }
 
