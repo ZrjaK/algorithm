@@ -156,6 +156,21 @@ template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p
     os << p.first << " " << p.second;
     return os;
 }
+inline void print() { std::cout << '\n'; }
+template <typename Head, typename... Tail>
+inline void print(const Head& head, const Tail &...tails) {
+    std::cout << head;
+    if (sizeof...(tails)) std::cout << ' ';
+    print(tails...);
+}
+template <typename Iterable>
+auto print_all(const Iterable& v, std::string sep = " ", std::string end = "\n") -> decltype(std::cout << *v.begin(), void()) {
+    for (auto it = v.begin(); it != v.end();) {
+        std::cout << *it;
+        if (++it != v.end()) std::cout << sep;
+    }
+    std::cout << end;
+}
 ll gcd(ll x, ll y) {
     if(!x) return y;
     if(!y) return x;
