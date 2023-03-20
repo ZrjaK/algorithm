@@ -51,14 +51,14 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define MIN(v) *min_element(all(v))
 #define MAX(v) *max_element(all(v))
 #define UNIQUE(x) sort(all(x)), x.erase(unique(all(x)), x.end()), x.shrink_to_fit()
-template <class T> long long SUM(const vector<T> &A) {
-    long long sum = 0;
+template <class T, class S> T SUM(const vector<S> &A) {
+    T sum = 0;
     for (auto &&a: A) sum += a;
     return sum;
 }
-template <class T> vector<long long> cumsum(vector<T> &A, int off = 1) {
+template <class T, class S> vector<T> cumsum(vector<S> &A, int off = 1) {
     int N = A.size();
-    vector<long long> B(N + 1);
+    vector<T> B(N + 1);
     for (int i = 0; i < N; i++) B[i + 1] = B[i] + A[i];
     if (off == 0) B.erase(B.begin());
     return B;
@@ -156,17 +156,17 @@ template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p
     os << p.first << " " << p.second;
     return os;
 }
-ll gcd(ll x, ll y) {
+ll gcd(ll x,ll y) {
     if(!x) return y;
     if(!y) return x;
     int t = __builtin_ctzll(x | y);
     x >>= __builtin_ctzll(x);
     do {
         y >>= __builtin_ctzll(y);
-        if (x > y) swap(x, y);
+        if(x > y) swap(x, y);
         y -= x;
-    } while (y);
-    return x << t;
+    } while(y);
+    return x<<t;
 }
 ll lcm(ll x, ll y) { return x * y / gcd(x, y); }
 ll exgcd(ll a, ll b, ll &x, ll &y) {
@@ -214,13 +214,6 @@ vector<vpii> getWeightedGraph(int n, int m, bool directed = false) {
     }
     return res;
 }
-template <class... Args> auto ndvector(size_t n, Args &&...args) {
-    if constexpr (sizeof...(args) == 1) {
-        return vector(n, args...);
-    } else {
-        return vector(n, ndvector(args...));
-    }
-}
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
@@ -229,11 +222,13 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    size_t n;
+    int n;
     cin >> n;
-    auto a = ndvector(n, 0);
+    vi a(n);
     each(i, a) cin >> i;
-
+    vi h(501);
+    each(i, a) h[i]++;
+    rep(i, 0, 501) if (h[i]) cout << i << " " << h[i] << endl;
 }
 
 signed main() {
