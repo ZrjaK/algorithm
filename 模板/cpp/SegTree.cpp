@@ -1,5 +1,3 @@
-#include <bits/stdc++.h>
-
 // S: return type, op: how to merge at return, e: S default constructor
 // F: value type of lazy value
 // mapping: called on apply() to each item, mapping(F f, S item)
