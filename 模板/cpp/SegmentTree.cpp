@@ -11,10 +11,16 @@ public:
 		ll mlazy;
 	};
 	STNode* root;
-	SegmentTree() { root = new STNode(); }
+    int L, R;
+	SegmentTree(int _L, int _R) : L(_L), R(_R) { root = new STNode(); }
 	~SegmentTree() {}
 
-	void assign(STNode* node, int l, int r, int start, int end, ll x) {
+    void assign(int start, int end, ll x) {
+        assert(L <= start && start <= end && end <= R);
+        _assign(root, L, R, start, end, x);
+    }
+
+	void _assign(STNode* node, int l, int r, int start, int end, ll x) {
 		if (l == start && r == end) {
 			node->val = 0;
 			node->maxval = 0;
@@ -26,17 +32,22 @@ public:
 		pushdown(node);
 		int mid = l+r>>1;
 		if (end <= mid) {
-			assign(node->left, l, mid, start, end, x);
+			_assign(node->left, l, mid, start, end, x);
 		} elif (start > mid) {
-			assign(node->right, mid+1, r, start, end, x);
+			_assign(node->right, mid+1, r, start, end, x);
 		} else {
-			assign(node->left, l, mid, start, mid , x);
-			assign(node->right, mid+1, r, mid+1, end, x);
+			_assign(node->left, l, mid, start, mid , x);
+			_assign(node->right, mid+1, r, mid+1, end, x);
 		}
 		pushup(node, mid-l+1, r-mid);
 	}
 
-	void add(STNode* node, int l, int r, int start, int end, ll x){
+    void add(int start, int end, ll x) {
+        assert(L <= start && start <= end && end <= R);
+        _add(root, L, R, start, end, x);
+    }
+
+	void _add(STNode* node, int l, int r, int start, int end, ll x){
 		if (l == start && r == end) {
 			node->lazy += x;
 			return;
@@ -44,17 +55,22 @@ public:
 		pushdown(node);
 		int mid = l+r>>1;
 		if (end <= mid) {
-			add(node->left, l, mid, start, end, x);
+			_add(node->left, l, mid, start, end, x);
 		} elif (start > mid) {
-			add(node->right, mid+1, r, start, end, x);
+			_add(node->right, mid+1, r, start, end, x);
 		} else {
-			add(node->left, l, mid, start, mid , x);
-			add(node->right, mid+1, r, mid+1, end, x);
+			_add(node->left, l, mid, start, mid , x);
+			_add(node->right, mid+1, r, mid+1, end, x);
 		}
 		pushup(node, mid-l+1, r-mid);
 	}
 
-	ll querySum(STNode* node, int l, int r, int start, int end) {
+    ll querySum(int start, int end) {
+        assert(L <= start && start <= end && end <= R);
+        return _querySum(root, L, R, start, end);
+    }
+
+	ll _querySum(STNode* node, int l, int r, int start, int end) {
 		if (l == start && r == end) {
 			return node->val + node->lazy * (r-l+1) + \
 				(node->mlazy == LINF ? 0 : node->mlazy * (r-l+1));
@@ -63,18 +79,23 @@ public:
 		int mid = l+r>>1;
 		ll res;
 		if (end <= mid) {
-			res = querySum(node->left, l, mid, start, end);
+			res = _querySum(node->left, l, mid, start, end);
 		} elif (start > mid) {
-			res = querySum(node->right, mid+1, r, start, end);
+			res = _querySum(node->right, mid+1, r, start, end);
 		} else {
-			res = querySum(node->left, l, mid, start, mid) +
-			querySum(node->right, mid+1, r, mid+1, end);
+			res = _querySum(node->left, l, mid, start, mid) +
+			_querySum(node->right, mid+1, r, mid+1, end);
 		}
 		pushup(node, mid-l+1, r-mid);
 		return res;
 	}
 
-	ll queryMax(STNode* node, int l, int r, int start, int end) {
+    ll queryMax(int start, int end) {
+        assert(L <= start && start <= end && end <= R);
+        return _queryMax(root, L, R, start, end);
+    }
+
+	ll _queryMax(STNode* node, int l, int r, int start, int end) {
 		if (l == start && r == end) {
 			return node->maxval + node->lazy + \
 				(node->mlazy == LINF ? 0 : node->mlazy);
@@ -83,18 +104,23 @@ public:
 		int mid = l+r>>1;
 		ll res;
 		if (end <= mid) {
-			res = queryMax(node->left, l, mid, start, end);
+			res = _queryMax(node->left, l, mid, start, end);
 		} elif (start > mid) {
-			res = queryMax(node->right, mid+1, r, start, end);
+			res = _queryMax(node->right, mid+1, r, start, end);
 		} else {
-			res = max(queryMax(node->left, l, mid, start, mid),
-			queryMax(node->right, mid+1, r, mid+1, end));
+			res = max(_queryMax(node->left, l, mid, start, mid),
+			_queryMax(node->right, mid+1, r, mid+1, end));
 		}
 		pushup(node, mid-l+1, r-mid);
 		return res;
 	}
 
-	ll queryMin(STNode* node, int l, int r, int start, int end) {
+    ll queryMin(int start, int end) {
+        assert(L <= start && start <= end && end <= R);
+        return _queryMin(root, L, R, start, end);
+    }
+
+	ll _queryMin(STNode* node, int l, int r, int start, int end) {
 		if (l == start && r == end) {
 			return node->minval + node->lazy + \
 				(node->mlazy == LINF ? 0 : node->mlazy);
@@ -103,12 +129,12 @@ public:
 		int mid = l+r>>1;
 		ll res;
 		if (end <= mid) {
-			res = queryMin(node->left, l, mid, start, end);
+			res = _queryMin(node->left, l, mid, start, end);
 		} elif (start > mid) {
-			res = queryMin(node->right, mid+1, r, start, end);
+			res = _queryMin(node->right, mid+1, r, start, end);
 		} else {
-			res = min(queryMin(node->left, l, mid, start, mid),
-			queryMin(node->right, mid+1, r, mid+1, end));
+			res = min(_queryMin(node->left, l, mid, start, mid),
+			_queryMin(node->right, mid+1, r, mid+1, end));
 		}
 		pushup(node, mid-l+1, r-mid);
 		return res;
