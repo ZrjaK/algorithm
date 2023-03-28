@@ -23,7 +23,7 @@ def solve():
     n, m = LII()
     d = [set() for _ in range(n)]
     for _ in range(m):
-        i, j = LGMI()
+        i, j = sorted(LGMI())
         d[i].add(j)
     a = [0] * n
     b = [0] * n
