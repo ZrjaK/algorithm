@@ -39,6 +39,8 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define se second
 #define rep(i, a, b) for(int i = a; i < b; ++i)
 #define per(i, a, b) for(int i = a; i > b; --i)
+#define FOR_subset(t, s) \
+  for (ll t = (s); t >= 0; t = (t == 0 ? -1 : (t - 1) & (s)))
 #define each(x, v) for(auto& x: v)
 #define len(x) (int)x.size()
 #define elif else if
@@ -50,9 +52,11 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define endl "\n"
 #define MIN(v) *min_element(all(v))
 #define MAX(v) *max_element(all(v))
+#define LB(c, x) distance((c).begin(), lower_bound(all(c), (x)))
+#define UB(c, x) distance((c).begin(), upper_bound(all(c), (x)))
 #define UNIQUE(x) sort(all(x)), x.erase(unique(all(x)), x.end()), x.shrink_to_fit()
-template <class T> long long SUM(const vector<T> &A) {
-    long long sum = 0;
+template <class T> auto SUM(const vector<T> &A) {
+    auto sum = 0;
     for (auto &&a: A) sum += a;
     return sum;
 }
@@ -236,6 +240,41 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
         return vector(n, ndvector(args...));
     }
 }
+template <class T> istream &operator>>(istream &in, vector<T> &v) {
+    for(auto& x : v) cin >> x;
+    return in;
+}
+template <class T, class S> istream &operator>>(istream &in, pair<T, S> &p) {
+    cin >> p.first >> p.second;
+    return in;
+}
+void read() {}
+template <class Head, class... Tail>
+void read(Head &head, Tail &... tail) {
+    cin >> head;
+    read(tail...);
+}
+#define INT(...)   \
+    int __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define LL(...)   \
+    ll __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define STR(...)      \
+    string __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define CHAR(...)   \
+    char __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define DBL(...)      \
+    double __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define VEC(type, name, size) \
+    vector<type> name(size);    \
+    read(name)
+#define VV(type, name, h, w)                     \
+    vector<vector<type>> name(h, vector<type>(w)); \
+    read(name)
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
@@ -244,11 +283,9 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    size_t n;
-    cin >> n;
-    auto a = ndvector(n, 0);
-    each(i, a) cin >> i;
-
+    INT(n);
+    VEC(int, a, n);
+    
 }
 
 signed main() {
