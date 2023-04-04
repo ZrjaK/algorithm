@@ -52,7 +52,7 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define each1(i, a)         for(auto&& i : a)
 #define each2(x, y, a)      for(auto&& [x, y] : a)
 #define each3(x, y, z, a)   for(auto&& [x, y, z] : a)
-#define each(...)           overload4(__VA_ARGS__, each3, each2, each1) (__VA_ARGS__)
+#define each(...)           overload3(__VA_ARGS__, each3, each2, each1) (__VA_ARGS__)
 #define FOR_subset(t, s)    for (int t = (s); t >= 0; t = (t == 0 ? -1 : (t - 1) & (s)))
 #define len(x)              (int)x.size()
 #define elif                else if
@@ -311,8 +311,23 @@ const int N = 1e6 + 10;
 
 void solve() {
     INT(n);
-    VEC(int, a, n);
-    
+    map<string, int> M;
+    auto a = ndvector(3, 0, string());
+    rep(i, 3) rep(j, n) {
+        STR(s);
+        a[i].pb(s);
+        M[s]++;
+    }
+    vi ans;
+    rep(i, 3) {
+        int t = 0;
+        rep(j, n) {
+            if (M[a[i][j]] == 1) t += 3;
+            if (M[a[i][j]] == 2) t += 1;
+        }
+        ans.pb(t);
+    }
+    print_all(ans);
 }
 
 signed main() {
@@ -320,7 +335,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

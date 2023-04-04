@@ -310,9 +310,29 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    INT(n);
-    VEC(int, a, n);
-    
+    INT(n, m);
+    VEC(string, a, n);
+    int tot = 0;
+    auto h = ndvector(n, m, 0);
+    rep(i, n - 1) rep(j, m - 1) {
+        int c = 0;
+        rep(dx, 2) rep(dy, 2) if (a[i + dx][j + dy] == '*') c++;
+        if (c == 3) {
+            tot++;
+            rep(dx, 2) rep(dy, 2) if (a[i + dx][j + dy] == '*') {
+                a[i + dx][j + dy] = '.';
+                h[i + dx][j + dy] = tot;
+            }
+        }
+    }
+    rep(i, n) rep(j, m) if (a[i][j] == '*') return print("NO");
+    rep(i, n - 1) rep(j, m - 1) {
+        set<int> S;
+        rep(dx, 2) rep(dy, 2) S.insert(h[i + dx][j + dy]);
+        S.erase(0);
+        if (len(S) > 1) return print("NO");
+    }
+    print("YES");
 }
 
 signed main() {
@@ -320,7 +340,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

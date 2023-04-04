@@ -310,8 +310,20 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    INT(n);
-    VEC(int, a, n);
+    INT(n, q);
+    auto a = ndvector(1001, 1001, 0ll);
+    rep(_, n) {
+        INT(h, w);
+        a[h][w] += h * w;
+    }
+    rep(i, 1, 1001) rep(j, 1, 1001) {
+        a[i][j] = a[i-1][j] + a[i][j-1] - a[i-1][j-1] + a[i][j];
+    }
+    rep(_, q) {
+        INT(hs, ws, hb, wb);
+        hb--, wb--;
+        print(a[hb][wb] - a[hs][wb] - a[hb][ws] + a[hs][ws]);
+    }
     
 }
 
@@ -320,7 +332,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

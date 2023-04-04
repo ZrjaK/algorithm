@@ -17,7 +17,7 @@ using Trie = trie<string, null_type, trie_string_access_traits<>, pat_trie_tag, 
 // template <class T> using heapq = __gnu_pbds::priority_queue<T, greater<T>, pairing_heap_tag>;
 template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define ll                  long long
-#define i128                size_t
+#define i128                __int128_t
 #define ld                  long double
 #define ui                  unsigned int
 #define ull                 unsigned long long
@@ -398,20 +398,19 @@ void solve() {
         each(y, d[x]) dep[y] = dep[x] + 1, q.pb(y);
     }
     q.clear();
-    auto h = ndvector(n, 26, 0);
+    auto h = ndvector(n, 0);
     auto ans = ndvector(m, 0);
     auto update = [&] (int i) -> void {
-        h[dep[i]][s[i] - 'a']++;
+        h[dep[i]] ^= 1 << s[i] - 'a';
     };
     auto query = [&] (int i) -> void {
         each(b, idx, Q[i]) {
             int c = 0;
-            rep(j, 26) if (h[b][j] % 2) c++;
-            ans[idx] = c <= 1;
+            ans[idx] = bitcnt(h[b]) <= 1;
         }
     };
     auto clear = [&] (int i) -> void {
-        h[dep[i]][s[i] - 'a']--;
+        h[dep[i]] ^= 1 << s[i] - 'a';
     };
     auto reset = [&] () {};
     DSUonTree<decltype(d)> dsu(d, 0);
