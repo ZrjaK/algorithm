@@ -311,8 +311,14 @@ const int N = 1e6 + 10;
 
 void solve() {
     INT(n);
-    VEC(int, a, n);
-    
+    vi ans(n);
+    int s = 0;
+    int c = 0;
+    rep(i, 3, n) ans[i] = c, s ^= c, c++;
+    ans[0] = 1 << 25;
+    ans[1] = 1 << 26;
+    ans[2] = s ^ ans[0] ^ ans[1];
+    print_all(ans);
 }
 
 signed main() {
@@ -320,7 +326,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

@@ -311,8 +311,18 @@ const int N = 1e6 + 10;
 
 void solve() {
     INT(n);
-    VEC(int, a, n);
-    
+    STR(S);
+    vll h(n);
+    ll s = 0;
+    rep(i, n) {
+        if (S[i] == 'L') h[i] = (n - 1 - i) - i, s += i;
+        else h[i] = i - (n - 1 - i), s += n - 1 - i;
+    }
+    SORT(h);
+    REV(h);
+    vll ans;
+    each(i, h) s += max(0, i), ans.pb(s);
+    print_all(ans);
 }
 
 signed main() {
@@ -320,7 +330,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }
