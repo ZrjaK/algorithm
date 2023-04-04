@@ -1,35 +1,29 @@
 struct JumpOnTree {
     int n, logn, root = 0;
-    vi depth;
-    vvi edges, parent;
-    JumpOnTree (vvi &e): edges(e), n(len(e)) {
-        logn = n > 1 ? __lg(n - 1) + 1 : 0;
-        depth = vi(n, -1), depth[root] = 0;
-        parent = vvi(logn, vi(n, -1));
-        dfs(), doubling();
-    };
-    JumpOnTree (vvi &e, int rt): edges(e), n(len(e)) {
+    vector<int> depth;
+    vector<vector<int>> edges, parent;
+    JumpOnTree (vector<vector<int>> &e, int rt = 0): edges(e), n(e.size()) {
         root = rt;
         logn = n > 1 ? __lg(n - 1) + 1 : 0;
-        depth = vi(n, -1), depth[root] = 0;
-        parent = vvi(logn, vi(n, -1));
+        depth = vector<int>(n, -1), depth[root] = 0;
+        parent = vector<vector<int>>(logn, vector<int>(n, -1));
         dfs(), doubling();
     };
     void dfs() {
-        vi q = {root};
+        vector<int> q = {root};
         while (!q.empty()) {
             int u = q.back();
             q.pop_back();
-            each(v, edges[u]) if (depth[v] == -1) {
+            for (auto& v : edges[u])  if (depth[v] == -1) {
                 depth[v] = depth[u] + 1;
                 parent[0][v] = u;
-                q.pb(v);
+                q.push_back(v);
             }
         }
     }
 
     void doubling() {
-        rep(i, 1, logn) rep(u, 0, n) {
+        for (int i = 1; i < logn; i++) for (int u = 0; u < n; i++) {
             int p = parent[i - 1][u];
             if (p != -1) parent[i][u] = parent[i - 1][p];
         }
@@ -44,7 +38,7 @@ struct JumpOnTree {
         }
         if (u == v) return u;
         int lgn = du > 1 ? __lg(du - 1) + 1 : 0;
-        per(i, lgn, -1) {
+        for (int i = lgn; i >= 0; i--) {
             int pu = parent[i][u];
             int pv = parent[i][v];
             if (pu != pv) u = pu, v = pv;
