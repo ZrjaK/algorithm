@@ -45,33 +45,14 @@ def lucas(n, m):
         return lucas(n // MOD, m // MOD) * lucas(n % MOD, m % MOD) % MOD
 
 def solve():
-    n, K = LII()
-    arr = LII()
-    dp = [[0] * (n + 1) for _ in range(n)]
-    for i in range(n):
-        for j in range(i):
-            c = 0
-            for k in range(j + 1, i): 
-                if arr[k] == arr[i]:
-                    c += 1
-            for x in range(2, n + 1):
-                dp[i][x] += dp[j][x-1] * C(c, K - 1)
-        c = 0
-        for k in range(i):
-            if arr[k] == arr[i]:
-                c += 1
-        dp[i][1] = C(c, K - 1)
-    mx = 0
-    for i in range(n):
-        for j in range(n+1):
-            if dp[i][j]:
-                mx = max(mx, j)
+    n = II()
+    c1 = bitcnt(n)
     ans = 0
-    for i in range(n):
-        ans += dp[i][mx]
+    for i in range(1, c1 - 1):
+        ans += C(c1, i) * (pow(2, c1 - i, MOD) - 2)
         ans %= MOD
-    print(max(1, ans))
-            
+    print(ans)
+
     
 
 def main():

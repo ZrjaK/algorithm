@@ -21,28 +21,13 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     k = II()
-    def check(x):
-        x = str(x)            
-        for i in range(len(x)):
-            if x[i] == "4":
-                x = x[:i] + "5" + "0" * (len(x) - 1 - i)
-        res = 0
-        for i in x:
-            i = int(i)
-            res = res * 9 + i
-            if i > 4:
-                res -= 1
-        return res >= k
-    l, r = 0, 10**13
-    while l + 1 < r:
-        mid = l + r >> 1
-        if check(mid):
-            r = mid
-        else:
-            l = mid
-    while "4" in str(r):
-        r += 1
-    print(r)
+    ans = []
+    h = [0, 1, 2, 3, 5, 6, 7, 8, 9]
+    while k:
+        ans.append(h[k % 9])
+        k //= 9
+    ans = ans[::-1]
+    print("".join(map(str, ans)))
     
     
 

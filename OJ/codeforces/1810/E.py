@@ -36,8 +36,8 @@ class DisjointSetUnion:
     def union(self, a, b):
         a, b = self.find(a), self.find(b)
         if a != b:
-            if self.size[a] < self.size[b]:
-                a, b = b, a
+            # if self.size[a] < self.size[b]:
+            #     a, b = b, a
  
             self.num_sets -= 1
             self.parent[b] = a
@@ -60,15 +60,15 @@ def solve():
             x, y = y, x
         d[x].append(y)
     h = sorted(range(n), key=lambda x: (arr[x], x))
-    vis = [0] * n
+    ok = [0] * n
     for i in h:
-        if not arr[i]:
-            vis[i] = 1
+        ok[i] = int(arr[i] == 0)
         for j in d[i]:
-            if vis[j] and arr[x] <= dsu.set_size(j):
-                vis[i] = 1
+            j = dsu.find(j)
+            if ok[j] and arr[i] <= dsu.set_size(j):
+                ok[i] = 1
             dsu.union(i, j)
-    if dsu.num_sets == 1 and vis[dsu.find(0)]:
+    if dsu.num_sets == 1 and ok[dsu.find(0)]:
         print("YES")
     else:
         print("NO")

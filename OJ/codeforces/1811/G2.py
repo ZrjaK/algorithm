@@ -20,7 +20,7 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 MOD = 10**9+7
-N = 10**2+10
+N = 10**4+10
 
 fac = [1] * N
 inv = [1] * N
@@ -45,32 +45,34 @@ def lucas(n, m):
         return lucas(n // MOD, m // MOD) * lucas(n % MOD, m % MOD) % MOD
 
 def solve():
-    n, K = LII()
+    n, k = LII()
     arr = LII()
-    dp = [[0] * (n + 1) for _ in range(n)]
+    h = [[0] * n for _ in range(n + 1)]
     for i in range(n):
-        for j in range(i):
-            c = 0
-            for k in range(j + 1, i): 
-                if arr[k] == arr[i]:
-                    c += 1
-            for x in range(2, n + 1):
-                dp[i][x] += dp[j][x-1] * C(c, K - 1)
-        c = 0
-        for k in range(i):
-            if arr[k] == arr[i]:
-                c += 1
-        dp[i][1] = C(c, K - 1)
-    mx = 0
+        h[arr[i]][i] = 1
+    for i in range(n + 1):
+        h[i] = list(accumulate(h[i])) + [0]
+    dp = [[0] * 2 for _ in range(n+1)]
+    dp[-1] = [0, 1]
     for i in range(n):
-        for j in range(n+1):
-            if dp[i][j]:
-                mx = max(mx, j)
+        for j in range(-1, i):
+            c = h[arr[i]][i] - h[arr[i]][j]
+            leng = dp[j][0] + 1
+            val = dp[j][1] * C(c-1, k-1)
+            if val:
+                if leng > dp[i][0]:
+                    dp[i] = [leng, val]
+                elif leng == dp[i][0]:
+                    dp[i][1] += val
+                dp[i][1] %= MOD
+    mx = max(i[0] for i in dp)
     ans = 0
-    for i in range(n):
-        ans += dp[i][mx]
+    for i in range(n+1):
+        if dp[i][0] == mx:
+            ans += dp[i][1]
         ans %= MOD
-    print(max(1, ans))
+    print(ans)
+
             
     
 

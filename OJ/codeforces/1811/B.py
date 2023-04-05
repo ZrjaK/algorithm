@@ -19,59 +19,13 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
-MOD = 10**9+7
-N = 10**2+10
-
-fac = [1] * N
-inv = [1] * N
-for i in range(1, N):
-    fac[i] = fac[i-1] * i % MOD
-for i in range(2, N):
-    inv[i] = (MOD - MOD // i) * inv[MOD % i] % MOD
-for i in range(1, N):
-    inv[i] = (inv[i-1] * inv[i]) % MOD
-
-def C(n, m):
-    return fac[n] * inv[m] * inv[n-m] % MOD if n >= m and m >= 0 else 0
-def P(n, m):
-    return fac[n] * inv[n-m] % MOD if n >= m and m >= 0 else 0
-
-def lucas(n, m):
-    if n < m:
-        return 0
-    elif n < MOD:
-        return C(n, m)
-    else:
-        return lucas(n // MOD, m // MOD) * lucas(n % MOD, m % MOD) % MOD
-
 def solve():
-    n, K = LII()
-    arr = LII()
-    dp = [[0] * (n + 1) for _ in range(n)]
-    for i in range(n):
-        for j in range(i):
-            c = 0
-            for k in range(j + 1, i): 
-                if arr[k] == arr[i]:
-                    c += 1
-            for x in range(2, n + 1):
-                dp[i][x] += dp[j][x-1] * C(c, K - 1)
-        c = 0
-        for k in range(i):
-            if arr[k] == arr[i]:
-                c += 1
-        dp[i][1] = C(c, K - 1)
-    mx = 0
-    for i in range(n):
-        for j in range(n+1):
-            if dp[i][j]:
-                mx = max(mx, j)
-    ans = 0
-    for i in range(n):
-        ans += dp[i][mx]
-        ans %= MOD
-    print(max(1, ans))
-            
+    n, x1, y1, x2, y2 = LII()
+    def trans(x, y):
+        return min(x, n - x + 1, y, n - y + 1)
+    t1 = trans(x1, y1)
+    t2 = trans(x2, y2)
+    print(abs(t1 - t2))
     
 
 def main():
