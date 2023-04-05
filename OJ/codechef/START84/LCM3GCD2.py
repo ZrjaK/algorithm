@@ -19,14 +19,56 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
+def ask1(i, j):
+    print(1, i + 1, j + 1, flush=True)
+    return II()
+
+def ask2(i, j, k):
+    print(2, i + 1, j + 1, k + 1, flush=True)
+    return II()
+
+def answer(arr):
+    print(3, *arr, flush=True)
+    return II()
+
 def solve():
     n = II()
-    arr = LII()
+    ans = [0] * n
+    g01, g02, g03 = ask1(0, 1), ask1(0, 2), ask1(0, 3)
+    g12, g13 = ask1(1, 2), ask1(1, 3)
+    g23 = ask1(2, 3)
+    
+    a012 = ask2(0, 1, 2) * g01 * g12 * g02 // gcd(g01, g12)
+    a013 = ask2(0, 1, 3) * g01 * g13 * g03 // gcd(g01, g03)
+    a023 = ask2(0, 2, 3) * g02 * g23 * g03 // gcd(g02, g03)
+    a123 = ask2(1, 2, 3) * g12 * g23 * g13 // gcd(g12, g13)
+
+    def find(x):
+        l, r = 0, 10**6 + 10
+        while l + 1 < r:
+            mid = l + r >> 1
+            if mid**3 >= x:
+                r = mid
+            else:
+                l = mid
+        return r
+    t = a012 * a013 * a023 * a123
+    ans[0] = find(t // a123**3)
+    ans[1] = find(t // a023**3)
+    ans[2] = find(t // a013**3)
+    ans[3] = find(t // a012**3)
+    for i in range(4, n):
+        g0i, g1i = ask1(0, i), ask1(1, i)
+        ans[i] = ask2(0, 1, i) * g01 * g0i * g1i // gcd(g0i, g1i)
+        ans[i] //= ans[0] * ans[1]
+    answer(ans)
+
+    
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
