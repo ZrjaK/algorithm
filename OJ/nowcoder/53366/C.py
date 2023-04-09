@@ -19,81 +19,32 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
-class DisjointSetUnion:
-    def __init__(self, n):
-        self.parent = list(range(n))
-        self.size = [1] * n
-        self.num_sets = n
- 
-    def find(self, a):
-        acopy = a
-        while a != self.parent[a]:
-            a = self.parent[a]
-        while acopy != a:
-            self.parent[acopy], acopy = a, self.parent[acopy]
-        return a
- 
-    def union(self, a, b):
-        a, b = self.find(a), self.find(b)
-        if a != b:
-            if self.size[a] < self.size[b]:
-                a, b = b, a
- 
-            self.num_sets -= 1
-            self.parent[b] = a
-            self.size[a] += self.size[b]
- 
-    def set_size(self, a):
-        return self.size[self.find(a)]
- 
-    def __len__(self):
-        return self.num_sets
-
 def solve():
-    I()
     n, m = LII()
-    d = getGraph(n, m)
-    deg = [0] * n
+    arr = [I() for _ in range(n)]
+    q = []
     for i in range(n):
-        for j in d[i]:
-            deg[j] += 1
-    center = [i for i in range(n) if deg[i] == 4]
-    other = [i for i in range(n) if deg[i] == 2]
-    k = len(center)
-    if k * k != n or len(other) != n - k:
-        return print("NO")
-    s = set(center)
-    dsu = DisjointSetUnion(n)
+        for j in range(m):
+            if arr[i][j] == "@":
+                q.append((i, j))
+    vis = [[0] * m for _ in range(n)]
+    for x, y in q:
+        for dx, dy in D4:
+            nx, ny = x + dx, y + dy
+            if 0<=nx<n and 0<=ny<m and arr[nx][ny] != "#" and not vis[nx][ny]:
+                vis[nx][ny] = 1
+                q.append((nx, ny))
+    ans = 0
     for i in range(n):
-        for j in d[i]:
-            if i in s and j in s:
-                dsu.union(i, j)
-    if any(dsu.set_size(i) != k for i in s):
-        return print("NO")
-    dsu = DisjointSetUnion(n)
-    for i in range(n):
-        for j in d[i]:
-            if not (i in s and j in s):
-                dsu.union(i, j)
-    h = [dsu.set_size(i) for i in range(n) if i == dsu.find(i)]
-    if len(h) != k or any(i != k for i in h):
-        return print("NO")
-    dsu = DisjointSetUnion(n)
-    for i in range(n):
-        for j in d[i]:
-            dsu.union(i, j)
-    if dsu.num_sets != 1:
-        return print("NO")
-    print("YES")
-    
-    
-    
-    
+        for j in range(m):
+            if vis[i][j] and arr[i][j] == "!":
+                ans += 1
+    print(ans)
     
 
 def main():
     t = 1
-    t = II()
+    # t = II()
     for _ in range(t):
         solve()
 
