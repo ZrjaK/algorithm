@@ -20,25 +20,36 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    x1, y1, x2, y2 = LII()
-    def calc(x1, y1, x2, y2):
-        t1 = abs(x1 - x2)
-        t2 = abs(y1 - y2)
-        if t1 % 2 == 1 or t2 % 2 == 1:
-            return INF
-        else:
-            return t1 + t2
-    ans = min(calc(x1, y1, x2, y2), 1 + calc(x1, y1, x2 - 1, y2 - 1), 1 + calc(x1, y1, x2 + 1, y2 + 1))
-    if ans == INF:
-        ans = -1
-    print(ans)
-
-
+    n, m = LII()
+    d = [[] for _ in range(n)]
+    for _ in range(m):
+        a, b = LGMI()
+        d[b].append(a)
+    dist = [INF] * n
+    dist[0] = 0
+    q = [0]
+    for i in q:
+        for j in d[i]:
+            if dist[j] > dist[i] + 1:
+                dist[j] = dist[i] + 1
+                q.append(j)
+    if max(dist) == INF:
+        return print("INFINITE")
+    h = [[] for _ in range(n)]
+    for x in q:
+        for i in range(dist[x] + 1):
+            h[i].append(x + 1)
+    ans = []
+    for lst in h:
+        ans += lst[::-1]
+    print("FINITE")
+    print(len(ans))
+    print(*ans)
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 

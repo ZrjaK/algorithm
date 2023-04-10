@@ -20,20 +20,29 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    x1, y1, x2, y2 = LII()
-    def calc(x1, y1, x2, y2):
-        t1 = abs(x1 - x2)
-        t2 = abs(y1 - y2)
-        if t1 % 2 == 1 or t2 % 2 == 1:
-            return INF
+    n = II()
+    xy = [LII() for _ in range(n)]
+    if min(i[1] for i in xy) * max(i[1] for i in xy) < 0:
+        return print(-1)
+    for i in range(n):
+        xy[i][1] = abs(xy[i][1])
+    def check(r):
+        L, R = -INF, INF
+        for x, y in xy:
+            t = 2 * r - y
+            if t < 0:
+                return False
+            L = max(L, x - math.sqrt(y * t))
+            R = min(R, x + math.sqrt(y * t))
+        return L <= R
+    l, r = 0, 1e14
+    for _ in range(100):
+        mid = (l + r) / 2
+        if check(mid):
+            r = mid
         else:
-            return t1 + t2
-    ans = min(calc(x1, y1, x2, y2), 1 + calc(x1, y1, x2 - 1, y2 - 1), 1 + calc(x1, y1, x2 + 1, y2 + 1))
-    if ans == INF:
-        ans = -1
-    print(ans)
-
-
+            l = mid
+    print(r)
     
 
 def main():
