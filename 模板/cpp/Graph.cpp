@@ -15,13 +15,14 @@ struct Graph {
         edges.emplace_back(u, v, cost, i);
     }
 
-    void read_tree() { read_graph(n - 1); }
+    void read_tree(bool wt = false, int off = 1) { read_graph(n - 1, wt, off); }
 
-    void read_graph(int m) {
+    void read_graph(int m, bool wt = false, int off = 1) {
         for (int i = 0; i < m; i++) {
             int a, b; cin >> a >> b;
-            a--, b--;
-            T cost; cin >> cost;
+            a -= off, b -= off;
+            cost_type cost = 1;
+            if (wt) cin >> cost;
             add(a, b, cost, i);
         }
         build();
