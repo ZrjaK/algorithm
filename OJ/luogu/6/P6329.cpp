@@ -1,7 +1,7 @@
-#ifdef ONLINE_JUDGE
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
-#endif
+// #ifdef ONLINE_JUDGE
+// #pragma GCC optimize("O3,unroll-loops")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+// #endif
 #include <bits/stdc++.h>
 #include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -309,10 +309,432 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-void solve() {
-    INT(n);
-    VEC(int, a, n);
+template <typename T = int, bool directed = false>
+struct Graph {
+    int n;
+    using cost_type = T;
+    using edge_type = tuple<int, int, cost_type, int>;
+    vector<vector<pair<int, cost_type>>> g;
+
+    vector<edge_type> edges;
+    constexpr bool is_directed() { return directed; }
+
+    Graph(int _n) : n(_n), g(_n) {}
+
+    void add(int u, int v, cost_type cost, int i = -1) {
+        assert(0 <= u && u < n && 0 <= v && v < n);
+        edges.emplace_back(u, v, cost, i);
+    }
+
+    void read_tree(bool wt = false, int off = 1) { read_graph(n - 1, wt, off); }
+
+    void read_graph(int m, bool wt = false, int off = 1) {
+        for (int i = 0; i < m; i++) {
+            int a, b; cin >> a >> b;
+            a -= off, b -= off;
+            cost_type cost = 1;
+            if (wt) cin >> cost;
+            add(a, b, cost, i);
+        }
+        build();
+    }
     
+    void build() {
+        for (auto&& [u, v, cost, i] : edges) {
+            g[u].emplace_back(v, cost);
+            if (!directed) g[v].emplace_back(u, cost);
+        }
+    }
+
+    vector<pair<int, cost_type>> operator[] (int i) {
+        return g[i];
+    }
+};
+
+template <typename GT>
+pair<int, int> find_centroids(GT& G) {
+    int n = G.n;
+    vector<int> parent(n, -1);
+    vector<int> sz(n);
+    vector<int> q = {0};
+    for (int i = 0; i < q.size(); i++) {
+        int u = q[i];
+        for (auto&& [v, w]: G[u])
+        if (v != parent[u]) {
+            parent[v] = u;
+            q.emplace_back(v);
+        }
+    }
+    for (int i = n - 1; i >= 0; i--) {
+        int v = q[i];
+        sz[v] += 1;
+        int p = parent[v];
+        if (p != -1) sz[p] += sz[v];
+    }
+
+    int m = n / 2;
+    auto check = [&](int u) -> bool {
+        if (n - sz[u] > m) return false;
+        for (auto&& [v, w]: G[u]) {
+            if (v != parent[u] && sz[v] > m) return false;
+        }
+        return true;
+    };
+    pair<int, int> ans = {-1, -1};
+    for (int i = 0; i < n; i++) if (check(i)) {
+        if (ans.first != -1) {
+            ans.second = i;
+        } else {
+            ans.first = i;
+        }
+    }
+    return ans;
+}
+
+template <typename GT>
+struct Centroid_Decomposition {
+    using edge_type = typename GT::edge_type;
+    GT& G;
+    int n;
+    vector<int> sz;
+    vector<int> parent;
+    vector<int> cdep; // depth in centroid tree
+
+    vector<int> dparent;
+
+    bool calculated;
+
+    Centroid_Decomposition(GT& G)
+        : G(G), n(G.n), sz(G.n), parent(G.n), cdep(G.n, -1), dparent(n, -1) {
+        calculated = 0;
+        build();
+    }
+
+private:
+  int find(int u) {
+    vector<int> q = {u};
+    parent[u] = -1;
+    int p = 0;
+    while (p < q.size()) {
+      int u = q[p++];
+      sz[u] = 0;
+      for (auto&& [v, w] : G[u]) {
+        if (v == parent[u] || cdep[v] != -1) continue;
+        parent[v] = u;
+        q.emplace_back(v);
+      }
+    }
+    while (q.size()) {
+        int u = q.back();
+        q.pop_back();
+        sz[u] += 1;
+        if (p - sz[u] <= p / 2) return u;
+        sz[parent[u]] += sz[u];
+    }
+    return -1;
+  }
+  void build() {
+    assert(!calculated);
+    calculated = 1;
+
+    vector<tuple<int, int, int>> st;
+    st.emplace_back(0, 0, -1);
+    while (!st.empty()) {
+        auto [lv, v, fa] = st.back();
+        st.pop_back();
+        auto c = find(v);
+        dparent[c] = fa;
+        cdep[c] = lv;
+        for (auto&& [to, w] : G[c]) {
+            if (cdep[to] == -1) { st.emplace_back(lv + 1, to, c); }
+        }
+    }
+  }
+
+public:
+  // vector of pairs (v, path data v)
+
+  template <typename E, typename F>
+  vector<vector<pair<int, E>>> collect(int root, E root_val, F f) {
+    vector<vector<pair<int, E>>> res = {{{root, root_val}}};
+    for (auto&& [nxt, w] : G[root]) {
+      if (cdep[nxt] < cdep[root]) continue;
+      vector<pair<int, E>> dat;
+      int p = 0;
+      dat.eb(nxt, f(root_val, tuple<int, int, E>{root, nxt, w}));
+      parent[nxt] = root;
+      while (p < len(dat)) {
+        auto [u, val] = dat[p++];
+        for (auto&& [v, w] : G[u]) {
+          if (v == parent[u]) continue;
+          if (cdep[v] < cdep[root]) continue;
+          parent[v] = u;
+          dat.emplace_back(v, f(val, tuple<int, int, E>{u, v, w}));
+        }
+      }
+      res.emplace_back(dat);
+      res[0].insert(res[0].end(), dat.begin(), dat.end());
+    }
+    return res;
+  }
+
+  vector<vector<pair<int, int>>> collect_dist(int root) {
+    auto f = [&](int x, auto e) -> int { return x + 1; };
+    return collect(root, 0, f);
+  }
+
+  // (V, H), (V[i] in G) = (i in H).
+
+  // 0,1,2... is a dfs order in H.
+
+  pair<vector<int>, Graph<typename GT::cost_type, true>> get_subgraph(int root) {
+    static vector<int> conv;
+    while (len(conv) < n) conv.emplace_back(-1);
+
+    vector<int> q;
+    using cost_type = typename GT::cost_type;
+    vector<tuple<int, int, cost_type>> edges;
+
+    auto dfs = [&](auto& dfs, int u, int p) -> void {
+      conv[u] = len(q);
+      q.emplace_back(u);
+      for (auto&& [v, cost] : G[u]) {
+        if (v == p) continue;
+        if (cdep[v] < cdep[root]) continue;
+        dfs(dfs, v, u);
+        edges.emplace_back(conv[u], conv[v], cost);
+      }
+    };
+    dfs(dfs, root, -1);
+    int n = len(q);
+    Graph<typename GT::cost_type, true> H(n);
+    for (auto&& [a, b, c]: edges) H.add(a, b, c);
+    H.build();
+    for (auto&& v: q) conv[v] = -1;
+    return {q, H};
+  }
+};
+
+struct HLD {
+    int n;
+    std::vector<int> siz, top, dep, parent, in, out, seq;
+    std::vector<std::vector<int>> adj;
+    int cur;
+    
+    HLD() {}
+    HLD(int n) {
+        init(n);
+    }
+    void init(int n) {
+        this->n = n;
+        siz.resize(n);
+        top.resize(n);
+        dep.resize(n);
+        parent.resize(n);
+        in.resize(n);
+        out.resize(n);
+        seq.resize(n);
+        cur = 0;
+        adj.assign(n, {});
+    }
+    void addEdge(int u, int v) {
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    void work(int root = 0) {
+        top[root] = root;
+        dep[root] = 0;
+        parent[root] = -1;
+        dfs1(root);
+        dfs2(root);
+    }
+    void dfs1(int u) {
+        if (parent[u] != -1) {
+            adj[u].erase(std::find(adj[u].begin(), adj[u].end(), parent[u]));
+        }
+        
+        siz[u] = 1;
+        for (auto &v : adj[u]) {
+            parent[v] = u;
+            dep[v] = dep[u] + 1;
+            dfs1(v);
+            siz[u] += siz[v];
+            if (siz[v] > siz[adj[u][0]]) {
+                std::swap(v, adj[u][0]);
+            }
+        }
+    }
+    void dfs2(int u) {
+        in[u] = cur++;
+        seq[in[u]] = u;
+        for (auto v : adj[u]) {
+            top[v] = v == adj[u][0] ? top[u] : v;
+            dfs2(v);
+        }
+        out[u] = cur;
+    }
+    int lca(int u, int v) {
+        while (top[u] != top[v]) {
+            if (dep[top[u]] > dep[top[v]]) {
+                u = parent[top[u]];
+            } else {
+                v = parent[top[v]];
+            }
+        }
+        return dep[u] < dep[v] ? u : v;
+    }
+    
+    int dist(int u, int v) {
+        return dep[u] + dep[v] - 2 * dep[lca(u, v)];
+    }
+    
+    int jump(int u, int k) {
+        if (dep[u] < k) {
+            return -1;
+        }
+        
+        int d = dep[u] - k;
+        
+        while (dep[top[u]] > d) {
+            u = parent[top[u]];
+        }
+        
+        return seq[in[u] - dep[u] + d];
+    }
+    
+    bool isAncester(int u, int v) {
+        return in[u] <= in[v] && in[v] < out[u];
+    }
+    
+    int rootedChild(int u, int v) {
+        if (u == v) {
+            return u;
+        }
+        if (!isAncester(u, v)) {
+            return parent[u];
+        }
+        auto it = std::upper_bound(adj[u].begin(), adj[u].end(), v, [&](int x, int y) {
+            return in[x] < in[y];
+        }) - 1;
+        return *it;
+    }
+    
+    int rootedSize(int u, int v) {
+        if (u == v) {
+            return n;
+        }
+        if (!isAncester(v, u)) {
+            return siz[v];
+        }
+        return n - siz[rootedChild(v, u)];
+    }
+    
+    int rootedLca(int a, int b, int c) {
+        return lca(a, b) ^ lca(b, c) ^ lca(c, a);
+    }
+};
+
+template <typename T>
+struct Fenwick {
+    int n;
+    std::vector<T> a;
+    
+    Fenwick(int n = 0) {
+        init(n);
+    }
+    
+    void init(int n) {
+        this->n = n;
+        a.assign(n, T());
+    }
+    
+    void add(int x, T v) {
+        for (int i = x + 1; i <= n; i += i & -i) {
+            a[i - 1] += v;
+        }
+    }
+    
+    T sum(int x) {
+        auto ans = T();
+        for (int i = x; i > 0; i -= i & -i) {
+            ans += a[i - 1];
+        }
+        return ans;
+    }
+    
+    T rangeSum(int l, int r) {
+        return sum(r) - sum(l);
+    }
+    
+    int kth(T k) {
+        int x = 0;
+        for (int i = 1 << std::__lg(n); i; i /= 2) {
+            if (x + i <= n && k >= a[x + i - 1]) {
+                x += i;
+                k -= a[x - 1];
+            }
+        }
+        return x;
+    }
+};
+
+void solve() {
+    INT(n, m);
+    VEC(int, a, n);
+    Graph d(n);
+    d.read_tree();
+    Centroid_Decomposition cd(d);
+    HLD hld(n);
+    for (auto&& [u, v, _, __] : d.edges) hld.addEdge(u, v);
+    hld.work();
+    auto& parent = cd.dparent;
+    vvi nd(n);
+    rep(i, n) if (parent[i] != -1) nd[parent[i]].pb(i);
+    vi sz(n, 1);
+    auto dfs = [&] (auto dfs, int i) -> void {
+        each(j, nd[i]) {
+            dfs(dfs, j);
+            sz[i] += sz[j];
+        }
+    };
+    rep(i, n) if (parent[i] == -1) dfs(dfs, i);
+    vector<Fenwick<int>> seg1;
+    rep(i, n) seg1.eb(Fenwick<int>(sz[i] + 2));
+    vector<Fenwick<int>> seg2;
+    rep(i, n) seg2.eb(Fenwick<int>(sz[i] + 2));
+    auto add = [&] (int i, int val) -> void {
+        seg1[i].add(0, val);
+        int x = i;
+        while (parent[x] != -1) {
+            int dist = hld.dist(i, parent[x]);
+            seg1[parent[x]].add(dist, val);
+            seg2[x].add(dist, val);
+            x = parent[x];
+        }
+    };
+    rep(i, n) add(i, a[i]);
+    int ans = 0;
+    while (m--) {
+        INT(op, x, y);
+        x ^= ans;
+        y ^= ans;
+        x--;
+        if (op == 0) {
+            int t = x;
+            ans = seg1[x].sum(min(sz[x], y) + 1);
+            while (parent[x] != -1) {
+                int dist = hld.dist(t, parent[x]);
+                ans += seg1[parent[x]].sum(min(sz[parent[x]], y - dist) + 1);
+                ans -= seg2[x].sum(min(sz[x], y - dist) + 1);
+                x = parent[x];
+            }
+            print(ans);
+        }
+        if (op == 1) {
+            add(x, y - a[x]);
+            a[x] = y;
+        }
+    }
 }
 
 signed main() {

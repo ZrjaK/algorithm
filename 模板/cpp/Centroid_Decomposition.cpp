@@ -1,3 +1,45 @@
+template <typename T = int, bool directed = false>
+struct Graph {
+    int n;
+    using cost_type = T;
+    using edge_type = tuple<int, int, cost_type, int>;
+    vector<vector<pair<int, cost_type>>> g;
+
+    vector<edge_type> edges;
+    constexpr bool is_directed() { return directed; }
+
+    Graph(int _n) : n(_n), g(_n) {}
+
+    void add(int u, int v, cost_type cost, int i = -1) {
+        assert(0 <= u && u < n && 0 <= v && v < n);
+        edges.emplace_back(u, v, cost, i);
+    }
+
+    void read_tree(bool wt = false, int off = 1) { read_graph(n - 1, wt, off); }
+
+    void read_graph(int m, bool wt = false, int off = 1) {
+        for (int i = 0; i < m; i++) {
+            int a, b; cin >> a >> b;
+            a -= off, b -= off;
+            cost_type cost = 1;
+            if (wt) cin >> cost;
+            add(a, b, cost, i);
+        }
+        build();
+    }
+    
+    void build() {
+        for (auto&& [u, v, cost, i] : edges) {
+            g[u].emplace_back(v, cost);
+            if (!directed) g[v].emplace_back(u, cost);
+        }
+    }
+
+    vector<pair<int, cost_type>> operator[] (int i) {
+        return g[i];
+    }
+};
+
 template <typename GT>
 pair<int, int> find_centroids(GT& G) {
     int n = G.n;
@@ -47,10 +89,12 @@ struct Centroid_Decomposition {
     vector<int> parent;
     vector<int> cdep; // depth in centroid tree
 
+    vector<int> dparent;
+
     bool calculated;
 
     Centroid_Decomposition(GT& G)
-        : G(G), n(G.n), sz(G.n), parent(G.n), cdep(G.n, -1) {
+        : G(G), n(G.n), sz(G.n), parent(G.n), cdep(G.n, -1), dparent(n, -1) {
         calculated = 0;
         build();
     }
@@ -82,15 +126,16 @@ private:
     assert(!calculated);
     calculated = 1;
 
-    vector<pair<int, int>> st;
-    st.emplace_back(0, 0);
+    vector<tuple<int, int, int>> st;
+    st.emplace_back(0, 0, -1);
     while (!st.empty()) {
-        auto [lv, v] = st.back();
+        auto [lv, v, fa] = st.back();
         st.pop_back();
         auto c = find(v);
+        dparent[c] = fa;
         cdep[c] = lv;
         for (auto&& [to, w] : G[c]) {
-            if (cdep[to] == -1) { st.emplace_back(lv + 1, to); }
+            if (cdep[to] == -1) { st.emplace_back(lv + 1, to, c); }
         }
     }
   }
