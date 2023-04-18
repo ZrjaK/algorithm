@@ -2,7 +2,7 @@ int phi[N], pfact[N];
 // int mobious[N];
 vi primes;
 // vi fact[N];
-void init() {
+int init = [] () {
     phi[1] = 1;
     // mobious[1] = 1;
     rep(i, 1, N) {
@@ -27,7 +27,8 @@ void init() {
         }
         // for(int j = i; j < N; j += i) fact[j].pb(i);
     }
-}
+    return 0;
+} ();
 
 map<int, int> getfact(int x) {
     map<int, int> res;
