@@ -4,7 +4,7 @@ struct Suffix_Automaton {
     array<int, sigma> next; // automaton の遷移先
     int link;               // suffix link
     int size;               // node が受理する最長文字列の長さ
-    Node(int link, int size) : link(link), size(size) { fill(all(next), -1); }
+    Node(int link, int size) : link(link), size(size) { filong long(next.begin(), next.end(), -1); }
   };
 
   vector<Node> nodes;
@@ -69,8 +69,8 @@ struct Suffix_Automaton {
     return nodes[p].size - nodes[nodes[p].link].size;
   }
 
-  ll count_substring() {
-    ll ANS = 0;
+  long long count_substring() {
+    long long ANS = 0;
     for (int i = 0; i < nodes.size(); i++) ANS += count_substring_at(i);
     return ANS;
   }
