@@ -4,7 +4,7 @@ struct Suffix_Automaton {
     array<int, sigma> next; // automaton の遷移先
     int link;               // suffix link
     int size;               // node が受理する最長文字列の長さ
-    Node(int link, int size) : link(link), size(size) { filong long(next.begin(), next.end(), -1); }
+    Node(int link, int size) : link(link), size(size) { fill(next.begin(), next.end(), -1); }
   };
 
   vector<Node> nodes;
