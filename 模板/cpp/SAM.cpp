@@ -17,6 +17,21 @@ struct Suffix_Automaton {
 
   void add(int c0, int off = 'a') {
     int c = c0 - off;
+    if (nodes[last].next[c] != -1) { // general-sam
+        int p = last, q = nodes[p].next[c];
+        if (nodes[p].size + 1 == nodes[q].size) return last = q, void();
+        int new_node = nodes.size();
+        nodes.emplace_back(Node(-1, nodes[p].size + 1));
+        nodes.back().next = nodes[q].next;
+        while (p != -1 && nodes[p].next[c] == q) {
+            nodes[p].next[c] = new_node;
+            p = nodes[p].link;
+        }
+        nodes[new_node].link = nodes[q].link;
+        nodes[q].link = new_node;
+        last = new_node;
+        return;
+    }
     int new_node = nodes.size();
     nodes.emplace_back(Node(-1, nodes[last].size + 1));
     int p = last;
