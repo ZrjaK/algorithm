@@ -241,8 +241,6 @@ void solve() {
         Info res = seg.all_prod();
         long long a = (res.a[0][0] * A % MOD + res.a[1][0] * B % MOD) % MOD;
         long long b = (res.a[0][1] * A % MOD + res.a[1][1] * B % MOD) % MOD;
-        cout << res.a[0][0] << " " << res.a[0][1] << endl;
-        cout << res.a[1][0] << " " << res.a[1][1] << endl;
         cout << a << " " << b << "\n";
     }
 }
