@@ -1,4 +1,4 @@
-import random, sys, os, math, threading, gc
+import random, sys, os, math, gc
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
 from itertools import accumulate, combinations, permutations, product
@@ -6,10 +6,11 @@ from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
 from bisect import bisect_left, bisect_right
-from math import factorial, ceil, floor, gcd
+from math import factorial, gcd
 from operator import mul, xor
 from types import GeneratorType
-from fractions import Fraction
+# if "PyPy" in sys.version:
+#     import pypyjit; pypyjit.set_param('max_unroll_recursion=-1')
 # sys.setrecursionlimit(2*10**5)
 BUFSIZE = 8192
 MOD = 10**9 + 7
@@ -19,13 +20,21 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
+    n, k = LII()
     arr = LII()
+    arr.sort()
+    h = list(accumulate(arr)) + [0]
+    ans = 0
+    for i in range(k + 1):
+        ans = max(ans, h[n-1-(k-i)] - h[2 * i - 1])
+    print(ans)
+    
+
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
@@ -61,17 +70,6 @@ def lcm(x, y):
 
 def lowbit(x):
     return x & -x
-
-@bootstrap
-def exgcd(a: int, b: int):
-    if b == 0:
-        d, x, y = a, 1, 0
-    else:
-        (d, p, q) = yield exgcd(b, a % b)
-        x = q
-        y = p - q * (a // b)
- 
-    yield d, x, y
 
 def perm(n, r):
     return factorial(n) // factorial(n - r) if n >= r else 0
@@ -358,8 +356,10 @@ class IOWrapper(IOBase):
         self.read = lambda: self.buffer.read().decode("ascii")
         self.readline = lambda: self.buffer.readline().decode("ascii")
 
-sys.stdin, sys.stdout = IOWrapper(sys.stdin), IOWrapper(sys.stdout)
+sys.stdin = IOWrapper(sys.stdin)
+# sys.stdout = IOWrapper(sys.stdout)
 input = lambda: sys.stdin.readline().rstrip("\r\n")
+# input = BytesIO(os.read(0, os.fstat(0).st_size)).readline
 
 def I():
     return input()
@@ -382,10 +382,24 @@ def GMI():
 def LGMI():
     return list(map(lambda x: int(x) - 1, input().split()))
 
-def debug(*args):
-    print('\033[92m', end='')
-    print(*args)
-    print('\033[0m', end='')
+def getGraph(n, m, directed=False):
+    d = [[] for _ in range(n)]
+    for _ in range(m):
+        u, v = LGMI()
+        d[u].append(v)
+        if not directed:
+            d[v].append(u)
+    return d
+
+def getWeightedGraph(n, m, directed=False):
+    d = [[] for _ in range(n)]
+    for _ in range(m):
+        u, v, w = LII()
+        u -= 1; v -= 1
+        d[u].append((v, w))
+        if not directed:
+            d[v].append((u, w))
+    return d
 
 if __name__ == "__main__":
     main()
