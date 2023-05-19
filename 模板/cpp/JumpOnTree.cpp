@@ -23,7 +23,7 @@ struct JumpOnTree {
     }
 
     void doubling() {
-        for (int i = 1; i < logn; i++) for (int u = 0; u < n; i++) {
+        for (int i = 1; i < logn; i++) for (int u = 0; u < n; u++) {
             int p = parent[i - 1][u];
             if (p != -1) parent[i][u] = parent[i - 1][p];
         }
