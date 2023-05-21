@@ -20,38 +20,16 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    p = [0] + LGMI()
-    d = [[] for _ in range(n)]
-    for i in range(1, n):
-        d[p[i]].append(i)
-    s = I()
-    tot = [s.count("R"), s.count("G"), s.count("B")]
-    cnt = [[0] * 3 for _ in range(n)]
-    ans = 0
-    q = [0]
-    while q:
-        i = q.pop()
-        if i >= 0:
-            if s[i] == "R":
-                cnt[i][0] += 1
-            if s[i] == "G":
-                cnt[i][1] += 1
-            if s[i] == "B":
-                cnt[i][2] += 1
-            for j in d[i]:
-                q.append(~j)
-                q.append(j)
+    n, m = LII()
+    arr = [I() for _ in range(n)]
+    for lst in permutations(arr, n):
+        for i in range(1, n):
+            t = len([i for i, j in zip(lst[i], lst[i-1]) if i != j])
+            if t != 1:
+                break
         else:
-            i = ~i
-            for j in d[i]:
-                for k in range(3):
-                    cnt[i][k] += cnt[j][k]
-            if all(cnt[i][k] and tot[k] - cnt[i][k] for k in range(3)):
-                ans += 1
-    print(ans)
-
-
+            return print("Yes")
+    print("No")
     
 
 def main():

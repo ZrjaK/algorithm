@@ -19,39 +19,65 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
+class DisjointSetUnion:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.num_sets = n
+ 
+    def find(self, a):
+        acopy = a
+        while a != self.parent[a]:
+            a = self.parent[a]
+        while acopy != a:
+            self.parent[acopy], acopy = a, self.parent[acopy]
+        return a
+ 
+    def union(self, a, b):
+        a, b = self.find(a), self.find(b)
+        if a != b:
+            if self.size[a] < self.size[b]:
+                a, b = b, a
+ 
+            self.num_sets -= 1
+            self.parent[b] = a
+            self.size[a] += self.size[b]
+ 
+    def set_size(self, a):
+        return self.size[self.find(a)]
+ 
+    def __len__(self):
+        return self.num_sets
+
 def solve():
-    n = II()
-    p = [0] + LGMI()
-    d = [[] for _ in range(n)]
-    for i in range(1, n):
-        d[p[i]].append(i)
-    s = I()
-    tot = [s.count("R"), s.count("G"), s.count("B")]
-    cnt = [[0] * 3 for _ in range(n)]
-    ans = 0
-    q = [0]
-    while q:
-        i = q.pop()
-        if i >= 0:
-            if s[i] == "R":
-                cnt[i][0] += 1
-            if s[i] == "G":
-                cnt[i][1] += 1
-            if s[i] == "B":
-                cnt[i][2] += 1
-            for j in d[i]:
-                q.append(~j)
-                q.append(j)
-        else:
-            i = ~i
-            for j in d[i]:
-                for k in range(3):
-                    cnt[i][k] += cnt[j][k]
-            if all(cnt[i][k] and tot[k] - cnt[i][k] for k in range(3)):
-                ans += 1
-    print(ans)
-
-
+    n, m = LII()
+    arr = []
+    for _ in range(n):
+        I()
+        arr.append(LII())
+    h = [[] for _ in range(m + 1)]
+    for i in range(n):
+        for j in arr[i]:
+            h[j].append(i)
+    q = []
+    vis1 = [0] * (m + 1)
+    vis2 = [0] * n
+    for i in range(n):
+        if 1 in arr[i]:
+            q.append((0, i))
+            vis1[1] = 1
+            vis2[i] = 1
+    for (s, i) in q:
+        for j in arr[i]:
+            if j == m:
+                return print(s)
+            if not vis1[j]:
+                vis1[j] = 1
+                for ii in h[j]:
+                    if not vis2[ii]:
+                        vis2[ii] = 1
+                        q.append((s + 1, ii))
+    print(-1)
     
 
 def main():

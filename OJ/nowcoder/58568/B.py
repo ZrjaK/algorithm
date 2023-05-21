@@ -19,38 +19,82 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
-def solve():
-    n = II()
-    p = [0] + LGMI()
-    d = [[] for _ in range(n)]
-    for i in range(1, n):
-        d[p[i]].append(i)
-    s = I()
-    tot = [s.count("R"), s.count("G"), s.count("B")]
-    cnt = [[0] * 3 for _ in range(n)]
-    ans = 0
-    q = [0]
-    while q:
-        i = q.pop()
-        if i >= 0:
-            if s[i] == "R":
-                cnt[i][0] += 1
-            if s[i] == "G":
-                cnt[i][1] += 1
-            if s[i] == "B":
-                cnt[i][2] += 1
-            for j in d[i]:
-                q.append(~j)
-                q.append(j)
-        else:
-            i = ~i
-            for j in d[i]:
-                for k in range(3):
-                    cnt[i][k] += cnt[j][k]
-            if all(cnt[i][k] and tot[k] - cnt[i][k] for k in range(3)):
-                ans += 1
-    print(ans)
+from math import gcd
 
+def isprime(n):
+    if n <= 1:
+        return False
+    elif n == 2:
+        return True
+    elif n % 2 == 0:
+        return False
+    
+    A = [2, 325, 9375, 28178, 450775, 9780504, 1795265022]
+    s = 0
+    d = n - 1
+    while d % 2 == 0:
+        s += 1
+        d >>= 1
+    
+    for a in A:
+        if a % n == 0:
+            return True
+        x = pow(a, d, n)
+        if x != 1:
+            for t in range(s):
+                if x == n - 1:
+                    break
+                x = x * x % n
+            else:
+                return False
+    return True
+        
+def pollard(n):
+    if n % 2 == 0:
+        return 2
+    if isprime(n):
+        return n
+    
+    f = lambda x:(x * x + 1) % n
+    
+    step = 0
+    while 1:
+        step += 1
+        x = step
+        y = f(x)
+        while 1:
+            p = gcd(y - x + n, n)
+            if p == 0 or p == n:
+                break
+            if p != 1:
+                return p
+            x = f(x)
+            y = f(f(y))
+
+def primefact(n):
+    if n == 1:
+        return []
+    p = pollard(n)
+    if p == n:
+        return [p]
+    left = primefact(p)
+    right = primefact(n // p)
+    return sorted(left + right)
+
+def solve():
+    n, k = LII()
+    arr = LII()
+    h = []
+    for i in arr:
+        h += primefact(i)
+    h.sort()
+    while h and k:
+        h.pop()
+        k -= 1
+    ans = 1
+    for i in h:
+        ans = ans * i % MOD
+    print(ans)
 
     
 

@@ -20,37 +20,17 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    p = [0] + LGMI()
-    d = [[] for _ in range(n)]
-    for i in range(1, n):
-        d[p[i]].append(i)
-    s = I()
-    tot = [s.count("R"), s.count("G"), s.count("B")]
-    cnt = [[0] * 3 for _ in range(n)]
-    ans = 0
-    q = [0]
-    while q:
-        i = q.pop()
-        if i >= 0:
-            if s[i] == "R":
-                cnt[i][0] += 1
-            if s[i] == "G":
-                cnt[i][1] += 1
-            if s[i] == "B":
-                cnt[i][2] += 1
-            for j in d[i]:
-                q.append(~j)
-                q.append(j)
-        else:
-            i = ~i
-            for j in d[i]:
-                for k in range(3):
-                    cnt[i][k] += cnt[j][k]
-            if all(cnt[i][k] and tot[k] - cnt[i][k] for k in range(3)):
-                ans += 1
+    n, m, r, c = LII()
+    arr = [LII() + [0] for _ in range(n)]
+    arr.append([0] * (m + 1))
+    for i in range(n):
+        for j in range(m):
+            arr[i][j] += arr[i-1][j] + arr[i][j-1] - arr[i-1][j-1]
+    ans = -INF
+    for i in range(r-1, n):
+        for j in range(c-1, m):
+            ans = max(ans, arr[i][j] - arr[i-r][j] - arr[i][j-c] + arr[i-r][j-c])
     print(ans)
-
 
     
 

@@ -20,38 +20,46 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    p = [0] + LGMI()
-    d = [[] for _ in range(n)]
-    for i in range(1, n):
-        d[p[i]].append(i)
-    s = I()
-    tot = [s.count("R"), s.count("G"), s.count("B")]
-    cnt = [[0] * 3 for _ in range(n)]
-    ans = 0
-    q = [0]
-    while q:
-        i = q.pop()
-        if i >= 0:
-            if s[i] == "R":
-                cnt[i][0] += 1
-            if s[i] == "G":
-                cnt[i][1] += 1
-            if s[i] == "B":
-                cnt[i][2] += 1
-            for j in d[i]:
-                q.append(~j)
-                q.append(j)
-        else:
-            i = ~i
-            for j in d[i]:
-                for k in range(3):
-                    cnt[i][k] += cnt[j][k]
-            if all(cnt[i][k] and tot[k] - cnt[i][k] for k in range(3)):
-                ans += 1
-    print(ans)
-
-
+    n, m = LII()
+    arr = [I() for _ in range(n)]
+    for i in range(n):
+        for j in range(m):
+            if arr[i][j] != "s":
+                continue
+            if j + 4 < m and "".join([arr[i][k] for k in range(j, j + 5)]) == "snuke":
+                for k in range(j, j + 5):
+                    print(i + 1, k + 1)
+                return
+            if j - 4 >= 0 and "".join([arr[i][k] for k in range(j, j - 5, -1)]) == "snuke":
+                for k in range(j, j - 5, -1):
+                    print(i + 1, k + 1)
+                return
+            if i + 4 < n and "".join([arr[k][j] for k in range(i, i + 5)]) == "snuke":
+                for k in range(i, i + 5):
+                    print(k + 1, j + 1)
+                return
+            if i - 4 >= 0 and "".join([arr[k][j] for k in range(i, i - 5, -1)]) == "snuke":
+                for k in range(i, i - 5, -1):
+                    print(k + 1, j + 1)
+                return
+            if i + 4 < n and j + 4 < m and "".join([arr[i+k][j+k] for k in range(5)]) == "snuke":
+                for k in range(5):
+                    print(i + k + 1, j + k + 1)
+                return
+            if i - 4 >= 0 and j - 4 >= 0 and "".join([arr[i-k][j-k] for k in range(5)]) == "snuke":
+                for k in range(5):
+                    print(i - k + 1, j - k + 1)
+                return
+            if i + 4 < n and j - 4 >= 0 and "".join([arr[i+k][j-k] for k in range(5)]) == "snuke":
+                for k in range(5):
+                    print(i + k + 1, j - k + 1)
+                return
+            if i - 4 >= 0 and j + 4 < m and "".join([arr[i-k][j+k] for k in range(5)]) == "snuke":
+                for k in range(5):
+                    print(i - k + 1, j + k + 1)
+                return
+            
+                    
     
 
 def main():

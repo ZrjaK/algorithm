@@ -21,36 +21,24 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    p = [0] + LGMI()
-    d = [[] for _ in range(n)]
-    for i in range(1, n):
-        d[p[i]].append(i)
-    s = I()
-    tot = [s.count("R"), s.count("G"), s.count("B")]
-    cnt = [[0] * 3 for _ in range(n)]
-    ans = 0
-    q = [0]
-    while q:
-        i = q.pop()
-        if i >= 0:
-            if s[i] == "R":
-                cnt[i][0] += 1
-            if s[i] == "G":
-                cnt[i][1] += 1
-            if s[i] == "B":
-                cnt[i][2] += 1
-            for j in d[i]:
-                q.append(~j)
-                q.append(j)
-        else:
-            i = ~i
-            for j in d[i]:
-                for k in range(3):
-                    cnt[i][k] += cnt[j][k]
-            if all(cnt[i][k] and tot[k] - cnt[i][k] for k in range(3)):
-                ans += 1
-    print(ans)
-
+    arr = LII()
+    s = LI()
+    dp = [[0] * 3 for _ in range(n + 1)]
+    for i in range(n):
+        if s[i] == "AA":
+            dp[i+1][0] = dp[i][0] + arr[i]
+            dp[i+1][1] = max(dp[i][1], dp[i][0] + arr[i])
+            dp[i+1][2] = dp[i][2]
+        if s[i] == "Aa":
+            dp[i+1][0] = dp[i][1] + arr[i]
+            dp[i+1][1] = dp[i][1] + arr[i]
+            dp[i+1][2] = dp[i][1] + arr[i]
+        if s[i] == "aa":
+            dp[i+1][0] = dp[i][0]
+            dp[i+1][1] = max(dp[i][1], dp[i][2] + arr[i])
+            dp[i+1][2] = dp[i][2] + arr[i]
+    print(max(max(i) for i in dp))
+        
 
     
 

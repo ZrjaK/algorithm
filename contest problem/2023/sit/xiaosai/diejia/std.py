@@ -70,6 +70,8 @@ for i in range(n):
         
 
 q = int(input())
+out = []
+
 for _ in range(q):
     x = int(input()) - 1
     if s[x] == "1":
@@ -83,4 +85,6 @@ for _ in range(q):
     a %= int(1e9 + 7)
     b = A * res[0][1] + B * res[1][1]
     b %= int(1e9 + 7)
-    print(a, b)
+    out.append(str(a) + " " + str(b))
+
+print("\n".join(out))

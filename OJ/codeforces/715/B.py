@@ -20,39 +20,53 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    p = [0] + LGMI()
-    d = [[] for _ in range(n)]
-    for i in range(1, n):
-        d[p[i]].append(i)
-    s = I()
-    tot = [s.count("R"), s.count("G"), s.count("B")]
-    cnt = [[0] * 3 for _ in range(n)]
-    ans = 0
-    q = [0]
-    while q:
-        i = q.pop()
-        if i >= 0:
-            if s[i] == "R":
-                cnt[i][0] += 1
-            if s[i] == "G":
-                cnt[i][1] += 1
-            if s[i] == "B":
-                cnt[i][2] += 1
-            for j in d[i]:
-                q.append(~j)
-                q.append(j)
+    n, m, L, s, t = LII()
+    E = [LII() for _ in range(m)]
+    d = [[INF] * n for _ in range(n)]
+    can = {}
+    for i in range(m):
+        u, v, w = E[i]
+        if w:
+            d[u][v] = d[v][u] = w
         else:
-            i = ~i
-            for j in d[i]:
-                for k in range(3):
-                    cnt[i][k] += cnt[j][k]
-            if all(cnt[i][k] and tot[k] - cnt[i][k] for k in range(3)):
-                ans += 1
-    print(ans)
+            d[u][v] = d[v][u] = 1
+            can[u, v] = can[v, u] = i
+    dist = [INF] * n
+    dist[s] = 0
+    pq = [(0, s)]
+    while pq:
+        _, x = heappop(pq)
+        for y in range(n):
+            if dist[y] > dist[x] + d[x][y]:
+                dist[y] = dist[x] + d[x][y]
+                heappush(pq, (dist[y], y))
+    if dist[t] > L:
+        return print("NO")
+    need = L - dist[t]
+    dist1 = [INF] * n
+    dist1[s] = 0
+    pq = [(0, s)]
+    while pq:
+        _, x = heappop(pq)
+        for y in range(n):
+            if (x, y) in can:
+                idx = can[x, y]
+                z = dist[y] + need - dist1[x]
+                if d[x][y] < z:
+                    d[x][y] = d[y][x] = z
+                E[idx][2] = d[x][y]
+            if dist1[y] > dist1[x] + d[x][y]:
+                dist1[y] = dist1[x] + d[x][y]
+                heappush(pq, (dist1[y], y))
+    if dist1[t] != L:
+        return print("NO")
+    print("YES")
+    for i in E:
+        print(*i)
+        
 
 
-    
+
 
 def main():
     t = 1
