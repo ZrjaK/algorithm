@@ -4,7 +4,7 @@ struct Rollback_Array {
   vector<T> dat;
   vector<pair<int, T>> history;
  
-  Rollback_Array(vector<T> x) : N(len(x)), dat(x) {}
+  Rollback_Array(vector<T> x) : N(x.size()), dat(x) {}
   Rollback_Array(int N) : N(N), dat(N) {}
   template <typename F>
   Rollback_Array(int N, F f) : N(N) {
