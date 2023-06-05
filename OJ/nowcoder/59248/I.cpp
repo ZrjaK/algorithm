@@ -237,12 +237,6 @@ void read(Head &head, Tail &... tail) {
 #define VV(type, name, h, w)                     \
     vector<vector<type>> name(h, vector<type>(w)); \
     read(name)
-void YES(bool t = 1) { print(t ? "YES" : "NO"); }
-void NO(bool t = 1) { YES(!t); }
-void Yes(bool t = 1) { print(t ? "Yes" : "No"); }
-void No(bool t = 1) { Yes(!t); }
-void yes(bool t = 1) { print(t ? "yes" : "no"); }
-void no(bool t = 1) { yes(!t); }
 ll gcd(ll x, ll y) {
     if(!x) return y;
     if(!y) return x;
@@ -315,9 +309,67 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
+pair<vector<int>, vector<int>> EulerTour(vector<vector<int>>& E, int root = 0) {
+    int n = E.size();
+    vector<int> IN(n, -1);
+    vector<int> OUT(n, 0);
+    vector<pair<int, int>> stack = {{root, 1}, {root, 0}};
+    int ind = 0;
+    while (stack.size()) {
+        auto [pos, t] = stack.back();
+        stack.pop_back();
+        if (!t) {
+            IN[pos] = ind++;
+            for (auto& npos : E[pos]) if (IN[npos] == -1) {
+                stack.emplace_back(pair{npos, 1});
+                stack.emplace_back(pair{npos, 0});
+            }
+        } else OUT[pos] = ind;
+    }
+    return {IN, OUT};
+}
+
 void solve() {
     INT(n);
-    VEC(int, a, n);
+    VEC(ll, a, n);
+    auto d = getGraph(n, n - 1);
+    vi dep(n);
+    auto dfs = [&] (auto dfs, int i, int fa) -> void {
+        each(j, d[i]) if (j != fa) dep[j] = dep[i] + 1, dfs(dfs, j, i);
+    };
+    dfs(dfs, 0, -1);
+    auto [in, out] = EulerTour(d);
+    INT(q);
+    rep(_, q) {
+        INT(op);
+        if (op == 1) {
+            INT(p, x);
+            p--;
+            a[p] = x;
+        }
+        if (op == 2) {
+            INT(p, k, x);
+            p--;
+            rep(i, n) if (dep[i] - k == dep[p] && in[p] < in[i] && in[i] < out[p]) a[i] = x;
+        }
+        if (op == 3) {
+            INT(p, k, x);
+            p--;
+            rep(i, n) if (dep[i] - k == dep[p] && in[p] < in[i] && in[i] < out[p]) a[i] += x;
+        }
+        if (op == 4) {
+            INT(p);
+            p--;
+            print(a[p]);
+        }
+        if (op == 5) {
+            INT(p, k);
+            p--;
+            ll ans = 0;
+            rep(i, n) if (dep[i] - k == dep[p] && in[p] < in[i] && in[i] < out[p]) ans += a[i];
+            print(ans);
+        }
+    }
     
 }
 

@@ -21,8 +21,30 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
-    
+    arr = [LII() for _ in range(n)]
+    ans = 0
+    for lst in permutations(range(n), n):
+        t = 0
+        for i in range(1, n):
+            t += arr[lst[i-1]][lst[i]]
+        arr[lst[0]][lst[-1]] = min(arr[lst[0]][lst[-1]], t)
+    def calc(s):
+        dist = [INF] * n
+        dist[s] = 0
+        pq = [(0, s)]
+        while pq:
+            _, i = heappop(pq)
+            for j in range(n):
+                if dist[j] > dist[i] + arr[i][j]:
+                    dist[j] = dist[i] + arr[i][j]
+                    heappush(pq, (dist[j], j))
+        ans = 0
+        for i in range(n):
+            if i != s:
+                ans = max(ans, dist[i])
+        return ans
+    print(max(calc(i) for i in range(n)))
+
 
 def main():
     t = 1
@@ -392,13 +414,6 @@ def getWeightedGraph(n, m, directed=False):
         if not directed:
             d[v].append((u, w))
     return d
-
-def YES(t = 1): print("YES" if t else "NO")
-def NO(t = 1): YES(t ^ 1)
-def Yes(t = 1): print("Yes" if t else "No")
-def No(t = 1): Yes(t ^ 1)
-def yes(t = 1): print("yes" if t else "no")
-def no(t = 1): yes(t ^ 1)
 
 if __name__ == "__main__":
     main()

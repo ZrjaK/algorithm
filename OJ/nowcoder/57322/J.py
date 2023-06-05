@@ -13,20 +13,51 @@ from types import GeneratorType
 #     import pypyjit; pypyjit.set_param('max_unroll_recursion=-1')
 # sys.setrecursionlimit(2*10**5)
 BUFSIZE = 8192
-MOD = 10**9 + 7
-MODD = 998244353
+# MOD = 10**9 + 7
+# MODD = 998244353
 INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
+MOD = 998244353
+N = 10**6+10
+
+fac = [1] * N
+inv = [1] * N
+for i in range(1, N):
+    fac[i] = fac[i-1] * i % MOD
+for i in range(2, N):
+    inv[i] = (MOD - MOD // i) * inv[MOD % i] % MOD
+for i in range(1, N):
+    inv[i] = (inv[i-1] * inv[i]) % MOD
+
+def C(n, m):
+    return fac[n] * inv[m] * inv[n-m] % MOD if n >= m and m >= 0 else 0
+def P(n, m):
+    return fac[n] * inv[n-m] % MOD if n >= m and m >= 0 else 0
+
+def lucas(n, m):
+    if n < m:
+        return 0
+    elif n < MOD:
+        return C(n, m)
+    else:
+        return lucas(n // MOD, m // MOD) * lucas(n % MOD, m % MOD) % MOD
+
 def solve():
     n = II()
     arr = LII()
+    c = Counter(arr)
+    ans = fac[n]
+    for i in c:
+        ans = ans * inv[c[i]] % MOD
+    print(ans)
+
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
@@ -392,13 +423,6 @@ def getWeightedGraph(n, m, directed=False):
         if not directed:
             d[v].append((u, w))
     return d
-
-def YES(t = 1): print("YES" if t else "NO")
-def NO(t = 1): YES(t ^ 1)
-def Yes(t = 1): print("Yes" if t else "No")
-def No(t = 1): Yes(t ^ 1)
-def yes(t = 1): print("yes" if t else "no")
-def no(t = 1): yes(t ^ 1)
 
 if __name__ == "__main__":
     main()

@@ -237,12 +237,6 @@ void read(Head &head, Tail &... tail) {
 #define VV(type, name, h, w)                     \
     vector<vector<type>> name(h, vector<type>(w)); \
     read(name)
-void YES(bool t = 1) { print(t ? "YES" : "NO"); }
-void NO(bool t = 1) { YES(!t); }
-void Yes(bool t = 1) { print(t ? "Yes" : "No"); }
-void No(bool t = 1) { Yes(!t); }
-void yes(bool t = 1) { print(t ? "yes" : "no"); }
-void no(bool t = 1) { yes(!t); }
 ll gcd(ll x, ll y) {
     if(!x) return y;
     if(!y) return x;
@@ -316,8 +310,17 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    INT(n);
+    INT(n, q);
     VEC(int, a, n);
+    vll h(n + 1);
+    rep(i, n) h[i+1] = h[i] + a[i];
+    ll s = SUM(a);
+    rep(_, q) {
+        INT(l, r, x);
+        ll ss = s - h[r] - h[l-1] + (r - l + 1) * x;
+        if (ss % 2 == 0) print("NO");
+        else print("YES");
+    }
     
 }
 

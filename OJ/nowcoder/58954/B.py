@@ -20,8 +20,35 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
+    s = I()
+    dp = [[[0] * 2 for _ in range(26)] for _ in range(10)]
+    dp[0][0][0] = 1
+    dp[0][0][1] = 1
+    for ch in s:
+        ch = ord(ch) - 97
+        ndp = [[[0] * 2 for _ in range(26)] for _ in range(10)]
+        for i in range(10):
+            for j in range(26):
+                if not 0 <= ch < 26:
+                    for ch in range(26):
+                        ni = i + 1 if j + 1 == ch else 1
+                        ndp[min(9, ni)][ch][int(ni == 10)] += dp[i][j][0]
+                        ndp[min(9, ni)][ch][1] += dp[i][j][1]
+
+                else:
+                    ni = i + 1 if j + 1 == ch else 1
+                    ndp[min(9, ni)][ch][int(ni == 10)] += dp[i][j][0]
+                    ndp[min(9, ni)][ch][1] += dp[i][j][1]
+        dp = ndp
+    ans = 0
+    for i in range(10):
+        for j in range(26):
+            ans += dp[i][j][1]
+            ans %= MOD
+    print(ans)
+
+
+
     
 
 def main():
@@ -392,13 +419,6 @@ def getWeightedGraph(n, m, directed=False):
         if not directed:
             d[v].append((u, w))
     return d
-
-def YES(t = 1): print("YES" if t else "NO")
-def NO(t = 1): YES(t ^ 1)
-def Yes(t = 1): print("Yes" if t else "No")
-def No(t = 1): Yes(t ^ 1)
-def yes(t = 1): print("yes" if t else "no")
-def no(t = 1): yes(t ^ 1)
 
 if __name__ == "__main__":
     main()

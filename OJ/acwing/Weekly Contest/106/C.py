@@ -19,9 +19,126 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
+class DoublyLinkedList:
+    """双端链表"""
+
+    class _Node:
+        __slots__ = "val", "prev", "next"
+
+        def __init__(self, val, prev, next):
+            self.val = val
+            self.prev = prev
+            self.next = next
+
+    def __init__(self):
+        self._header = self._Node(None, None, None)
+        self._trailer = self._Node(None, None, None)
+        self._header.next = self._trailer
+        self._trailer.prev = self._header
+        self._size = 0
+
+    def __len__(self):
+        return self._size
+
+    def __bool__(self):
+        return self._size > 0
+
+    def first(self):
+        if not self:
+            raise KeyError("empty deque")
+        return self._header.next
+
+    def last(self):
+        if not self:
+            raise KeyError("empty deque")
+        return self._trailer.prev
+
+    def _insert_between(self, val, before, after):
+        newest = self._Node(val, before, after)
+        before.next = newest
+        after.prev = newest
+        self._size += 1
+        return newest
+
+    def delete_node(self, node):
+        before = node.prev
+        after = node.next
+        before.next = after
+        after.prev = before
+        self._size -= 1
+        return node
+
+    def insert_first(self, val):
+        return self._insert_between(val, self._header, self._header.next)
+
+    def insert_last(self, val):
+        return self._insert_between(val, self._trailer.prev, self._trailer)
+
+    def delete_first(self):
+        if not self:
+            raise KeyError("empty deque")
+        return self.delete_node(self._header.next)
+
+    def delete_last(self):
+        if not self:
+            raise KeyError("empty deque")
+        return self.delete_node(self._trailer.prev)
+
+    def __repr__(self):
+        ans = []
+        node = self._header.next
+        while node.next:
+            ans.append(str(node.val))
+            node = node.next
+        return "deque:" + "<->".join(ans)
+
 def solve():
     n = II()
+    s = I()
     arr = LII()
+    q = DoublyLinkedList()
+    sl = SortedList()
+    d = {}
+    for i in range(n):
+        node = q.insert_last((arr[i], s[i], i))
+        d[i] = node
+        if node != q.first():
+            pre = node.prev
+            if pre.val[1] != node.val[1]:
+                sl.add((abs(pre.val[0] - node.val[0]), pre.val[2]))
+    ans = []
+    while sl:
+        _, idx = sl.pop(0)
+        node = d[idx]
+        node2 = node.next
+        ans.append((idx + 1, node2.val[2] + 1))
+        if node != q.first():
+            pre = node.prev
+            if pre.val[1] != node.val[1]:
+                sl.remove((abs(pre.val[0] - node.val[0]), pre.val[2]))
+        if node2 != q.last():
+            node = node2.next
+            pre = node.prev
+            if pre.val[1] != node.val[1]:
+                sl.remove((abs(pre.val[0] - node.val[0]), pre.val[2]))
+        node = None
+        if node2 != q.last():
+            node = node2.next
+        q.delete_node(d[idx])
+        q.delete_node(node2)
+        if node:
+            pre = node.prev
+            if node != q.first():
+                if pre.val[1] != node.val[1]:
+                    sl.add((abs(pre.val[0] - node.val[0]), pre.val[2]))
+    print(len(ans))
+    for i in ans:
+        print(*i)
+        
+            
+        
+
+
     
 
 def main():
@@ -392,13 +509,6 @@ def getWeightedGraph(n, m, directed=False):
         if not directed:
             d[v].append((u, w))
     return d
-
-def YES(t = 1): print("YES" if t else "NO")
-def NO(t = 1): YES(t ^ 1)
-def Yes(t = 1): print("Yes" if t else "No")
-def No(t = 1): Yes(t ^ 1)
-def yes(t = 1): print("yes" if t else "no")
-def no(t = 1): yes(t ^ 1)
 
 if __name__ == "__main__":
     main()

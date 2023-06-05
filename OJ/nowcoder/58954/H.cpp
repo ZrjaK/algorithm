@@ -237,12 +237,6 @@ void read(Head &head, Tail &... tail) {
 #define VV(type, name, h, w)                     \
     vector<vector<type>> name(h, vector<type>(w)); \
     read(name)
-void YES(bool t = 1) { print(t ? "YES" : "NO"); }
-void NO(bool t = 1) { YES(!t); }
-void Yes(bool t = 1) { print(t ? "Yes" : "No"); }
-void No(bool t = 1) { Yes(!t); }
-void yes(bool t = 1) { print(t ? "yes" : "no"); }
-void no(bool t = 1) { yes(!t); }
 ll gcd(ll x, ll y) {
     if(!x) return y;
     if(!y) return x;
@@ -311,13 +305,43 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
 const ll LINF = 0x1fffffffffffffff;
 const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
-const int MOD = 1000000007;
+const int MOD = 1100000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    INT(n);
+    INT(n, q);
     VEC(int, a, n);
+    int sq = sqrt(n);
+    auto cnt = ndvector(sq + 10, 1100, 0);
+    vector<bitset<1100>> mask(sq + 10);
+    rep(i, n) if (a[i] < 1100 && cnt[i / sq][a[i]]++ == 0) mask[i / sq][a[i]] = 1;
+    rep(_, q) {
+        INT(op);
+        if (op == 1) {
+            INT(l, r);
+            l--, r--;
+            bitset<1100> h;
+            if (l / sq == r / sq) {
+                rep(i, l, r + 1) if (a[i] < 1100) h[a[i]] = 1;
+            } else {
+                rep(i, l / sq + 1, r / sq) h |= mask[i];
+                rep(i, l, (l / sq + 1) * sq) if (a[i] < 1100) h[a[i]] = 1;
+                rep(i, r / sq * sq, r + 1) if (a[i] < 1100) h[a[i]] = 1;
+            }
+            rep(i, 1100 + 2) if (!h[i]) {
+                print(i);
+                break;
+            }
+        }
+        if (op == 2) {
+            INT(p, x);
+            p--;
+            if (a[p] < 1100 && --cnt[p / sq][a[p]] == 0) mask[p / sq][a[p]] = 0;
+            a[p] = x;
+            if (a[p] < 1100 && cnt[p / sq][a[p]]++ == 0) mask[p / sq][a[p]] = 1;
+        }
+    }
     
 }
 

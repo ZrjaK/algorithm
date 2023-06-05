@@ -22,11 +22,32 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 def solve():
     n = II()
     arr = LII()
+    x = deepcopy(arr)
+    if arr[-1] == 1:
+        return print("NO")
+    arr = arr[::-1]
+    ans = []
+    t = 0
+    while arr:
+        if arr[-1] == 0:
+            ans.append(0)
+            arr.pop()
+        else:
+            while arr[-1] == 1:
+                arr.pop()
+                t += 1
+            ans.append(t)
+            for _ in range(t-1):
+                ans.append(0)
+            t = 0
+    print("YES")
+    print(*ans[::-1])
+
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
@@ -392,13 +413,6 @@ def getWeightedGraph(n, m, directed=False):
         if not directed:
             d[v].append((u, w))
     return d
-
-def YES(t = 1): print("YES" if t else "NO")
-def NO(t = 1): YES(t ^ 1)
-def Yes(t = 1): print("Yes" if t else "No")
-def No(t = 1): Yes(t ^ 1)
-def yes(t = 1): print("yes" if t else "no")
-def no(t = 1): yes(t ^ 1)
 
 if __name__ == "__main__":
     main()

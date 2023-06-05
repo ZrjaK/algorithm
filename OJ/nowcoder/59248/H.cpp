@@ -237,12 +237,6 @@ void read(Head &head, Tail &... tail) {
 #define VV(type, name, h, w)                     \
     vector<vector<type>> name(h, vector<type>(w)); \
     read(name)
-void YES(bool t = 1) { print(t ? "YES" : "NO"); }
-void NO(bool t = 1) { YES(!t); }
-void Yes(bool t = 1) { print(t ? "Yes" : "No"); }
-void No(bool t = 1) { Yes(!t); }
-void yes(bool t = 1) { print(t ? "yes" : "no"); }
-void no(bool t = 1) { yes(!t); }
 ll gcd(ll x, ll y) {
     if(!x) return y;
     if(!y) return x;
@@ -316,9 +310,37 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    INT(n);
-    VEC(int, a, n);
-    
+    LL(n, x);
+    VEC(ll, a, n);
+    ll s = SUM(a);
+    vll h(n, s / n);
+    rep(i, s % n) h[i]++;
+    s = 0;
+    each(i, h) s += i * i;
+    if (s > x * n) return print(-1);
+    if (n == 1) return print(0);
+    s = 0;
+    map<ll, ll> M;
+    each(i, a) M[i]++, s += i * i;
+    ll ans = 0;
+    while (1) {
+        auto it1 = begin(M);
+        auto it2 = prev(end(M));
+        ll t = min(it1->se, it2->se);
+        if (s + t * 2 * (it1->fi - it2->fi + 1) > n * x) {
+            s += t * 2 * (it1->fi - it2->fi + 1);
+            ans += t;
+            it1->se -= t;
+            M[it1->fi + 1] += t;
+            if (!it1->se) M.erase(it1);
+            it2->se -= t;
+            M[it2->fi - 1] += t;
+            if (!it2->se) M.erase(it2);
+            continue;
+        }
+        rep(i, 0, t + 1) if (s + 1ll * i * 2 * (it1->fi - it2->fi + 1) <= n * x) 
+            return print(ans + i);
+    }
 }
 
 signed main() {

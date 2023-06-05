@@ -19,9 +19,58 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
+class DisjointSetUnion:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.num_sets = n
+ 
+    def find(self, a):
+        acopy = a
+        while a != self.parent[a]:
+            a = self.parent[a]
+        while acopy != a:
+            self.parent[acopy], acopy = a, self.parent[acopy]
+        return a
+ 
+    def union(self, a, b):
+        a, b = self.find(a), self.find(b)
+        if a != b:
+            if self.size[a] < self.size[b]:
+                a, b = b, a
+ 
+            self.num_sets -= 1
+            self.parent[b] = a
+            self.size[a] += self.size[b]
+ 
+    def set_size(self, a):
+        return self.size[self.find(a)]
+ 
+    def __len__(self):
+        return self.num_sets
+
 def solve():
-    n = II()
-    arr = LII()
+    n, m = LII()
+    dsu = DisjointSetUnion(n)
+    for _ in range(m):
+        x, y = LGMI()
+        dsu.union(x, y)
+    s = set()
+    for _ in range(II()):
+        x, y = LGMI()
+        x = dsu.find(x)
+        y = dsu.find(y)
+        s.add((x, y))
+        s.add((y, x))
+    for _ in range(II()):
+        x, y = LGMI()
+        x = dsu.find(x)
+        y = dsu.find(y)
+        if (x, y) in s:
+            print("No")
+        else:
+            print("Yes")
+        
     
 
 def main():
@@ -392,13 +441,6 @@ def getWeightedGraph(n, m, directed=False):
         if not directed:
             d[v].append((u, w))
     return d
-
-def YES(t = 1): print("YES" if t else "NO")
-def NO(t = 1): YES(t ^ 1)
-def Yes(t = 1): print("Yes" if t else "No")
-def No(t = 1): Yes(t ^ 1)
-def yes(t = 1): print("yes" if t else "no")
-def no(t = 1): yes(t ^ 1)
 
 if __name__ == "__main__":
     main()

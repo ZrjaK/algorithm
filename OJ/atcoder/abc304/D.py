@@ -20,8 +20,51 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
+    w, h = LII()
     n = II()
-    arr = LII()
+    xy = [LII() for _ in range(n)]
+    A = II()
+    a = LII()
+    B = II()
+    b = LII()
+    cnt = [0] * (B + 1)
+    sl = SortedList(cnt)
+    xy.sort(reverse=True)
+    a.sort(reverse=True)
+    mx = -INF
+    mn = INF
+    while a:
+        tt = a.pop()
+        h = []
+        while xy and xy[-1][0] <= tt:
+            x, y = xy.pop()
+            t = bisect_left(b, y)
+            sl.remove(cnt[t])
+            cnt[t] += 1
+            sl.add(cnt[t])
+            h.append((x, y))
+        mx = max(mx, sl[-1])
+        mn = min(mn, sl[0])
+        for x, y in h:
+            t = bisect_left(b, y)
+            sl.remove(cnt[t])
+            cnt[t] -= 1
+            sl.add(cnt[t])
+    while xy:
+        x, y = xy.pop()
+        t = bisect_left(b, y)
+        sl.remove(cnt[t])
+        cnt[t] += 1
+        sl.add(cnt[t])
+    mx = max(mx, sl[-1])
+    mn = min(mn, sl[0])
+    
+    print(mn, mx)
+
+        
+
+
+
     
 
 def main():
@@ -392,13 +435,6 @@ def getWeightedGraph(n, m, directed=False):
         if not directed:
             d[v].append((u, w))
     return d
-
-def YES(t = 1): print("YES" if t else "NO")
-def NO(t = 1): YES(t ^ 1)
-def Yes(t = 1): print("Yes" if t else "No")
-def No(t = 1): Yes(t ^ 1)
-def yes(t = 1): print("yes" if t else "no")
-def no(t = 1): yes(t ^ 1)
 
 if __name__ == "__main__":
     main()

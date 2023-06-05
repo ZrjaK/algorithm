@@ -237,12 +237,6 @@ void read(Head &head, Tail &... tail) {
 #define VV(type, name, h, w)                     \
     vector<vector<type>> name(h, vector<type>(w)); \
     read(name)
-void YES(bool t = 1) { print(t ? "YES" : "NO"); }
-void NO(bool t = 1) { YES(!t); }
-void Yes(bool t = 1) { print(t ? "Yes" : "No"); }
-void No(bool t = 1) { Yes(!t); }
-void yes(bool t = 1) { print(t ? "yes" : "no"); }
-void no(bool t = 1) { yes(!t); }
 ll gcd(ll x, ll y) {
     if(!x) return y;
     if(!y) return x;
@@ -315,9 +309,275 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
+class SegmentTree {
+public:
+	struct STNode {
+		STNode () : left(nullptr), right(nullptr), val(0), maxval(0), minval(0), lazy(0), mlazy(LINF) {}
+		STNode* left;
+		STNode* right;
+		ll val;
+		ll maxval;
+		ll minval;
+		ll lazy;
+		ll mlazy;
+	};
+	STNode* root;
+    int L, R;
+	SegmentTree(int _L, int _R) : L(_L), R(_R) { root = new STNode(); }
+	~SegmentTree() {}
+
+    void assign(int start, int end, ll x) {
+        assert(L <= start && start <= end && end <= R);
+        _assign(root, L, R, start, end, x);
+    }
+
+	void _assign(STNode* node, int l, int r, int start, int end, ll x) {
+		if (l == start && r == end) {
+			node->val = 0;
+			node->maxval = 0;
+			node->minval = 0;
+			node->lazy = 0;
+			node->mlazy = x;
+			return;
+		}
+		pushdown(node);
+		int mid = l+r>>1;
+		if (end <= mid) {
+			_assign(node->left, l, mid, start, end, x);
+		} elif (start > mid) {
+			_assign(node->right, mid+1, r, start, end, x);
+		} else {
+			_assign(node->left, l, mid, start, mid , x);
+			_assign(node->right, mid+1, r, mid+1, end, x);
+		}
+		pushup(node, mid-l+1, r-mid);
+	}
+
+    void add(int start, int end, ll x) {
+        assert(L <= start && start <= end && end <= R);
+        _add(root, L, R, start, end, x);
+    }
+
+	void _add(STNode* node, int l, int r, int start, int end, ll x){
+		if (l == start && r == end) {
+			node->lazy += x;
+			return;
+		}
+		pushdown(node);
+		int mid = l+r>>1;
+		if (end <= mid) {
+			_add(node->left, l, mid, start, end, x);
+		} elif (start > mid) {
+			_add(node->right, mid+1, r, start, end, x);
+		} else {
+			_add(node->left, l, mid, start, mid , x);
+			_add(node->right, mid+1, r, mid+1, end, x);
+		}
+		pushup(node, mid-l+1, r-mid);
+	}
+
+    ll querySum(int start, int end) {
+        assert(L <= start && start <= end && end <= R);
+        return _querySum(root, L, R, start, end);
+    }
+
+	ll _querySum(STNode* node, int l, int r, int start, int end) {
+		if (l == start && r == end) {
+			return node->val + node->lazy * (r-l+1) + \
+				(node->mlazy == LINF ? 0 : node->mlazy * (r-l+1));
+		}
+		pushdown(node);
+		int mid = l+r>>1;
+		ll res;
+		if (end <= mid) {
+			res = _querySum(node->left, l, mid, start, end);
+		} elif (start > mid) {
+			res = _querySum(node->right, mid+1, r, start, end);
+		} else {
+			res = _querySum(node->left, l, mid, start, mid) +
+			_querySum(node->right, mid+1, r, mid+1, end);
+		}
+		pushup(node, mid-l+1, r-mid);
+		return res;
+	}
+
+    ll queryMax(int start, int end) {
+        assert(L <= start && start <= end && end <= R);
+        return _queryMax(root, L, R, start, end);
+    }
+
+	ll _queryMax(STNode* node, int l, int r, int start, int end) {
+		if (l == start && r == end) {
+			return node->maxval + node->lazy + \
+				(node->mlazy == LINF ? 0 : node->mlazy);
+		}
+		pushdown(node);
+		int mid = l+r>>1;
+		ll res;
+		if (end <= mid) {
+			res = _queryMax(node->left, l, mid, start, end);
+		} elif (start > mid) {
+			res = _queryMax(node->right, mid+1, r, start, end);
+		} else {
+			res = max(_queryMax(node->left, l, mid, start, mid),
+			_queryMax(node->right, mid+1, r, mid+1, end));
+		}
+		pushup(node, mid-l+1, r-mid);
+		return res;
+	}
+
+    ll queryMin(int start, int end) {
+        assert(L <= start && start <= end && end <= R);
+        return _queryMin(root, L, R, start, end);
+    }
+
+	ll _queryMin(STNode* node, int l, int r, int start, int end) {
+		if (l == start && r == end) {
+			return node->minval + node->lazy + \
+				(node->mlazy == LINF ? 0 : node->mlazy);
+		}
+		pushdown(node);
+		int mid = l+r>>1;
+		ll res;
+		if (end <= mid) {
+			res = _queryMin(node->left, l, mid, start, end);
+		} elif (start > mid) {
+			res = _queryMin(node->right, mid+1, r, start, end);
+		} else {
+			res = min(_queryMin(node->left, l, mid, start, mid),
+			_queryMin(node->right, mid+1, r, mid+1, end));
+		}
+		pushup(node, mid-l+1, r-mid);
+		return res;
+	}
+
+	void pushdown(STNode* node) {
+		if (node->left == nullptr) {
+			node->left = new STNode();
+		}
+		if (node->right == nullptr) {
+			node->right = new STNode();
+		}
+		if (node->mlazy != LINF) {
+			node->left->lazy = 0;
+			node->left->val = 0;
+			node->left->maxval = 0;
+			node->left->minval = 0;
+		
+			node->right->lazy = 0;
+			node->right->val = 0;
+			node->right->maxval = 0;
+			node->right->minval = 0;
+			
+			node->left->mlazy = node->mlazy;
+			node->right->mlazy = node->mlazy;
+			node->mlazy = LINF;
+		}
+		if (node->lazy) {
+			node->left->lazy += node->lazy;
+			node->right->lazy += node->lazy;
+			node->lazy = 0;
+		}
+	}
+
+	void pushup(STNode* node, int ln, int rn) {
+		node->val = node->left->val + node->left->lazy * ln + \
+					(node->left->mlazy == LINF ? 0 : node->left->mlazy * ln) + \ 
+					node->right->val + node->right->lazy * rn + \
+					(node->right->mlazy == LINF ? 0 : node->right->mlazy * rn);
+
+		node->maxval = max(node->left->maxval + node->left->lazy + \
+						(node->left->mlazy == LINF ? 0 : node->left->mlazy),
+						node->right->maxval + node->right->lazy + \
+						(node->right->mlazy == LINF ? 0 : node->right->mlazy));
+
+		node->minval = min(node->left->minval + node->left->lazy + \
+						(node->left->mlazy == LINF ? 0 : node->left->mlazy),
+						node->right->minval + node->right->lazy + \
+						(node->right->mlazy == LINF ? 0 : node->right->mlazy));
+
+	}
+};
+
+pair<vector<int>, vector<int>> EulerTour(vector<vector<int>>& E, int root = 0) {
+    int n = E.size();
+    vector<int> IN(n, -1);
+    vector<int> OUT(n, 0);
+    vector<pair<int, int>> stack = {{root, 1}, {root, 0}};
+    int ind = 0;
+    while (stack.size()) {
+        auto [pos, t] = stack.back();
+        stack.pop_back();
+        if (!t) {
+            IN[pos] = ind++;
+            for (auto& npos : E[pos]) if (IN[npos] == -1) {
+                stack.emplace_back(pair{npos, 1});
+                stack.emplace_back(pair{npos, 0});
+            }
+        } else OUT[pos] = ind;
+    }
+    return {IN, OUT};
+}
+
 void solve() {
     INT(n);
-    VEC(int, a, n);
+    VEC(ll, a, n);
+    auto d = getGraph(n, n - 1);
+    vi dep(n);
+    auto dfs = [&] (auto dfs, int i, int fa) -> void {
+        each(j, d[i]) if (j != fa) dep[j] = dep[i] + 1, dfs(dfs, j, i);
+    };
+    dfs(dfs, 0, -1);
+    auto [in, out] = EulerTour(d);
+    vvi pos(2 * n);
+    vi seq(n);
+    rep(i, n) pos[dep[i]].pb(in[i]), seq[in[i]] = i;
+    rep(i, n) SORT(pos[i]);
+    vector<SegmentTree> seg;
+    rep(i, 2 * n) seg.pb(SegmentTree(0, len(pos[i])));
+    rep(i, n) {
+        int t = LB(pos[dep[i]], in[i]);
+        seg[dep[i]].add(t, t, a[i]);
+    }
+    INT(q);
+    rep(_, q) {
+        INT(op);
+        if (op == 1) {
+            INT(p, x);
+            p--;
+            int t = LB(pos[dep[p]], in[p]);
+            seg[dep[p]].assign(t, t, x);
+        }
+        if (op == 2) {
+            INT(p, k, x);
+            p--;
+            int l = LB(pos[dep[p] + k], in[p]);
+            int r = LB(pos[dep[p] + k], out[p]) - 1;
+            if (l <= r) seg[dep[p] + k].assign(l, r, x);
+        }
+        if (op == 3) {
+            INT(p, k, x);
+            p--;
+            int l = LB(pos[dep[p] + k], in[p]);
+            int r = LB(pos[dep[p] + k], out[p]) - 1;
+            if (l <= r) seg[dep[p] + k].add(l, r, x);
+        }
+        if (op == 4) {
+            INT(p);
+            p--;
+            int t = LB(pos[dep[p]], in[p]);
+            print(seg[dep[p]].querySum(t, t));
+        }
+        if (op == 5) {
+            INT(p, k);
+            p--;
+            int l = LB(pos[dep[p] + k], in[p]);
+            int r = LB(pos[dep[p] + k], out[p]) - 1;
+            ll ans = 0;
+            if (l <= r) ans += seg[dep[p] + k].querySum(l, r);
+            print(ans);
+        }
+    }
     
 }
 

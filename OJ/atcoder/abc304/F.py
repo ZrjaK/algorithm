@@ -21,7 +21,29 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
+    h = []
+    for i in range(1, n):
+        if n % i == 0:
+            h.append(i)
+    s = I()
+    ans = 0
+    d = defaultdict(int)
+    for m in h:
+        ok = [1] * m
+        for i in range(n):
+            if s[i] == ".":
+                ok[i % m] = 0
+        d[m] = pow(2, sum(ok), MODD)
+        for i in range(1, m):
+            if m % i == 0:
+                d[m] -= d[i]
+        ans += d[m]
+        ans %= MODD
+    print(ans)
+        
+        
+
+
     
 
 def main():
@@ -392,13 +414,6 @@ def getWeightedGraph(n, m, directed=False):
         if not directed:
             d[v].append((u, w))
     return d
-
-def YES(t = 1): print("YES" if t else "NO")
-def NO(t = 1): YES(t ^ 1)
-def Yes(t = 1): print("Yes" if t else "No")
-def No(t = 1): Yes(t ^ 1)
-def yes(t = 1): print("yes" if t else "no")
-def no(t = 1): yes(t ^ 1)
 
 if __name__ == "__main__":
     main()

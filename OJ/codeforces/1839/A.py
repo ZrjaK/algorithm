@@ -20,13 +20,38 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
+    n, k = LII()
+    arr = [0] * n
+    s = 0
+    for i in range((n + 1) // 2):
+        if arr[i]:
+            s += 1
+        if s < i // k + 1:
+            arr[i] = arr[~i] = 1
+            s += 1
+    def check(arr):
+        s = 0
+        for i in range(n):
+            s += arr[i]
+            if s < i // k + 1:
+                return False
+        s = 0
+        for i in range(n):
+            s += arr[~i]
+            if s < i // k + 1:
+                return False
+        return True
+    ans = sum(arr)
+    if check(arr):
+        print(ans)
+    else:
+        print(ans + 1)
+
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
@@ -392,13 +417,6 @@ def getWeightedGraph(n, m, directed=False):
         if not directed:
             d[v].append((u, w))
     return d
-
-def YES(t = 1): print("YES" if t else "NO")
-def NO(t = 1): YES(t ^ 1)
-def Yes(t = 1): print("Yes" if t else "No")
-def No(t = 1): Yes(t ^ 1)
-def yes(t = 1): print("yes" if t else "no")
-def no(t = 1): yes(t ^ 1)
 
 if __name__ == "__main__":
     main()
