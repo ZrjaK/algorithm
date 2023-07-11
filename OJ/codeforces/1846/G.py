@@ -20,13 +20,30 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    arr = LII()
+    n, m = LII()
+    cur = int(I(), 2)
+    h = []
+    for _ in range(m):
+        h.append((II(), int(I(), 2), int(I(), 2)))
+    dist = [INF] * (1 << n)
+    dist[cur] = 0
+    pq = [(0, cur)]
+    while pq:
+        _, mask = heappop(pq)
+        for day, heal, appear in h:
+            nd = dist[mask] + day
+            nmask = ((mask | heal) ^ heal) | appear
+            if dist[nmask] > nd:
+                dist[nmask] = nd
+                heappush(pq, (nd, nmask))
+    print(dist[0] if dist[0] != INF else -1)
+
+    
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
