@@ -16,9 +16,9 @@ struct binary_tree {
         return next++;
     }
      
-    void add(ll x) {
+    void add(long long x) {
         int cur = root;
-        per(i, limit, -1) {
+        for(int i = limit; i >= 0; i--) {
             int d = x >> i & 1;
             if (pool[cur].son[d] == -1) {
                 int p = getid();
@@ -30,18 +30,18 @@ struct binary_tree {
         }
     }
 
-    void del(ll x) {
+    void del(long long x) {
         int cur = root;
-        per(i, limit, -1) {
+        for(int i = limit; i >= 0; i--) {
             int d = x >> i & 1;
             cur = pool[cur].son[d];
             pool[cur].count--;
         }
     }
      
-    ll max_xor(ll x) {
+    long long max_xor(long long x) {
         int cur = root, ans = 0;
-        per(i, limit, -1) {
+        for(int i = limit; i >= 0; i--) {
             if (cur == -1) break;
             int d = x >> i & 1;
             int nxt = pool[cur].son[!d];
