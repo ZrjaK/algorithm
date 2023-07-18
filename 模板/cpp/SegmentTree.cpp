@@ -1,4 +1,3 @@
-const long long LINF = 0x1fffffffffffffff;
 class SegmentTree {
 public:
 	struct STNode {
