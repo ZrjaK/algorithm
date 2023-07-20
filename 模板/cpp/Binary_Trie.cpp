@@ -1,3 +1,8 @@
+int topbit(int x) { return (x == 0 ? -1 : 31 - __builtin_clz(x)); }
+int topbit(uint32_t x) { return (x == 0 ? -1 : 31 - __builtin_clz(x)); }
+int topbit(long long x) { return (x == 0 ? -1 : 63 - __builtin_clzll(x)); }
+int topbit(uint64_t x) { return (x == 0 ? -1 : 63 - __builtin_clzll(x)); }
+
 // 非永続ならば、2 * 要素数 のノード数
 template <int LOG, bool PERSISTENT, int NODES, typename UINT = size_t,
           typename SIZE_TYPE = int>
@@ -148,7 +153,7 @@ private:
     if ((LIM >> ht) > (now >> ht)) return root->cnt;
     if (ht == 0 || (LIM >> ht) < (now >> ht)) return 0;
     T res = 0;
-    FOR(k, 2) {
+    for (int k = 0; k < 2; k++) {
       np c = (k == 0 ? root->l : root->r);
       if (c) {
         int w = c->width;
