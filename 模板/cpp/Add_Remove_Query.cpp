@@ -67,3 +67,52 @@ private:
     return dat;
   }
 };
+    
+    // Add_Remove_Query<pii, false> X;
+    //
+    // // add and remove
+    //
+    // auto upd = X.calc(Q);
+    // vector<int> I(len(upd));
+    // iota(all(I), 0);
+
+    // auto dfs = [&] (auto& dfs, vector<int>& upd_query_I, int begin, int end) -> void {
+    //     if (begin == end) return;
+    //     // snapshot
+    //
+    //
+    //
+    //     vector<int> IL, IR;
+    //     int mid = (begin + end) / 2;
+    //     for (auto&& i: upd_query_I) {
+    //         auto [a, b, XX] = upd[i];
+    //         // get data in XX
+    //
+    //
+    //         if (a <= begin && end <= b) {
+    //             // X で表される update query を処理する
+    //             
+    //             
+    //             
+    //         } else {
+    //             if (a < mid) IL.eb(i);
+    //             if (mid < b) IR.eb(i);
+    //         }
+    //     }
+    //     if (begin + 1 == end) {
+    //         // 求値クエリ
+    //         int qid = begin;
+    //
+    //
+    //
+    //         // ここで出力してしまってもよい
+    //     } else {
+    //         dfs(dfs, IL, begin, mid);
+    //         dfs(dfs, IR, mid, end);
+    //     }
+    //     // rollback
+    //     
+    //     
+    //     
+    // };
+    // dfs(dfs, I, 0, Q);
