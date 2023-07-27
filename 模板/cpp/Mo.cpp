@@ -9,18 +9,18 @@ struct Mo {
   vector<int> get_mo_order() {
     int N = 1;
     for (auto &&[l, r]: LR) chmax(N, l), chmax(N, r);
-    int Q = len(LR);
+    int Q = LR.size();
     int bs = N / min<int>(N, sqrt(Q));
     vector<int> I(Q);
-    iota(all(I), 0);
-    sort(all(I), [&](int a, int b) {
-      int aa = LR[a].fi / bs, bb = LR[b].fi / bs;
+    iota(I.begin(), I.end(), 0);
+    sort(I.begin(), I.end(), [&](int a, int b) {
+      int aa = LR[a].first / bs, bb = LR[b].first / bs;
       if (aa != bb) return aa < bb;
-      return (aa & 1) ? LR[a].se > LR[b].se : LR[a].se < LR[b].se;
+      return (aa & 1) ? LR[a].second > LR[b].second : LR[a].second < LR[b].second;
     });
  
     auto cost = [&](int a, int b) -> int {
-      return abs(LR[I[a]].fi - LR[I[b]].fi) + abs(LR[I[a]].se - LR[I[b]].se);
+      return abs(LR[I[a]].first - LR[I[b]].first) + abs(LR[I[a]].second - LR[I[b]].second);
     };
  
     // ランダムケースで数パーセント
@@ -42,10 +42,10 @@ struct Mo {
     auto I = get_mo_order();
     int l = 0, r = 0;
     for (auto idx: I) {
-      while (l > LR[idx].fi) add_l(--l);
-      while (r < LR[idx].se) add_r(r++);
-      while (l < LR[idx].fi) rm_l(l++);
-      while (r > LR[idx].se) rm_r(--r);
+      while (l > LR[idx].first) add_l(--l);
+      while (r < LR[idx].second) add_r(r++);
+      while (l < LR[idx].first) rm_l(l++);
+      while (r > LR[idx].second) rm_r(--r);
       query(idx);
     }
   }
