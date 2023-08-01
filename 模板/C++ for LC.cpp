@@ -17,6 +17,8 @@ using Trie = trie<string, null_type, trie_string_access_traits<>, pat_trie_tag, 
 // template <class T> using heapq = __gnu_pbds::priority_queue<T, greater<T>, pairing_heap_tag>;
 template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define ll                  long long
+#define u32                 unsigned int
+#define u64                 unsigned long long
 #define i128                __int128
 #define ld                  long double
 #define ui                  unsigned int
@@ -71,14 +73,33 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define LB(c, x)            distance((c).begin(), lower_bound(all(c), (x)))
 #define UB(c, x)            distance((c).begin(), upper_bound(all(c), (x)))
 #define UNIQUE(x)           sort(all(x)), x.erase(unique(all(x)), x.end()), x.shrink_to_fit()
-#define SUM(...)            accumulate(all(__VA_ARGS__), 0LL)
 #define SORT(a)             sort(all(a))
 #define REV(a)              reverse(all(a))
 template<class T> auto max(const T& a){ return *max_element(all(a)); }
 template<class T> auto min(const T& a){ return *min_element(all(a)); }
-template <class T> vector<long long> cumsum(vector<T> &A, int off = 1) {
+template <typename T, typename U>
+T ceil(T x, U y) {
+    return (x > 0 ? (x + y - 1) / y : x / y);
+}
+template <typename T, typename U>
+T floor(T x, U y) {
+    return (x > 0 ? x / y : (x - y + 1) / y);
+}
+template <typename T, typename U>
+pair<T, T> divmod(T x, U y) {
+    T q = floor(x, y);
+    return {q, x - q * y};
+}
+template <typename T, typename U>
+T SUM(const vector<U> &A) {
+    T sum = 0;
+    for (auto &&a: A) sum += a;
+    return sum;
+}
+template <typename T, typename U>
+vector<T> cumsum(vector<U> &A, int off = 1) {
     int N = A.size();
-    vector<long long> B(N + 1);
+    vector<T> B(N + 1);
     for (int i = 0; i < N; i++) B[i + 1] = B[i] + A[i];
     if (off == 0) B.erase(B.begin());
     return B;
