@@ -104,6 +104,23 @@ vector<T> cumsum(vector<U> &A, int off = 1) {
     if (off == 0) B.erase(B.begin());
     return B;
 }
+template <typename F>
+ll binary_search(F check, ll ok, ll ng, bool check_ok = true) {
+  if (check_ok) assert(check(ok));
+  while (abs(ok - ng) > 1) {
+    auto x = (ng + ok) / 2;
+    tie(ok, ng) = (check(x) ? make_pair(x, ng) : make_pair(ok, x));
+  }
+  return ok;
+}
+template <typename F>
+double binary_search_real(F check, double ok, double ng, int iter = 100) {
+  while (iter--) {
+    double x = (ok + ng) / 2;
+    tie(ok, ng) = (check(x) ? make_pair(x, ng) : make_pair(ok, x));
+  }
+  return (ok + ng) / 2;
+}
 template <class T, class S> inline bool chmax(T &a, const S &b) {
     return (a < b ? a = b, 1 : 0);
 }
