@@ -16,16 +16,17 @@ template <class T> using Tree = tree<T, null_type, less_equal<T>, rb_tree_tag,tr
 using Trie = trie<string, null_type, trie_string_access_traits<>, pat_trie_tag, trie_prefix_search_node_update>;
 // template <class T> using heapq = __gnu_pbds::priority_queue<T, greater<T>, pairing_heap_tag>;
 template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
-#define ll                  long long
-#define u32                 unsigned int
-#define u64                 unsigned long long
-#define i128                __int128
-#define ld                  long double
-#define ui                  unsigned int
-#define ull                 unsigned long long
+using ll   =                long long;
+using u32  =                unsigned int;
+using u64  =                unsigned long long;
+using i128 =                __int128;
+using ld   =                long double;
+using ui   =                unsigned int;
+using ull  =                unsigned long long;
 #define pii                 pair<int, int>
 #define pll                 pair<ll, ll>
 #define pdd                 pair<ld, ld>
+#define vc                  vector
 #define vi                  vector<int>
 #define vvi                 vector<vector<int>>
 #define vll                 vector<ll>
@@ -55,7 +56,19 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define each2(x, y, a)      for(auto&& [x, y] : a)
 #define each3(x, y, z, a)   for(auto&& [x, y, z] : a)
 #define each(...)           overload4(__VA_ARGS__, each3, each2, each1) (__VA_ARGS__)
-#define FOR_subset(t, s)    for (int t = (s); t >= 0; t = (t == 0 ? -1 : (t - 1) & (s)))
+#define FOR1(a) for (ll _ = 0; _ < ll(a); ++_)
+#define FOR2(i, a) for (ll i = 0; i < ll(a); ++i)
+#define FOR3(i, a, b) for (ll i = a; i < ll(b); ++i)
+#define FOR4(i, a, b, c) for (ll i = a; i < ll(b); i += (c))
+#define FOR1_R(a) for (ll i = (a)-1; i >= ll(0); --i)
+#define FOR2_R(i, a) for (ll i = (a)-1; i >= ll(0); --i)
+#define FOR3_R(i, a, b) for (ll i = (b)-1; i >= ll(a); --i)
+#define overload4(a, b, c, d, e, ...) e
+#define overload3(a, b, c, d, ...) d
+#define FOR(...) overload4(__VA_ARGS__, FOR4, FOR3, FOR2, FOR1)(__VA_ARGS__)
+#define FOR_R(...) overload3(__VA_ARGS__, FOR3_R, FOR2_R, FOR1_R)(__VA_ARGS__)
+#define FOR_subset(t, s) \
+  for (ll t = (s); t >= 0; t = (t == 0 ? -1 : (t - 1) & (s)))
 #define len(x)              (int)x.size()
 #define elif                else if
 #define all1(i)             begin(i), end(i)
@@ -67,7 +80,6 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define rall3(i, a, b)      rbegin(i) + a, rbegin(i) + b
 #define rall(...)           overload3(__VA_ARGS__, rall3, rall2, rall1) (__VA_ARGS__)
 #define mst(x, a)           memset(x, a, sizeof(x))
-#define lowbit(x)           (x & (-x))
 #define bitcnt(x)           (__builtin_popcountll(x))
 #define endl                "\n"
 #define LB(c, x)            distance((c).begin(), lower_bound(all(c), (x)))
@@ -75,6 +87,20 @@ template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
 #define UNIQUE(x)           sort(all(x)), x.erase(unique(all(x)), x.end()), x.shrink_to_fit()
 #define SORT(a)             sort(all(a))
 #define REV(a)              reverse(all(a))
+int popcnt(int x) { return __builtin_popcount(x); }
+int popcnt(u32 x) { return __builtin_popcount(x); }
+int popcnt(ll x) { return __builtin_popcountll(x); }
+int popcnt(u64 x) { return __builtin_popcountll(x); }
+// (0, 1, 2, 3, 4) -> (-1, 0, 1, 1, 2)
+int topbit(int x) { return (x == 0 ? -1 : 31 - __builtin_clz(x)); }
+int topbit(u32 x) { return (x == 0 ? -1 : 31 - __builtin_clz(x)); }
+int topbit(ll x) { return (x == 0 ? -1 : 63 - __builtin_clzll(x)); }
+int topbit(u64 x) { return (x == 0 ? -1 : 63 - __builtin_clzll(x)); }
+// (0, 1, 2, 3, 4) -> (-1, 0, 1, 0, 2)
+int lowbit(int x) { return (x == 0 ? -1 : __builtin_ctz(x)); }
+int lowbit(u32 x) { return (x == 0 ? -1 : __builtin_ctz(x)); }
+int lowbit(ll x) { return (x == 0 ? -1 : __builtin_ctzll(x)); }
+int lowbit(u64 x) { return (x == 0 ? -1 : __builtin_ctzll(x)); }
 template<class T> auto max(const T& a){ return *max_element(all(a)); }
 template<class T> auto min(const T& a){ return *min_element(all(a)); }
 template <typename T, typename U>
