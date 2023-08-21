@@ -23,16 +23,16 @@ using i128 =                __int128;
 using ld   =                long double;
 using ui   =                unsigned int;
 using ull  =                unsigned long long;
-#define pii                 pair<int, int>
-#define pll                 pair<ll, ll>
-#define pdd                 pair<ld, ld>
+using pii  =                pair<int, int>;
+using pll  =                pair<ll, ll>;
+using pdd  =                pair<ld, ld>;
+using vi   =                vector<int>;
+using vvi  =                vector<vector<int>>;
+using vll  =                vector<ll>;
+using vvll =                vector<vector<ll>>;
+using vpii =                vector<pii>;
+using vpll =                vector<pll>;
 #define vc                  vector
-#define vi                  vector<int>
-#define vvi                 vector<vector<int>>
-#define vll                 vector<ll>
-#define vvll                vector<vector<ll>>
-#define vpii                vector<pii>
-#define vpll                vector<pll>
 #define lb                  lower_bound
 #define ub                  upper_bound
 #define pb                  push_back
