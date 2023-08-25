@@ -32,7 +32,36 @@ using vll  =                vector<ll>;
 using vvll =                vector<vector<ll>>;
 using vpii =                vector<pii>;
 using vpll =                vector<pll>;
-#define vc                  vector
+template <class T>
+constexpr T infty = 0;
+template <>
+constexpr int infty<int> = 1'000'000'000;
+template <>
+constexpr ll infty<ll> = ll(infty<int>) * infty<int> * 2;
+template <>
+constexpr u32 infty<u32> = infty<int>;
+template <>
+constexpr u64 infty<u64> = infty<ll>;
+template <>
+constexpr i128 infty<i128> = i128(infty<ll>) * infty<ll>;
+template <>
+constexpr double infty<double> = infty<ll>;
+template <>
+constexpr long double infty<long double> = infty<ll>;
+template <class T>
+using vc = vector<T>;
+template <class T>
+using vvc = vector<vc<T>>;
+template <class T>
+using vvvc = vector<vvc<T>>;
+template <class T>
+using vvvvc = vector<vvvc<T>>;
+template <class T>
+using vvvvvc = vector<vvvvc<T>>;
+template <class T>
+using pq = std::priority_queue<T>;
+template <class T>
+using pqg = std::priority_queue<T, vector<T>, greater<T>>;
 #define lb                  lower_bound
 #define ub                  upper_bound
 #define pb                  push_back
@@ -129,6 +158,32 @@ vector<T> cumsum(vector<U> &A, int off = 1) {
     for (int i = 0; i < N; i++) B[i + 1] = B[i] + A[i];
     if (off == 0) B.erase(B.begin());
     return B;
+}
+template <typename T>
+T POP(deque<T> &que) {
+  T a = que.front();
+  que.pop_front();
+  return a;
+}
+template <typename T>
+T POP(pq<T> &que) {
+  T a = que.top();
+  que.pop();
+  return a;
+}
+template <typename T>
+T POP(pqg<T> &que) {
+  assert(!que.empty());
+  T a = que.top();
+  que.pop();
+  return a;
+}
+template <typename T>
+T POP(vc<T> &que) {
+  assert(!que.empty());
+  T a = que.back();
+  que.pop_back();
+  return a;
 }
 template <typename F>
 ll binary_search(F check, ll ok, ll ng, bool check_ok = true) {
