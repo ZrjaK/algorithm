@@ -435,17 +435,13 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    INT(n, a, q);
-    STR(s);
-    if (a == n) return YES();
-    int b = a;
-    each(i, s) {
-        a += i == '+' ? 1 : -1;
-        b += i == '+' ? 1 : 0;
-        if (a == n) return YES();
-    }
-    if (b >= n) return print("MAYBE");
-    NO();
+    INT(n);
+    VEC(int, a, n);
+    vi pos(n);
+    rep(i, n) pos[a[i] - 1] = i;
+    int ans = 0;
+    rep(i, n - 1) if (pos[i] > pos[i + 1]) ans++;
+    print(ans);
 }
 
 signed main() {

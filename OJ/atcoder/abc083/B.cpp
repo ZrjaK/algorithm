@@ -435,17 +435,14 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    INT(n, a, q);
-    STR(s);
-    if (a == n) return YES();
-    int b = a;
-    each(i, s) {
-        a += i == '+' ? 1 : -1;
-        b += i == '+' ? 1 : 0;
-        if (a == n) return YES();
+    INT(n, a, b);
+    ll ans = 0;
+    rep(i, 1, n + 1) {
+        int x = 0;
+        each(j, to_string(i)) x += j - 48;
+        if (a <= x && x <= b) ans += i;
     }
-    if (b >= n) return print("MAYBE");
-    NO();
+    print(ans);
 }
 
 signed main() {
@@ -453,7 +450,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while (t--) {
         solve();
     }

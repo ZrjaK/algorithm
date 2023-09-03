@@ -434,18 +434,17 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
+#define int ll
+
 void solve() {
-    INT(n, a, q);
-    STR(s);
-    if (a == n) return YES();
-    int b = a;
-    each(i, s) {
-        a += i == '+' ? 1 : -1;
-        b += i == '+' ? 1 : 0;
-        if (a == n) return YES();
-    }
-    if (b >= n) return print("MAYBE");
-    NO();
+    LL(n, k);
+    VEC(int, a, n);
+    ll mex = n * (n + 1) / 2 - SUM<ll>(a);
+    a.pb(mex);
+    vi ans(n);
+    k *= n;
+    rep(i, k, k + n) ans[i % n] = a[i % (n + 1)];
+    print(ans);
 }
 
 signed main() {

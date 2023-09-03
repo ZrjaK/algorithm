@@ -434,18 +434,93 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-void solve() {
-    INT(n, a, q);
-    STR(s);
-    if (a == n) return YES();
-    int b = a;
-    each(i, s) {
-        a += i == '+' ? 1 : -1;
-        b += i == '+' ? 1 : 0;
-        if (a == n) return YES();
+template <typename T>
+struct Fenwick {
+    int n;
+    std::vector<T> a;
+    
+    Fenwick(int n = 0) {
+        init(n);
     }
-    if (b >= n) return print("MAYBE");
-    NO();
+    
+    void init(int n) {
+        this->n = n;
+        a.assign(n, T());
+    }
+    
+    void add(int x, T v) {
+        for (int i = x + 1; i <= n; i += i & -i) {
+            a[i - 1] += v;
+        }
+    }
+    
+    T sum(int x) {
+        auto ans = T();
+        for (int i = x; i > 0; i -= i & -i) {
+            ans += a[i - 1];
+        }
+        return ans;
+    }
+    
+    T rangeSum(int l, int r) {
+        return sum(r) - sum(l);
+    }
+    
+    int kth(T k) {
+        int x = 0;
+        for (int i = 1 << std::__lg(n); i; i /= 2) {
+            if (x + i <= n && k >= a[x + i - 1]) {
+                x += i;
+                k -= a[x - 1];
+            }
+        }
+        return x;
+    }
+};
+
+void solve() {
+    INT(n, q);
+    VEC(ll, a, n);
+    vc<array<ll, 4>> Q;
+    rep(_, q) {
+        INT(op);
+        if (op == 1) {
+            INT(i, x);
+            i--;
+            Q.pb({op, i, x, 0});
+        }
+        if (op == 2) {
+            INT(l, r, k);
+            l--, r--;
+            Q.pb({op, l, r, k});
+        }
+    }
+    vi ans(q, 1);
+    gp_hash_table<ll, ll, custom_hash> M;
+    rep(_, 30) {
+        vll aa = a;
+        each(i, a) M[i] = Ran(1000000000, 100000000000000);
+        each(lst, Q) if (lst[0] == 1) M[lst[2]] = Ran(1000000000, 100000000000000);
+        Fenwick<ll> X(n);
+        rep(i, n) X.add(i, M[a[i]]);
+        rep(i, q) {
+            auto& lst = Q[i];
+            int op = lst[0];
+            if (op == 1) {
+                ll idx = lst[1], x = lst[2];
+                X.add(idx, -M[a[idx]]);
+                a[idx] = x;
+                X.add(idx, M[a[idx]]);
+            }
+            if (op == 2) {
+                int l = lst[1], r = lst[2], k = lst[3];
+                ll s = X.rangeSum(l, r + 1);
+                if (s % k) ans[i] = 0;
+            }
+        }
+        a = aa;
+    }
+    rep(i, q) if (Q[i][0] == 2) YES(ans[i]);
 }
 
 signed main() {
@@ -453,7 +528,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while (t--) {
         solve();
     }

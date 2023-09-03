@@ -435,17 +435,14 @@ const int MODD = 998244353;
 const int N = 1e6 + 10;
 
 void solve() {
-    INT(n, a, q);
     STR(s);
-    if (a == n) return YES();
-    int b = a;
-    each(i, s) {
-        a += i == '+' ? 1 : -1;
-        b += i == '+' ? 1 : 0;
-        if (a == n) return YES();
-    }
-    if (b >= n) return print("MAYBE");
-    NO();
+    int n = len(s);
+    auto check = [&] (int k) -> bool {
+        set<int> S;
+        rep(i, n - k, k) S.insert(s[i]);
+        return len(S) <= 1;
+    };
+    print(binary_search(check, (n + 1) / 2, n + 1));
 }
 
 signed main() {
@@ -453,7 +450,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while (t--) {
         solve();
     }
