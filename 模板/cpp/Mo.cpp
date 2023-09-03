@@ -1,7 +1,3 @@
-template <class T, class S>
-inline bool chmax(T &a, const S &b) {
-  return (a < b ? a = b, 1 : 0);
-}
 struct Mo {
   vector<pair<int, int>> LR;
   void add(int L, int R) { LR.emplace_back(L, R); }
