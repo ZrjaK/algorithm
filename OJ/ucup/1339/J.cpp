@@ -434,110 +434,45 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-// https://codeforces.com/contest/620/problem/F
-struct Rollback_Mo {
-  vc<pair<int, int>> LR;
-  void add(int L, int R) { LR.emplace_back(L, R); }
-
-  template <typename AL, typename AR, typename F1, typename F2, typename F3,
-            typename O>
-  void calc(AL add_left, AR add_right, F1 reset, F2 save, F3 rollback,
-            O query) {
-    const int Q = len(LR);
-    if (Q == 0) return;
-    int N = 0;
-    for (auto &&[L, R]: LR) chmax(N, R);
-    const int b_num = sqrt(Q);
-    const int b_sz = ceil(N, b_num);
-    vvc<int> QID((N - 1) / b_sz + 1);
-    // 左端の属するブロックで分類
-    // 左端と右端が同じブロックに属するものは、先に処理してしまう。
-    auto naive = [&](int qid) -> void {
-      save();
-      auto [L, R] = LR[qid];
-      FOR(i, L, R) add_right(i);
-      query(qid);
-      rollback();
-    };
-
-    FOR(qid, Q) {
-      auto [L, R] = LR[qid];
-      int iL = L / b_sz, iR = R / b_sz;
-      if (iL == iR) {
-        naive(qid);
-        continue;
-      }
-      QID[iL].eb(qid);
-    }
-
-    FOR(iL, len(QID)) {
-      auto &I = QID[iL];
-      if (I.empty()) continue;
-      sort(all(I),
-           [&](auto &a, auto &b) -> bool { return LR[a].se < LR[b].se; });
-      int LMAX = 0;
-      for (auto &&qid: I) {
-        auto [L, R] = LR[qid];
-        chmax(LMAX, L);
-      }
-      reset();
-      int l = LMAX, r = LMAX;
-      for (auto &&qid: I) {
-        auto [L, R] = LR[qid];
-        while (r < R) add_right(r++);
-        save();
-        while (L < l) add_left(--l);
-        query(qid);
-        rollback();
-        l = LMAX;
-      }
-    }
-  }
-};
-
 void solve() {
-    INT(n, q);
-    VEC(int, a, n);
-    vi nums(all(a));
-    UNIQUE(nums);
-    each(i, a) i = LB(nums, i);
-    Rollback_Mo mo;
-    vll ans(q);
-    rep(_, q) {
-        INT(l, r);
-        l--;
-        mo.add(l, r);
-    }
-    vi history, cnt(len(nums));
-    ll mx = 0, tmx = 0, t = 0;
-    auto add = [&] (int i) -> void {
-        int x = a[i];
-        cnt[x]++;
-        chmax(mx, 1ll * cnt[x] * nums[x]);
-        history.eb(x);
-    };
-    auto rb = [&] (int t) -> void {
-        while (len(history) > t) {
-            cnt[POP(history)]--;
+    LL(a, b, c, d, v, t);
+    vll h;
+    rep(i, 1, c + 1) h.pb(a * i);
+    rep(i, 1, a + 1) h.pb(c * i);
+    UNIQUE(h);
+    ll p = v;
+    ll ans = 0;
+    if (t >= a * c) {
+        each(i, h) {
+            if (i % a == 0) {
+                ans += b - 1;
+                if (i <= p) ans++;
+                p = i + v;
+            }
+            if (i % c == 0) {
+                ans += d - 1;
+                if (i <= p) ans++;
+                p = i + v;
+            }
         }
-    };
-    auto reset = [&] () -> void {
-        rb(0);
-        mx = 0;
-    };
-    auto save = [&] () -> void {
-        t = len(history);
-        tmx = mx;
-    };
-    auto rollback = [&] () -> void {
-        rb(t);
-        mx = tmx;
-    };
-    auto calc = [&] (int qid) -> void {
-        ans[qid] = mx;
-    };
-    mo.calc(add, add, reset, save, rollback, calc);
-    print_all(ans, "\n");
+    }
+    ans *= t / (a * c);
+    t %= a * c;
+    p = v;
+    while (len(h) && h.back() > t) POP(h);
+    each(i, h) {
+        if (i % a == 0) {
+            ans += b - 1;
+            if (i <= p) ans++;
+            p = i + v;
+        }
+        if (i % c == 0) {
+            ans += d - 1;
+            if (i <= p) ans++;
+            p = i + v;
+        }
+    }
+    print(ans + b + d - 1);
 }
 
 signed main() {
@@ -545,7 +480,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

@@ -434,110 +434,167 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-// https://codeforces.com/contest/620/problem/F
-struct Rollback_Mo {
-  vc<pair<int, int>> LR;
-  void add(int L, int R) { LR.emplace_back(L, R); }
-
-  template <typename AL, typename AR, typename F1, typename F2, typename F3,
-            typename O>
-  void calc(AL add_left, AR add_right, F1 reset, F2 save, F3 rollback,
-            O query) {
-    const int Q = len(LR);
-    if (Q == 0) return;
-    int N = 0;
-    for (auto &&[L, R]: LR) chmax(N, R);
-    const int b_num = sqrt(Q);
-    const int b_sz = ceil(N, b_num);
-    vvc<int> QID((N - 1) / b_sz + 1);
-    // 左端の属するブロックで分類
-    // 左端と右端が同じブロックに属するものは、先に処理してしまう。
-    auto naive = [&](int qid) -> void {
-      save();
-      auto [L, R] = LR[qid];
-      FOR(i, L, R) add_right(i);
-      query(qid);
-      rollback();
-    };
-
-    FOR(qid, Q) {
-      auto [L, R] = LR[qid];
-      int iL = L / b_sz, iR = R / b_sz;
-      if (iL == iR) {
-        naive(qid);
-        continue;
-      }
-      QID[iL].eb(qid);
+struct HLD {
+    int n;
+    std::vector<int> siz, top, dep, parent, in, out, seq;
+    std::vector<std::vector<int>> adj;
+    int cur;
+    
+    HLD() {}
+    HLD(int n) {
+        init(n);
     }
-
-    FOR(iL, len(QID)) {
-      auto &I = QID[iL];
-      if (I.empty()) continue;
-      sort(all(I),
-           [&](auto &a, auto &b) -> bool { return LR[a].se < LR[b].se; });
-      int LMAX = 0;
-      for (auto &&qid: I) {
-        auto [L, R] = LR[qid];
-        chmax(LMAX, L);
-      }
-      reset();
-      int l = LMAX, r = LMAX;
-      for (auto &&qid: I) {
-        auto [L, R] = LR[qid];
-        while (r < R) add_right(r++);
-        save();
-        while (L < l) add_left(--l);
-        query(qid);
-        rollback();
-        l = LMAX;
-      }
+    void init(int n) {
+        this->n = n;
+        siz.resize(n);
+        top.resize(n);
+        dep.resize(n);
+        parent.resize(n);
+        in.resize(n);
+        out.resize(n);
+        seq.resize(n);
+        cur = 0;
+        adj.assign(n, {});
     }
-  }
+    void addEdge(int u, int v) {
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    void work(int root = 0) {
+        top[root] = root;
+        dep[root] = 0;
+        parent[root] = -1;
+        dfs1(root);
+        dfs2(root);
+    }
+    void dfs1(int u) {
+        if (parent[u] != -1) {
+            adj[u].erase(std::find(adj[u].begin(), adj[u].end(), parent[u]));
+        }
+        
+        siz[u] = 1;
+        for (auto &v : adj[u]) {
+            parent[v] = u;
+            dep[v] = dep[u] + 1;
+            dfs1(v);
+            siz[u] += siz[v];
+            if (siz[v] > siz[adj[u][0]]) {
+                std::swap(v, adj[u][0]);
+            }
+        }
+    }
+    void dfs2(int u) {
+        in[u] = cur++;
+        seq[in[u]] = u;
+        for (auto v : adj[u]) {
+            top[v] = v == adj[u][0] ? top[u] : v;
+            dfs2(v);
+        }
+        out[u] = cur;
+    }
+    int lca(int u, int v) {
+        while (top[u] != top[v]) {
+            if (dep[top[u]] > dep[top[v]]) {
+                u = parent[top[u]];
+            } else {
+                v = parent[top[v]];
+            }
+        }
+        return dep[u] < dep[v] ? u : v;
+    }
+    
+    int dist(int u, int v) {
+        return dep[u] + dep[v] - 2 * dep[lca(u, v)];
+    }
+    
+    int jump(int u, int k) {
+        if (dep[u] < k) {
+            return -1;
+        }
+        
+        int d = dep[u] - k;
+        
+        while (dep[top[u]] > d) {
+            u = parent[top[u]];
+        }
+        
+        return seq[in[u] - dep[u] + d];
+    }
+    
+    bool isAncester(int u, int v) {
+        return in[u] <= in[v] && in[v] < out[u];
+    }
+    
+    int rootedChild(int u, int v) {
+        if (u == v) {
+            return u;
+        }
+        if (!isAncester(u, v)) {
+            return parent[u];
+        }
+        auto it = std::upper_bound(adj[u].begin(), adj[u].end(), v, [&](int x, int y) {
+            return in[x] < in[y];
+        }) - 1;
+        return *it;
+    }
+    
+    int rootedSize(int u, int v) {
+        if (u == v) {
+            return n;
+        }
+        if (!isAncester(v, u)) {
+            return siz[v];
+        }
+        return n - siz[rootedChild(v, u)];
+    }
+    
+    int rootedLca(int a, int b, int c) {
+        return lca(a, b) ^ lca(b, c) ^ lca(c, a);
+    }
 };
 
 void solve() {
-    INT(n, q);
-    VEC(int, a, n);
-    vi nums(all(a));
-    UNIQUE(nums);
-    each(i, a) i = LB(nums, i);
-    Rollback_Mo mo;
-    vll ans(q);
-    rep(_, q) {
-        INT(l, r);
-        l--;
-        mo.add(l, r);
+    INT(n, m, q);
+    VEC(int, r, m);
+    set<int> R;
+    each(i, r) R.insert(i - 1);
+    auto E = ndvector(n - 1, array<int, 3>{});
+    each(i, E) cin >> i;
+    HLD hld(n);
+    each(u, v, w, E) u--, v--, hld.addEdge(u, v);
+    hld.work();
+    vll cost(n);
+    each(u, v, w, E) {
+        if (hld.dep[u] > hld.dep[v]) swap(u, v);
+        cost[v] = w;
     }
-    vi history, cnt(len(nums));
-    ll mx = 0, tmx = 0, t = 0;
-    auto add = [&] (int i) -> void {
-        int x = a[i];
-        cnt[x]++;
-        chmax(mx, 1ll * cnt[x] * nums[x]);
-        history.eb(x);
+    vll h(n);
+    vi Q;
+    auto dfs = [&] (auto dfs, int i) -> void {
+        if (R.count(i)) Q.pb(i);
+        h[i] = cost[i] - cost[Q.back()];
+        each(j, hld.adj[i]) cost[j] += cost[i], dfs(dfs, j);
+        if (R.count(i)) POP(Q);
     };
-    auto rb = [&] (int t) -> void {
-        while (len(history) > t) {
-            cnt[POP(history)]--;
-        }
-    };
-    auto reset = [&] () -> void {
-        rb(0);
-        mx = 0;
-    };
-    auto save = [&] () -> void {
-        t = len(history);
-        tmx = mx;
-    };
-    auto rollback = [&] () -> void {
-        rb(t);
-        mx = tmx;
-    };
-    auto calc = [&] (int qid) -> void {
-        ans[qid] = mx;
-    };
-    mo.calc(add, add, reset, save, rollback, calc);
-    print_all(ans, "\n");
+    dfs(dfs, 0);
+    rep(_, q) {
+        INT(k);
+        VEC(int, a, k);
+        each(i, a) i--;
+        auto check = [&] (ll x) -> bool {
+            int mn = n, mx = -1;
+            each(i, a) if (h[i] > x) {
+                chmin(mn, hld.in[i]), chmax(mx, hld.in[i]);
+            }
+            if (mx == -1) return 1;
+            assert(mn != n || mx != -1);
+            int L = hld.lca(hld.seq[mn], hld.seq[mx]);
+            each(i, a) if (h[i] > x && cost[i] - cost[L] > x) return 0;
+            return 1;
+        };
+        print(binary_search(check, 1e18, -1));
+    }
+    
 }
 
 signed main() {
@@ -545,7 +602,7 @@ signed main() {
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }
