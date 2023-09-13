@@ -1,5 +1,3 @@
-#pragma once
-
 // atcoder library のものを改変
 
 namespace internal {

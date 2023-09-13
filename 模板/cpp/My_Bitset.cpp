@@ -1,5 +1,3 @@
-#pragma once
-
 // https://codeforces.com/contest/914/problem/F
 // https://yukicoder.me/problems/no/142
 // わずかに普通の bitset より遅いときもあるようだが，
