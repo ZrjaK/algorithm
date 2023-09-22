@@ -230,6 +230,22 @@ struct custom_hash {
     }
 };
 const i128 ONE = 1;
+// istream &operator>>(istream &in, i128 &x) {
+//     string s;
+//     in >> s;
+//     bool minus = false;
+//     if (s[0] == '-') {
+//         minus = true;
+//         s.erase(s.begin());
+//     }
+//     x = 0;
+//     for (auto i : s) {
+//         x *= 10;
+//         x += i - '0';
+//     }
+//     if (minus) x = -x;
+//     return in;
+// }
 ostream &operator<<(ostream &out, i128 x) {
     string s;
     bool minus = false;
@@ -246,6 +262,10 @@ ostream &operator<<(ostream &out, i128 x) {
     reverse(s.begin(), s.end());
     out << s;
     return out;
+}
+template <class T> istream &operator>>(istream &in, vector<T> &v) {
+    for(auto& x : v) cin >> x;
+    return in;
 }
 template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
     for(auto it = begin(v); it != end(v); ++it) {
@@ -275,9 +295,17 @@ template <class T> ostream &operator<<(ostream &os, const Tree<T> &v) {
     }
     return os;
 }
+template <class T, class S> istream &operator>>(istream &in, pair<T, S> &p) {
+    cin >> p.first >> p.second;
+    return in;
+}
 template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p) {
     os << p.first << " " << p.second;
     return os;
+}
+template <class T, size_t size> istream &operator>>(istream &in, array<T, size> &v) {
+    for(auto& x : v) cin >> x;
+    return in;
 }
 template <class T, size_t size> ostream &operator<<(ostream &os, const array<T, size> &v) {
     for(int i = 0; i < size; i++) {
@@ -301,6 +329,39 @@ auto print_all(const Iterable& v, std::string sep = " ", std::string end = "\n")
     }
     std::cout << end;
 }
+void read() {}
+template <class Head, class... Tail>
+void read(Head &head, Tail &... tail) {
+    cin >> head;
+    read(tail...);
+}
+#define INT(...)   \
+    int __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define LL(...)   \
+    ll __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define STR(...)      \
+    string __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define CHAR(...)   \
+    char __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define DBL(...)      \
+    double __VA_ARGS__; \
+    read(__VA_ARGS__)
+#define VEC(type, name, size) \
+    vector<type> name(size);    \
+    read(name)
+#define VV(type, name, h, w)                     \
+    vector<vector<type>> name(h, vector<type>(w)); \
+    read(name)
+void YES(bool t = 1) { print(t ? "YES" : "NO"); }
+void NO(bool t = 1) { YES(!t); }
+void Yes(bool t = 1) { print(t ? "Yes" : "No"); }
+void No(bool t = 1) { Yes(!t); }
+void yes(bool t = 1) { print(t ? "yes" : "no"); }
+void no(bool t = 1) { yes(!t); }
 ll gcd(ll x, ll y) {
     if(!x) return y;
     if(!y) return x;
@@ -336,6 +397,28 @@ ll pow(ll x, ll y, ll mod){
 }
 ll probabilityMod(ll x, ll y, ll mod) {
     return x * pow(y, mod-2, mod) % mod;
+}
+vvi getGraph(int n, int m, bool directed = false) {
+    vvi res(n);
+    rep(_, 0, m) {
+        int u, v;
+        cin >> u >> v;
+        u--, v--;
+        res[u].emplace_back(v);
+        if(!directed) res[v].emplace_back(u);
+    }
+    return res;
+}
+vector<vpii> getWeightedGraph(int n, int m, bool directed = false) {
+    vector<vpii> res(n);
+    rep(_, 0, m) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        u--, v--;
+        res[u].emplace_back(v, w);
+        if(!directed) res[v].emplace_back(u, w);
+    }
+    return res;
 }
 template <class... Args> auto ndvector(size_t n, Args &&...args) {
     if constexpr (sizeof...(args) == 1) {
