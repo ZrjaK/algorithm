@@ -12,7 +12,7 @@
 using namespace std;
 using namespace __gnu_cxx;
 using namespace __gnu_pbds;
-template <class T> using Tree = tree<T, null_type, less_equal<T>, rb_tree_tag,tree_order_statistics_node_update>;
+template <class T> using pbds_set = tree<T, null_type, less_equal<T>, rb_tree_tag,tree_order_statistics_node_update>;
 using Trie = trie<string, null_type, trie_string_access_traits<>, pat_trie_tag, trie_prefix_search_node_update>;
 // template <class T> using heapq = __gnu_pbds::priority_queue<T, greater<T>, pairing_heap_tag>;
 template <class T> using heapq = std::priority_queue<T, vector<T>, greater<T>>;
@@ -288,7 +288,7 @@ template <class T> ostream &operator<<(ostream &os, const multiset<T> &v) {
     }
     return os;
 }
-template <class T> ostream &operator<<(ostream &os, const Tree<T> &v) {
+template <class T> ostream &operator<<(ostream &os, const pbds_set<T> &v) {
     for(auto it = begin(v); it != end(v); ++it) {
         if(it == begin(v)) os << *it;
         else os << " " << *it;
