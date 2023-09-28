@@ -260,17 +260,6 @@ ostream &operator<<(ostream &out, i128 x) {
     out << s;
     return out;
 }
-template <class T> istream &operator>>(istream &in, vector<T> &v) {
-    for(auto& x : v) cin >> x;
-    return in;
-}
-template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
-    for(auto it = begin(v); it != end(v); ++it) {
-        if(it == begin(v)) os << *it;
-        else os << " " << *it;
-    }
-    return os;
-}
 template <class T> ostream &operator<<(ostream &os, const set<T> &v) {
     for(auto it = begin(v); it != end(v); ++it) {
         if(it == begin(v)) os << *it;
@@ -293,7 +282,7 @@ template <class T> ostream &operator<<(ostream &os, const pbds_set<T> &v) {
     return os;
 }
 template <class T, class S> istream &operator>>(istream &in, pair<T, S> &p) {
-    cin >> p.first >> p.second;
+    in >> p.first >> p.second;
     return in;
 }
 template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p) {
@@ -301,13 +290,24 @@ template <class T, class S> ostream &operator<<(ostream &os, const pair<T, S> &p
     return os;
 }
 template <class T, size_t size> istream &operator>>(istream &in, array<T, size> &v) {
-    for(auto& x : v) cin >> x;
+    for(auto& x : v) in >> x;
     return in;
 }
 template <class T, size_t size> ostream &operator<<(ostream &os, const array<T, size> &v) {
     for(int i = 0; i < size; i++) {
         if(i == 0) os << v[i];
         else os << " " << v[i];
+    }
+    return os;
+}
+template <class T> istream &operator>>(istream &in, vector<T> &v) {
+    for(auto& x : v) in >> x;
+    return in;
+}
+template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
+    for(auto it = begin(v); it != end(v); ++it) {
+        if(it == begin(v)) os << *it;
+        else os << " " << *it;
     }
     return os;
 }
