@@ -20,6 +20,7 @@ using ll   =                long long;
 using u32  =                unsigned int;
 using u64  =                unsigned long long;
 using i128 =                __int128;
+using u128 =                __uint128_t;
 using ld   =                long double;
 using ui   =                unsigned int;
 using ull  =                unsigned long long;
