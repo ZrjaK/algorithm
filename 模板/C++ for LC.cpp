@@ -109,6 +109,8 @@ using pqg = std::priority_queue<T, vector<T>, greater<T>>;
 #define mst(x, a)           memset(x, a, sizeof(x))
 #define bitcnt(x)           (__builtin_popcountll(x))
 #define endl                "\n"
+#define MIN(v)              *min_element(all(v))
+#define MAX(v)              *max_element(all(v))
 #define LB(c, x)            distance((c).begin(), lower_bound(all(c), (x)))
 #define UB(c, x)            distance((c).begin(), upper_bound(all(c), (x)))
 #define UNIQUE(x)           sort(all(x)), x.erase(unique(all(x)), x.end()), x.shrink_to_fit()
@@ -156,6 +158,14 @@ vector<T> cumsum(vector<U> &A, int off = 1) {
     for (int i = 0; i < N; i++) B[i + 1] = B[i] + A[i];
     if (off == 0) B.erase(B.begin());
     return B;
+}
+template <typename T>
+vector<int> argsort(const vector<T> &A) {
+  vector<int> ids(len(A));
+  iota(all(ids), 0);
+  sort(all(ids),
+       [&](int i, int j) { return (A[i] == A[j] ? i < j : A[i] < A[j]); });
+  return ids;
 }
 template <typename T>
 T POP(deque<T> &que) {
