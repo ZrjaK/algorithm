@@ -168,6 +168,12 @@ vector<int> argsort(const vector<T> &A) {
   return ids;
 }
 template <typename T>
+vc<T> rearrange(const vc<T> &A, const vc<int> &I) {
+  vc<T> B(len(I));
+  FOR(i, len(I)) B[i] = A[I[i]];
+  return B;
+}
+template <typename T>
 T POP(deque<T> &que) {
   T a = que.front();
   que.pop_front();
