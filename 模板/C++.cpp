@@ -63,6 +63,15 @@ template <class T>
 using pq = std::priority_queue<T>;
 template <class T>
 using pqg = std::priority_queue<T, vector<T>, greater<T>>;
+#define vv(type, name, h, ...) \
+  vector<vector<type>> name(h, vector<type>(__VA_ARGS__))
+#define vvv(type, name, h, w, ...)   \
+  vector<vector<vector<type>>> name( \
+      h, vector<vector<type>>(w, vector<type>(__VA_ARGS__)))
+#define vvvv(type, name, a, b, c, ...)       \
+  vector<vector<vector<vector<type>>>> name( \
+      a, vector<vector<vector<type>>>(       \
+             b, vector<vector<type>>(c, vector<type>(__VA_ARGS__))))
 #define lb                  lower_bound
 #define ub                  upper_bound
 #define pb                  push_back
