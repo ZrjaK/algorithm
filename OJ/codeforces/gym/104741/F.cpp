@@ -457,187 +457,201 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-template <typename T>
-T inverse(T a, T m) {
-  T u = 0, v = 1;
-  while (a != 0) {
-    T t = m / a;
-    m -= t * a; swap(a, m);
-    u -= t * v; swap(u, v);
-  }
-  assert(m == 1);
-  return u;
-}
+#line 2 "mod/modint_common.hpp"
 
-template <typename T>
-class Modular {
- public:
-  using Type = typename decay<decltype(T::value)>::type;
-
-  constexpr Modular() : value() {}
-  template <typename U>
-  Modular(const U& x) {
-    value = normalize(x);
-  }
-
-  template <typename U>
-  static Type normalize(const U& x) {
-    Type v;
-    if (-mod() <= x && x < mod()) v = static_cast<Type>(x);
-    else v = static_cast<Type>(x % mod());
-    if (v < 0) v += mod();
-    return v;
-  }
-
-  const Type& operator()() const { return value; }
-  template <typename U>
-  explicit operator U() const { return static_cast<U>(value); }
-  constexpr static Type mod() { return T::value; }
-
-  Modular& operator+=(const Modular& other) { if ((value += other.value) >= mod()) value -= mod(); return *this; }
-  Modular& operator-=(const Modular& other) { if ((value -= other.value) < 0) value += mod(); return *this; }
-  template <typename U> Modular& operator+=(const U& other) { return *this += Modular(other); }
-  template <typename U> Modular& operator-=(const U& other) { return *this -= Modular(other); }
-  Modular& operator++() { return *this += 1; }
-  Modular& operator--() { return *this -= 1; }
-  Modular operator++(int) { Modular result(*this); *this += 1; return result; }
-  Modular operator--(int) { Modular result(*this); *this -= 1; return result; }
-  Modular operator-() const { return Modular(-value); }
-
-  template <typename U = T>
-  typename enable_if<is_same<typename Modular<U>::Type, int>::value, Modular>::type& operator*=(const Modular& rhs) {
-#ifdef _WIN32
-    uint64_t x = static_cast<int64_t>(value) * static_cast<int64_t>(rhs.value);
-    uint32_t xh = static_cast<uint32_t>(x >> 32), xl = static_cast<uint32_t>(x), d, m;
-    asm(
-      "divl %4; \n\t"
-      : "=a" (d), "=d" (m)
-      : "d" (xh), "a" (xl), "r" (mod())
-    );
-    value = m;
-#else
-    value = normalize(static_cast<int64_t>(value) * static_cast<int64_t>(rhs.value));
-#endif
-    return *this;
-  }
-  template <typename U = T>
-  typename enable_if<is_same<typename Modular<U>::Type, long long>::value, Modular>::type& operator*=(const Modular& rhs) {
-    long long q = static_cast<long long>(static_cast<long double>(value) * rhs.value / mod());
-    value = normalize(value * rhs.value - q * mod());
-    return *this;
-  }
-  template <typename U = T>
-  typename enable_if<!is_integral<typename Modular<U>::Type>::value, Modular>::type& operator*=(const Modular& rhs) {
-    value = normalize(value * rhs.value);
-    return *this;
-  }
-
-  Modular& operator/=(const Modular& other) { return *this *= Modular(inverse(other.value, mod())); }
-
-  friend const Type& abs(const Modular& x) { return x.value; }
-
-  template <typename U>
-  friend bool operator==(const Modular<U>& lhs, const Modular<U>& rhs);
-
-  template <typename U>
-  friend bool operator<(const Modular<U>& lhs, const Modular<U>& rhs);
-
-  template <typename V, typename U>
-  friend V& operator>>(V& stream, Modular<U>& number);
-
- private:
-  Type value;
+struct has_mod_impl {
+  template <class T>
+  static auto check(T &&x) -> decltype(x.get_mod(), std::true_type{});
+  template <class T>
+  static auto check(...) -> std::false_type;
 };
 
-template <typename T> bool operator==(const Modular<T>& lhs, const Modular<T>& rhs) { return lhs.value == rhs.value; }
-template <typename T, typename U> bool operator==(const Modular<T>& lhs, U rhs) { return lhs == Modular<T>(rhs); }
-template <typename T, typename U> bool operator==(U lhs, const Modular<T>& rhs) { return Modular<T>(lhs) == rhs; }
+template <class T>
+class has_mod : public decltype(has_mod_impl::check<T>(std::declval<T>())) {};
 
-template <typename T> bool operator!=(const Modular<T>& lhs, const Modular<T>& rhs) { return !(lhs == rhs); }
-template <typename T, typename U> bool operator!=(const Modular<T>& lhs, U rhs) { return !(lhs == rhs); }
-template <typename T, typename U> bool operator!=(U lhs, const Modular<T>& rhs) { return !(lhs == rhs); }
-
-template <typename T> bool operator<(const Modular<T>& lhs, const Modular<T>& rhs) { return lhs.value < rhs.value; }
-
-template <typename T> Modular<T> operator+(const Modular<T>& lhs, const Modular<T>& rhs) { return Modular<T>(lhs) += rhs; }
-template <typename T, typename U> Modular<T> operator+(const Modular<T>& lhs, U rhs) { return Modular<T>(lhs) += rhs; }
-template <typename T, typename U> Modular<T> operator+(U lhs, const Modular<T>& rhs) { return Modular<T>(lhs) += rhs; }
-
-template <typename T> Modular<T> operator-(const Modular<T>& lhs, const Modular<T>& rhs) { return Modular<T>(lhs) -= rhs; }
-template <typename T, typename U> Modular<T> operator-(const Modular<T>& lhs, U rhs) { return Modular<T>(lhs) -= rhs; }
-template <typename T, typename U> Modular<T> operator-(U lhs, const Modular<T>& rhs) { return Modular<T>(lhs) -= rhs; }
-
-template <typename T> Modular<T> operator*(const Modular<T>& lhs, const Modular<T>& rhs) { return Modular<T>(lhs) *= rhs; }
-template <typename T, typename U> Modular<T> operator*(const Modular<T>& lhs, U rhs) { return Modular<T>(lhs) *= rhs; }
-template <typename T, typename U> Modular<T> operator*(U lhs, const Modular<T>& rhs) { return Modular<T>(lhs) *= rhs; }
-
-template <typename T> Modular<T> operator/(const Modular<T>& lhs, const Modular<T>& rhs) { return Modular<T>(lhs) /= rhs; }
-template <typename T, typename U> Modular<T> operator/(const Modular<T>& lhs, U rhs) { return Modular<T>(lhs) /= rhs; }
-template <typename T, typename U> Modular<T> operator/(U lhs, const Modular<T>& rhs) { return Modular<T>(lhs) /= rhs; }
-
-template<typename T, typename U>
-Modular<T> power(const Modular<T>& a, const U& b) {
-  assert(b >= 0);
-  Modular<T> x = a, res = 1;
-  U p = b;
-  while (p > 0) {
-    if (p & 1) res *= x;
-    x *= x;
-    p >>= 1;
+template <typename mint>
+mint inv(int n) {
+  static const int mod = mint::get_mod();
+  static vector<mint> dat = {0, 1};
+  assert(0 <= n);
+  if (n >= mod) n %= mod;
+  while (len(dat) <= n) {
+    int k = len(dat);
+    int q = (mod + k - 1) / k;
+    dat.eb(dat[k * q - mod] * mint::raw(q));
   }
-  return res;
+  return dat[n];
 }
 
-template <typename T>
-bool IsZero(const Modular<T>& number) {
-  return number() == 0;
+template <typename mint>
+mint fact(int n) {
+  static const int mod = mint::get_mod();
+  assert(0 <= n && n < mod);
+  static vector<mint> dat = {1, 1};
+  while (len(dat) <= n) dat.eb(dat[len(dat) - 1] * mint::raw(len(dat)));
+  return dat[n];
 }
 
-template <typename T>
-string to_string(const Modular<T>& number) {
-  return to_string(number());
+template <typename mint>
+mint fact_inv(int n) {
+  static vector<mint> dat = {1, 1};
+  if (n < 0) return mint(0);
+  while (len(dat) <= n) dat.eb(dat[len(dat) - 1] * inv<mint>(len(dat)));
+  return dat[n];
 }
 
-// U == std::ostream? but done this way because of fastoutput
-template <typename U, typename T>
-U& operator<<(U& stream, const Modular<T>& number) {
-  return stream << number();
+template <class mint, class... Ts>
+mint fact_invs(Ts... xs) {
+  return (mint(1) * ... * fact_inv<mint>(xs));
 }
 
-// U == std::istream? but done this way because of fastinput
-template <typename U, typename T>
-U& operator>>(U& stream, Modular<T>& number) {
-  typename common_type<typename Modular<T>::Type, long long>::type x;
-  stream >> x;
-  number.value = Modular<T>::normalize(x);
-  return stream;
+template <typename mint, class Head, class... Tail>
+mint multinomial(Head &&head, Tail &&... tail) {
+  return fact<mint>(head) * fact_invs<mint>(std::forward<Tail>(tail)...);
 }
 
-/*
-using ModType = int;
-
-struct VarMod { static ModType value; };
-ModType VarMod::value;
-ModType& md = VarMod::value;
-using Mint = Modular<VarMod>;
-*/
-
-constexpr int md = 1e9 + 7;
-using Mint = Modular<std::integral_constant<decay<decltype(md)>::type, md>>;
-
-vector<Mint> fact(1, 1);
-vector<Mint> inv_fact(1, 1);
-
-Mint C(int n, int k) {
-  if (k < 0 || k > n) {
-    return 0;
+template <typename mint>
+mint C_dense(int n, int k) {
+  static vvc<mint> C;
+  static int H = 0, W = 0;
+  auto calc = [&](int i, int j) -> mint {
+    if (i == 0) return (j == 0 ? mint(1) : mint(0));
+    return C[i - 1][j] + (j ? C[i - 1][j - 1] : 0);
+  };
+  if (W <= k) {
+    FOR(i, H) {
+      C[i].resize(k + 1);
+      FOR(j, W, k + 1) { C[i][j] = calc(i, j); }
+    }
+    W = k + 1;
   }
-  while ((int) fact.size() < n + 1) {
-    fact.push_back(fact.back() * (int) fact.size());
-    inv_fact.push_back(1 / fact.back());
+  if (H <= n) {
+    C.resize(n + 1);
+    FOR(i, H, n + 1) {
+      C[i].resize(W);
+      FOR(j, W) { C[i][j] = calc(i, j); }
+    }
+    H = n + 1;
   }
-  return fact[n] * inv_fact[k] * inv_fact[n - k];
+  return C[n][k];
 }
+
+template <typename mint, bool large = false, bool dense = false>
+mint C(ll n, ll k) {
+  assert(n >= 0);
+  if (k < 0 || n < k) return 0;
+  if constexpr (dense) return C_dense<mint>(n, k);
+  if constexpr (!large) return multinomial<mint>(n, k, n - k);
+  k = min(k, n - k);
+  mint x(1);
+  FOR(i, k) x *= mint(n - i);
+  return x * fact_inv<mint>(k);
+}
+
+template <typename mint, bool large = false>
+mint C_inv(ll n, ll k) {
+  assert(n >= 0);
+  assert(0 <= k && k <= n);
+  if (!large) return fact_inv<mint>(n) * fact<mint>(k) * fact<mint>(n - k);
+  return mint(1) / C<mint, 1>(n, k);
+}
+
+// [x^d] (1-x) ^ {-n} の計算
+template <typename mint, bool large = false, bool dense = false>
+mint C_negative(ll n, ll d) {
+  assert(n >= 0);
+  if (d < 0) return mint(0);
+  if (n == 0) { return (d == 0 ? mint(1) : mint(0)); }
+  return C<mint, large, dense>(n + d - 1, d);
+}
+#line 3 "mod/modint.hpp"
+
+template <int mod>
+struct modint {
+  static constexpr u32 umod = u32(mod);
+  static_assert(umod < u32(1) << 31);
+  u32 val;
+
+  static modint raw(u32 v) {
+    modint x;
+    x.val = v;
+    return x;
+  }
+  constexpr modint() : val(0) {}
+  constexpr modint(u32 x) : val(x % umod) {}
+  constexpr modint(u64 x) : val(x % umod) {}
+  constexpr modint(int x) : val((x %= mod) < 0 ? x + mod : x){};
+  constexpr modint(ll x) : val((x %= mod) < 0 ? x + mod : x){};
+  bool operator<(const modint &other) const { return val < other.val; }
+  modint &operator+=(const modint &p) {
+    if ((val += p.val) >= umod) val -= umod;
+    return *this;
+  }
+  modint &operator-=(const modint &p) {
+    if ((val += umod - p.val) >= umod) val -= umod;
+    return *this;
+  }
+  modint &operator*=(const modint &p) {
+    val = u64(val) * p.val % umod;
+    return *this;
+  }
+  modint &operator/=(const modint &p) {
+    *this *= p.inverse();
+    return *this;
+  }
+  modint operator-() const { return modint::raw(val ? mod - val : u32(0)); }
+  modint operator+(const modint &p) const { return modint(*this) += p; }
+  modint operator-(const modint &p) const { return modint(*this) -= p; }
+  modint operator*(const modint &p) const { return modint(*this) *= p; }
+  modint operator/(const modint &p) const { return modint(*this) /= p; }
+  bool operator==(const modint &p) const { return val == p.val; }
+  bool operator!=(const modint &p) const { return val != p.val; }
+  modint inverse() const {
+    int a = val, b = mod, u = 1, v = 0, t;
+    while (b > 0) {
+      t = a / b;
+      swap(a -= t * b, b), swap(u -= t * v, v);
+    }
+    return modint(u);
+  }
+  modint pow(ll n) const {
+    assert(n >= 0);
+    modint ret(1), mul(val);
+    while (n > 0) {
+      if (n & 1) ret *= mul;
+      mul *= mul;
+      n >>= 1;
+    }
+    return ret;
+  }
+#ifdef FASTIO
+  void write() { fastio::printer.write(val); }
+  void read() {
+    fastio::scanner.read(val);
+    val %= mod;
+  }
+#endif
+  static constexpr int get_mod() { return mod; }
+  // (n, r), r は 1 の 2^n 乗根
+  static constexpr pair<int, int> ntt_info() {
+    if (mod == 167772161) return {25, 17};
+    if (mod == 469762049) return {26, 30};
+    if (mod == 754974721) return {24, 362};
+    if (mod == 880803841) return {23, 211};
+    if (mod == 943718401) return {22, 663003469};
+    if (mod == 998244353) return {23, 31};
+    if (mod == 1045430273) return {20, 363};
+    if (mod == 1051721729) return {20, 330};
+    if (mod == 1053818881) return {20, 2789};
+    return {-1, -1};
+  }
+  static constexpr bool can_ntt() { return ntt_info().fi != -1; }
+};
+
+using modint107 = modint<1000000007>;
+using modint998 = modint<998244353>;
+
+using mint = modint107;
 
 void solve() {
     INT(n);
@@ -648,12 +662,12 @@ void solve() {
         a.pb(b);
     }
     INT(m);
-    vv(Mint, dp, m + 1, 2);
+    vv(mint, dp, m + 1, 2);
     dp[0][0] = 1;
     int s = 0;
     rep(i, n) {
         auto ndp = dp;
-        rep(j, min(m, s) + 1) {
+        rep(j, m + 1) {
             rep(k, len(a[i])) if (j + k + 1 <= m) {
                 ndp[j + k + 1][0] += dp[j][0];
                 ndp[j + k + 1][1] += dp[j][1];
@@ -663,7 +677,7 @@ void solve() {
         swap(dp, ndp);
         s += len(a[i]);
     }
-    print(dp[m][1]);
+    print(dp[m][1].val);
     
 }
 
