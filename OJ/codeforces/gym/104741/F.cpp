@@ -664,7 +664,6 @@ void solve() {
     INT(m);
     vv(mint, dp, m + 1, 2);
     dp[0][0] = 1;
-    int s = 0;
     rep(i, n) {
         auto ndp = dp;
         rep(j, m + 1) {
@@ -675,7 +674,6 @@ void solve() {
             }
         }
         swap(dp, ndp);
-        s += len(a[i]);
     }
     print(dp[m][1].val);
     
