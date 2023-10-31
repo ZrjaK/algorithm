@@ -1,4 +1,5 @@
 from functools import cache
+@cache
 def dfs(n, round):
     if n <= round:
         return True
@@ -7,5 +8,5 @@ def dfs(n, round):
         res |= not dfs(n - i, round + 1)
     return res
 
-for n in range(1, 30):
+for n in range(1, 100):
     print(n, dfs(n, 1))
