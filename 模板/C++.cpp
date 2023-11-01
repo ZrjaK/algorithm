@@ -81,15 +81,15 @@ using pqg = std::priority_queue<T, vector<T>, greater<T>>;
 #define se                  second
 #define overload4(_1, _2, _3, _4, name, ...) name
 #define overload3(_1, _2, _3, name, ...) name
-#define rep1(n)             for(int i = 0; i < n; ++i)
-#define rep2(i, n)          for(int i = 0; i < n; ++i)
-#define rep3(i, a, b)       for(int i = a; i < b; ++i)
+#define rep1(n)             for(ll _ = 0; _ < n; ++_)
+#define rep2(i, n)          for(ll i = 0; i < n; ++i)
+#define rep3(i, a, b)       for(ll i = a; i < b; ++i)
 #define rep4(i, a, b, c)    for(int i = a; i < b; i += c)
 #define rep(...)            overload4(__VA_ARGS__, rep4, rep3, rep2, rep1) (__VA_ARGS__)
-#define rrep1(n)            for(int i = n; i--; )
-#define rrep2(i, n)         for(int i = n; i--; )
-#define rrep3(i, a, b)      for(int i = a; i > b; i--)
-#define rrep4(i, a, b, c)   for(int i = a; i > b; i -= c)
+#define rrep1(n)            for(ll i = n; i--; )
+#define rrep2(i, n)         for(ll i = n; i--; )
+#define rrep3(i, a, b)      for(ll i = a; i > b; i--)
+#define rrep4(i, a, b, c)   for(ll i = a; i > b; i -= c)
 #define rrep(...)           overload4(__VA_ARGS__, rrep4, rrep3, rrep2, rrep1) (__VA_ARGS__)
 #define each1(i, a)         for(auto&& i : a)
 #define each2(x, y, a)      for(auto&& [x, y] : a)
