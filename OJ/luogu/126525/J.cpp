@@ -457,431 +457,66 @@ const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
 
-#line 2 "graph/tree.hpp"
-
-#line 2 "graph/base.hpp"
-
-template <typename T>
-struct Edge {
-  int frm, to;
-  T cost;
-  int id;
-};
-
-template <typename T = int, bool directed = false>
-struct Graph {
-  static constexpr bool is_directed = directed;
-  int N, M;
-  using cost_type = T;
-  using edge_type = Edge<T>;
-  vector<edge_type> edges;
-  vector<int> indptr;
-  vector<edge_type> csr_edges;
-  vc<int> vc_deg, vc_indeg, vc_outdeg;
-  bool prepared;
-
-  class OutgoingEdges {
-  public:
-    OutgoingEdges(const Graph* G, int l, int r) : G(G), l(l), r(r) {}
-
-    const edge_type* begin() const {
-      if (l == r) { return 0; }
-      return &G->csr_edges[l];
+struct DSU {
+    std::vector<int> f, siz;
+    
+    DSU() {}
+    DSU(int n) {
+        init(n);
     }
-
-    const edge_type* end() const {
-      if (l == r) { return 0; }
-      return &G->csr_edges[r];
+    
+    void init(int n) {
+        f.resize(n);
+        std::iota(f.begin(), f.end(), 0);
+        siz.assign(n, 1);
     }
-
-  private:
-    const Graph* G;
-    int l, r;
-  };
-
-  bool is_prepared() { return prepared; }
-
-  Graph() : N(0), M(0), prepared(0) {}
-  Graph(int N) : N(N), M(0), prepared(0) {}
-
-  void build(int n) {
-    N = n, M = 0;
-    prepared = 0;
-    edges.clear();
-    indptr.clear();
-    csr_edges.clear();
-    vc_deg.clear();
-    vc_indeg.clear();
-    vc_outdeg.clear();
-  }
-
-  void add(int frm, int to, T cost = 1, int i = -1) {
-    assert(!prepared);
-    assert(0 <= frm && 0 <= to && to < N);
-    if (i == -1) i = M;
-    auto e = edge_type({frm, to, cost, i});
-    edges.eb(e);
-    ++M;
-  }
-
-  // wt, off
-  void read_tree(bool wt = false, int off = 1) { read_graph(N - 1, wt, off); }
-
-  void read_graph(int M, bool wt = false, int off = 1) {
-    for (int m = 0; m < M; ++m) {
-      INT(a, b);
-      a -= off, b -= off;
-      if (!wt) {
-        add(a, b);
-      } else {
-        T c;
-        read(c);
-        add(a, b, c);
-      }
-    }
-    build();
-  }
-
-  void build() {
-    assert(!prepared);
-    prepared = true;
-    indptr.assign(N + 1, 0);
-    for (auto&& e: edges) {
-      indptr[e.frm + 1]++;
-      if (!directed) indptr[e.to + 1]++;
-    }
-    for (int v = 0; v < N; ++v) { indptr[v + 1] += indptr[v]; }
-    auto counter = indptr;
-    csr_edges.resize(indptr.back() + 1);
-    for (auto&& e: edges) {
-      csr_edges[counter[e.frm]++] = e;
-      if (!directed)
-        csr_edges[counter[e.to]++] = edge_type({e.to, e.frm, e.cost, e.id});
-    }
-  }
-
-  OutgoingEdges operator[](int v) const {
-    assert(prepared);
-    return {this, indptr[v], indptr[v + 1]};
-  }
-
-  vc<int> deg_array() {
-    if (vc_deg.empty()) calc_deg();
-    return vc_deg;
-  }
-
-  pair<vc<int>, vc<int>> deg_array_inout() {
-    if (vc_indeg.empty()) calc_deg_inout();
-    return {vc_indeg, vc_outdeg};
-  }
-
-  int deg(int v) {
-    if (vc_deg.empty()) calc_deg();
-    return vc_deg[v];
-  }
-
-  int in_deg(int v) {
-    if (vc_indeg.empty()) calc_deg_inout();
-    return vc_indeg[v];
-  }
-
-  int out_deg(int v) {
-    if (vc_outdeg.empty()) calc_deg_inout();
-    return vc_outdeg[v];
-  }
-
-  void debug() {
-    print("Graph");
-    if (!prepared) {
-      print("frm to cost id");
-      for (auto&& e: edges) print(e.frm, e.to, e.cost, e.id);
-    } else {
-      print("indptr", indptr);
-      print("frm to cost id");
-      FOR(v, N) for (auto&& e: (*this)[v]) print(e.frm, e.to, e.cost, e.id);
-    }
-  }
-
-  vc<int> new_idx;
-  vc<bool> used_e;
-
-  // G における頂点 V[i] が、新しいグラフで i になるようにする
-  // {G, es}
-  pair<Graph<T, directed>, vc<int>> rearrange(vc<int> V) {
-    if (len(new_idx) != N) new_idx.assign(N, -1);
-    if (len(used_e) != M) used_e.assign(M, 0);
-    int n = len(V);
-    FOR(i, n) new_idx[V[i]] = i;
-    Graph<T, directed> G(n);
-    vc<int> es;
-    FOR(i, n) {
-      for (auto&& e: (*this)[V[i]]) {
-        if (used_e[e.id]) continue;
-        int a = e.frm, b = e.to;
-        if (new_idx[a] != -1 && new_idx[b] != -1) {
-          used_e[e.id] = 1;
-          G.add(new_idx[a], new_idx[b], e.cost);
-          es.eb(e.id);
+    
+    int find(int x) {
+        while (x != f[x]) {
+            x = f[x] = f[f[x]];
         }
-      }
+        return x;
     }
-    FOR(i, n) new_idx[V[i]] = -1;
-    for (auto&& eid: es) used_e[eid] = 0;
-    G.build();
-    return {G, es};
-  }
-
-private:
-  void calc_deg() {
-    assert(vc_deg.empty());
-    vc_deg.resize(N);
-    for (auto&& e: edges) vc_deg[e.frm]++, vc_deg[e.to]++;
-  }
-
-  void calc_deg_inout() {
-    assert(vc_indeg.empty());
-    vc_indeg.resize(N);
-    vc_outdeg.resize(N);
-    for (auto&& e: edges) { vc_indeg[e.to]++, vc_outdeg[e.frm]++; }
-  }
-};
-#line 4 "graph/tree.hpp"
-
-// HLD euler tour をとっていろいろ。
-
-template <typename GT>
-struct Tree {
-  using Graph_type = GT;
-  GT &G;
-  using WT = typename GT::cost_type;
-  int N;
-  vector<int> LID, RID, head, V, parent, VtoE;
-  vc<int> depth;
-  vc<WT> depth_weighted;
-
-  Tree(GT &G, int r = 0, bool hld = 1) : G(G) { build(r, hld); }
-
-  void build(int r = 0, bool hld = 1) {
-    if (r == -1) return; // build を遅延したいとき
-
-    N = G.N;
-    LID.assign(N, -1), RID.assign(N, -1), head.assign(N, r);
-    V.assign(N, -1), parent.assign(N, -1), VtoE.assign(N, -1);
-    depth.assign(N, -1), depth_weighted.assign(N, 0);
-    assert(G.is_prepared());
-    int t1 = 0;
-    dfs_sz(r, -1, hld);
-    dfs_hld(r, t1);
-  }
-
-  void dfs_sz(int v, int p, bool hld) {
-    auto &sz = RID;
-    parent[v] = p;
-    depth[v] = (p == -1 ? 0 : depth[p] + 1);
-    sz[v] = 1;
-    int l = G.indptr[v], r = G.indptr[v + 1];
-    auto &csr = G.csr_edges;
-    // 使う辺があれば先頭にする
-
-    for (int i = r - 2; i >= l; --i) {
-      if (hld && depth[csr[i + 1].to] == -1) swap(csr[i], csr[i + 1]);
+    
+    bool same(int x, int y) {
+        return find(x) == find(y);
     }
-    int hld_sz = 0;
-    for (int i = l; i < r; ++i) {
-      auto e = csr[i];
-      if (depth[e.to] != -1) continue;
-      depth_weighted[e.to] = depth_weighted[v] + e.cost;
-      VtoE[e.to] = e.id;
-      dfs_sz(e.to, v, hld);
-      sz[v] += sz[e.to];
-      if (hld && chmax(hld_sz, sz[e.to]) && l < i) { swap(csr[l], csr[i]); }
-    }
-  }
-
-  void dfs_hld(int v, int &times) {
-    LID[v] = times++;
-    RID[v] += LID[v];
-    V[LID[v]] = v;
-    bool heavy = true;
-    for (auto &&e: G[v]) {
-      if (depth[e.to] <= depth[v]) continue;
-      head[e.to] = (heavy ? head[v] : e.to);
-      heavy = false;
-      dfs_hld(e.to, times);
-    }
-  }
-
-  vc<int> heavy_path_at(int v) {
-    vc<int> P = {v};
-    while (1) {
-      int a = P.back();
-      for (auto &&e: G[a]) {
-        if (e.to != parent[a] && head[e.to] == v) {
-          P.eb(e.to);
-          break;
+    
+    bool merge(int x, int y) {
+        x = find(x);
+        y = find(y);
+        if (x == y) {
+            return false;
         }
-      }
-      if (P.back() == a) break;
+        siz[x] += siz[y];
+        f[y] = x;
+        return true;
     }
-    return P;
-  }
-
-  int heavy_child(int v) {
-    int k = LID[v] + 1;
-    if (k == N) return -1;
-    int w = V[k];
-    return (parent[w] == v ? w : -1);
-  }
-
-  int e_to_v(int eid) {
-    auto e = G.edges[eid];
-    return (parent[e.frm] == e.to ? e.frm : e.to);
-  }
-  int v_to_e(int v) { return VtoE[v]; }
-
-  int ELID(int v) { return 2 * LID[v] - depth[v]; }
-  int ERID(int v) { return 2 * RID[v] - depth[v] - 1; }
-
-  // 目標地点へ進む個数が k
-
-  int LA(int v, int k) {
-    assert(k <= depth[v]);
-    while (1) {
-      int u = head[v];
-      if (LID[v] - k >= LID[u]) return V[LID[v] - k];
-      k -= LID[v] - LID[u] + 1;
-      v = parent[u];
+    
+    int size(int x) {
+        return siz[find(x)];
     }
-  }
-  int la(int u, int v) { return LA(u, v); }
-
-  int LCA(int u, int v) {
-    for (;; v = parent[head[v]]) {
-      if (LID[u] > LID[v]) swap(u, v);
-      if (head[u] == head[v]) return u;
-    }
-  }
-  // root を根とした場合の lca
-
-  int LCA_root(int u, int v, int root) {
-    return LCA(u, v) ^ LCA(u, root) ^ LCA(v, root);
-  }
-  int lca(int u, int v) { return LCA(u, v); }
-  int lca_root(int u, int v, int root) { return LCA_root(u, v, root); }
-
-  int subtree_size(int v, int root = -1) {
-    if (root == -1) return RID[v] - LID[v];
-    if (v == root) return N;
-    int x = jump(v, root, 1);
-    if (in_subtree(v, x)) return RID[v] - LID[v];
-    return N - RID[x] + LID[x];
-  }
-
-  int dist(int a, int b) {
-    int c = LCA(a, b);
-    return depth[a] + depth[b] - 2 * depth[c];
-  }
-
-  WT dist_weighted(int a, int b) {
-    int c = LCA(a, b);
-    return depth_weighted[a] + depth_weighted[b] - WT(2) * depth_weighted[c];
-  }
-
-  // a is in b
-
-  bool in_subtree(int a, int b) { return LID[b] <= LID[a] && LID[a] < RID[b]; }
-
-  int jump(int a, int b, ll k) {
-    if (k == 1) {
-      if (a == b) return -1;
-      return (in_subtree(b, a) ? LA(b, depth[b] - depth[a] - 1) : parent[a]);
-    }
-    int c = LCA(a, b);
-    int d_ac = depth[a] - depth[c];
-    int d_bc = depth[b] - depth[c];
-    if (k > d_ac + d_bc) return -1;
-    if (k <= d_ac) return LA(a, k);
-    return LA(b, d_ac + d_bc - k);
-  }
-
-  vc<int> collect_child(int v) {
-    vc<int> res;
-    for (auto &&e: G[v])
-      if (e.to != parent[v]) res.eb(e.to);
-    return res;
-  }
-
-  vc<pair<int, int>> get_path_decomposition(int u, int v, bool edge) {
-    // [始点, 終点] の"閉"区間列。
-
-    vc<pair<int, int>> up, down;
-    while (1) {
-      if (head[u] == head[v]) break;
-      if (LID[u] < LID[v]) {
-        down.eb(LID[head[v]], LID[v]);
-        v = parent[head[v]];
-      } else {
-        up.eb(LID[u], LID[head[u]]);
-        u = parent[head[u]];
-      }
-    }
-    if (LID[u] < LID[v]) down.eb(LID[u] + edge, LID[v]);
-    elif (LID[v] + edge <= LID[u]) up.eb(LID[u], LID[v] + edge);
-    reverse(all(down));
-    up.insert(up.end(), all(down));
-    return up;
-  }
-
-  vc<int> restore_path(int u, int v) {
-    vc<int> P;
-    for (auto &&[a, b]: get_path_decomposition(u, v, 0)) {
-      if (a <= b) {
-        FOR(i, a, b + 1) P.eb(V[i]);
-      } else {
-        FOR_R(i, b, a + 1) P.eb(V[i]);
-      }
-    }
-    return P;
-  }
 };
 
 void solve() {
-    INT(n, q);
-    VEC(int, a, n);
-    Graph<ll> G2(n), G5(n);
-    rep(n - 1) {
-        INT(x, y);
-        x--, y--;
-        DBL(w);
-        w *= 1e4;
-        int W = w;
-        if (W == 0) {
-            G2.add(x, y, infty<int>);
-            G5.add(x, y, infty<int>);
-        } else {
-            int c2 = 0, c5 = 0;
-            while (W % 2 == 0) W /= 2, c2++;
-            while (W % 5 == 0) W /= 5, c5++;
-            G2.add(x, y, c2);
-            G5.add(x, y, c5);
+    LL(n, m, q, V);
+    vc<array<ll, 3>> E(m);
+    read(E);
+    each(u, v, w, E) u--, v--;
+    vpii Q(q);
+    read(Q);
+    each(x, y, Q) x--, y--;
+    vi ans(q);
+    for (ll x = V; x < 1ll << 60; x += 1ll << lowbit(x)) {
+        DSU dsu(n);
+        each(u, v, w, E) if ((w & x) == x) dsu.merge(u, v);
+        rep(i, q) {
+            auto [x, y] = Q[i];
+            ans[i] |= dsu.same(x, y);
         }
+        if (x == 0) break;
     }
-    G2.build(), G5.build();
-    Tree<decltype(G2)> t2(G2);
-    Tree<decltype(G5)> t5(G5);
-    rep(q) {
-        INT(x, y);
-        x--, y--;
-        ll c2 = t2.dist_weighted(x, y), c5 = t5.dist_weighted(x, y);
-        int W = a[x];
-        if (W == 0) {
-            c2 = c5 = infty<int>;
-        } else {
-            while (W % 2 == 0) W /= 2, c2++;
-            while (W % 5 == 0) W /= 5, c5++;
-        }
-        Yes(min(c2, c5) >= 4 * t2.dist(x, y));
-    }
+    each(i, ans) Yes(i);
     
 }
 
