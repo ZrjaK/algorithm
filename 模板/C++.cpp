@@ -337,6 +337,7 @@ template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
     }
     return os;
 }
+#define FASTIO
 inline void print() { std::cout << '\n'; }
 template <typename Head, typename... Tail>
 inline void print(const Head& head, const Tail &...tails) {
