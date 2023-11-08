@@ -1,8 +1,3 @@
-int topbit(int x) { return (x == 0 ? -1 : 31 - __builtin_clz(x)); }
-int topbit(uint32_t x) { return (x == 0 ? -1 : 31 - __builtin_clz(x)); }
-int topbit(long long x) { return (x == 0 ? -1 : 63 - __builtin_clzll(x)); }
-int topbit(uint64_t x) { return (x == 0 ? -1 : 63 - __builtin_clzll(x)); }
-
 // 非永続ならば、2 * 要素数 のノード数
 template <int LOG, bool PERSISTENT, int NODES, typename UINT = size_t,
           typename SIZE_TYPE = int>
