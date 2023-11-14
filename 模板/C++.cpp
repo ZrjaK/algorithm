@@ -526,12 +526,12 @@ void yes(bool t = 1) { print(t ? "yes" : "no"); }
 void no(bool t = 1) { yes(!t); }
 const i128 ONE = 1;
 template <typename Iterable>
-auto print_all(const Iterable& v, std::string sep = " ", std::string end = "\n") -> decltype(std::cout << *v.begin(), void()) {
+auto print_all(const Iterable& v, std::string sep = " ", std::string end = "\n") -> decltype(fastio::wt(*v.begin())) {
     for (auto it = v.begin(); it != v.end();) {
-        std::cout << *it;
-        if (++it != v.end()) std::cout << sep;
+        fastio::wt(*it);
+        if (++it != v.end()) fastio::wt(sep);
     }
-    std::cout << end;
+    fastio::wt(end);
 }
 ll gcd(ll x, ll y) {
     if(!x) return y;
@@ -572,8 +572,7 @@ ll probabilityMod(ll x, ll y, ll mod) {
 vvi getGraph(int n, int m, bool directed = false) {
     vvi res(n);
     rep(_, 0, m) {
-        int u, v;
-        cin >> u >> v;
+        INT(u, v);
         u--, v--;
         res[u].emplace_back(v);
         if(!directed) res[v].emplace_back(u);
@@ -583,8 +582,7 @@ vvi getGraph(int n, int m, bool directed = false) {
 vector<vpii> getWeightedGraph(int n, int m, bool directed = false) {
     vector<vpii> res(n);
     rep(_, 0, m) {
-        int u, v, w;
-        cin >> u >> v >> w;
+        INT(u, v, w);
         u--, v--;
         res[u].emplace_back(v, w);
         if(!directed) res[v].emplace_back(u, w);
