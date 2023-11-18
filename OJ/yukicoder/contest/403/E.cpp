@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -602,3 +602,46 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
+
+template <typename STRING>  // string, vector どちらでも
+vector<int> zalgorithm(const STRING& s) {
+  int n = int(s.size());
+  if (n == 0) return {};
+  vector<int> z(n);
+  z[0] = 0;
+  for (int i = 1, j = 0; i < n; i++) {
+    int& k = z[i];
+    k = (j + z[j] <= i) ? 0 : min(j + z[j] - i, z[i - j]);
+    while (i + k < n && s[k] == s[i + k]) k++;
+    if (j + z[j] < i + z[i]) j = i;
+  }
+  z[0] = n;
+  return z;
+}
+
+void solve() {
+    INT(n);
+    STR(s);
+    vi z = zalgorithm(s);
+    int ans = 0;
+    rep(i, 1, n) {
+        int t = z[i];
+        if (i < t) ans++;
+        elif (t == i) {
+            if (i < n - i) ans++;
+        } else {
+            if (s[t] < s[i + t]) ans++;
+        }
+    }
+    print(ans);
+    
+}
+
+signed main() {
+    int T = 1;
+    read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

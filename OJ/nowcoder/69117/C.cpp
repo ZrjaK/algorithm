@@ -1,5 +1,5 @@
 #ifdef ONLINE_JUDGE
-#pragma GCC optimize("Ofast,unroll-loops")
+#pragma GCC optimize("O3,unroll-loops")
 #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #endif
 #include <bits/stdc++.h>
@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -526,12 +526,12 @@ void yes(bool t = 1) { print(t ? "yes" : "no"); }
 void no(bool t = 1) { yes(!t); }
 const i128 ONE = 1;
 template <typename Iterable>
-auto print_all(const Iterable& v, std::string sep = " ", std::string end = "\n") -> decltype(fastio::wt(*v.begin())) {
+auto print_all(const Iterable& v, std::string sep = " ", std::string end = "\n") -> decltype(std::cout << *v.begin(), void()) {
     for (auto it = v.begin(); it != v.end();) {
-        fastio::wt(*it);
-        if (++it != v.end()) fastio::wt(sep);
+        std::cout << *it;
+        if (++it != v.end()) std::cout << sep;
     }
-    fastio::wt(end);
+    std::cout << end;
 }
 ll gcd(ll x, ll y) {
     if(!x) return y;
@@ -572,7 +572,8 @@ ll probabilityMod(ll x, ll y, ll mod) {
 vvi getGraph(int n, int m, bool directed = false) {
     vvi res(n);
     rep(_, 0, m) {
-        INT(u, v);
+        int u, v;
+        cin >> u >> v;
         u--, v--;
         res[u].emplace_back(v);
         if(!directed) res[v].emplace_back(u);
@@ -582,7 +583,8 @@ vvi getGraph(int n, int m, bool directed = false) {
 vector<vpii> getWeightedGraph(int n, int m, bool directed = false) {
     vector<vpii> res(n);
     rep(_, 0, m) {
-        INT(u, v, w);
+        int u, v, w;
+        cin >> u >> v >> w;
         u--, v--;
         res[u].emplace_back(v, w);
         if(!directed) res[v].emplace_back(u, w);
@@ -601,4 +603,31 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 1e5 + 10;
+
+void solve() {
+    INT(n);
+    VEC(int, a, n);
+    vll f(N, infty<int>);
+    f[1] = 0;
+    rep(i, 2, N) {
+        f[i] = f[i - 1] + 1;
+        rep(j, 2, N) {
+            if (j * j > i) break;
+            if (i % j == 0) chmin(f[i], f[j] + f[i / j] + 1);
+        }
+    }
+    ll ans = 0;
+    each(i, a) ans += f[i];
+    print(ans);
+    
+}
+
+signed main() {
+    int T = 1;
+    // read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

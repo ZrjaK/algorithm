@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -602,3 +602,21 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
+
+void solve() {
+    LL(a, b);
+    print(binary_search([&] (i128 x) {
+        i128 v = x * x - (a + b);
+        return v > 0 && v * v > 4 * a * b;
+    }, 1e9, 0));
+    
+}
+
+signed main() {
+    int T = 1;
+    read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

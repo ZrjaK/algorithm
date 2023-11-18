@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -602,3 +602,43 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
+
+void solve() {
+    INT(n, m);
+    vc<vpii> X(m);
+    rep(i, 1, n * m + 1) {
+        INT(x, y);
+        x--, y--;
+        X[y].eb(x, i);
+    }
+    int ans = infty<int>;
+    each(lst, X) {
+        SORT(lst);
+        rep(i, n - 4) {
+            vi h;
+            int mx = 0;
+            rep(j, i, i + 5) h.pb(lst[j % n].se);
+            SORT(h), REV(h);
+            int cur = 0;
+            int res = -1;
+            while (len(h)) {
+                int t = ceil(h.back() - cur, len(h));
+                cur += len(h) * t;
+                res += t;
+                while (len(h) && h.back() <= cur) POP(h);
+            }
+            chmin(ans, res);
+        }
+    }
+    print(ans);
+    
+}
+
+signed main() {
+    int T = 1;
+    // read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

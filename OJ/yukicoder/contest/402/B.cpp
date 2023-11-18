@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -602,3 +602,21 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
+
+void solve() {
+    INT(n);
+    VEC(u64, a, 1 << n);
+    rep(i, 1 << n) if (a[i ^ 0] != a[i] ^ a[0]) return No();
+    rep(i, 1 << n) if (1 < (1 << n) && (i ^ 1) < (1 << n) && a[i ^ 1] != a[i] ^ a[1]) return No();
+    Yes();
+    
+}
+
+signed main() {
+    int T = 1;
+    // read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -602,3 +602,69 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
+
+struct DSU {
+    std::vector<int> f, siz;
+    
+    DSU() {}
+    DSU(int n) {
+        init(n);
+    }
+    
+    void init(int n) {
+        f.resize(n);
+        std::iota(f.begin(), f.end(), 0);
+        siz.assign(n, 1);
+    }
+    
+    int find(int x) {
+        while (x != f[x]) {
+            x = f[x] = f[f[x]];
+        }
+        return x;
+    }
+    
+    bool same(int x, int y) {
+        return find(x) == find(y);
+    }
+    
+    bool merge(int x, int y) {
+        x = find(x);
+        y = find(y);
+        if (x == y) {
+            return false;
+        }
+        siz[x] += siz[y];
+        f[y] = x;
+        return true;
+    }
+    
+    int size(int x) {
+        return siz[find(x)];
+    }
+};
+
+void solve() {
+    INT(n, m);
+    DSU dsu(2 * n);
+    rep(m) {
+        INT(a, b);
+        a--, b--;
+        dsu.merge(a, b);
+    }
+    set<int> S;
+    rep(i, 2 * n) S.insert(dsu.find(i));
+    int ans = 0;
+    each(i, S) if (dsu.size(i) % 2) ans++;
+    print(ans / 2);
+    
+}
+
+signed main() {
+    int T = 1;
+    // read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

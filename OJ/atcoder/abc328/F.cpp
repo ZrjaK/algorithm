@@ -1,5 +1,5 @@
 #ifdef ONLINE_JUDGE
-#pragma GCC optimize("Ofast,unroll-loops")
+#pragma GCC optimize("O3,unroll-loops")
 #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #endif
 #include <bits/stdc++.h>
@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -526,12 +526,12 @@ void yes(bool t = 1) { print(t ? "yes" : "no"); }
 void no(bool t = 1) { yes(!t); }
 const i128 ONE = 1;
 template <typename Iterable>
-auto print_all(const Iterable& v, std::string sep = " ", std::string end = "\n") -> decltype(fastio::wt(*v.begin())) {
+auto print_all(const Iterable& v, std::string sep = " ", std::string end = "\n") -> decltype(std::cout << *v.begin(), void()) {
     for (auto it = v.begin(); it != v.end();) {
-        fastio::wt(*it);
-        if (++it != v.end()) fastio::wt(sep);
+        std::cout << *it;
+        if (++it != v.end()) std::cout << sep;
     }
-    fastio::wt(end);
+    std::cout << end;
 }
 ll gcd(ll x, ll y) {
     if(!x) return y;
@@ -572,7 +572,8 @@ ll probabilityMod(ll x, ll y, ll mod) {
 vvi getGraph(int n, int m, bool directed = false) {
     vvi res(n);
     rep(_, 0, m) {
-        INT(u, v);
+        int u, v;
+        cin >> u >> v;
         u--, v--;
         res[u].emplace_back(v);
         if(!directed) res[v].emplace_back(u);
@@ -582,7 +583,8 @@ vvi getGraph(int n, int m, bool directed = false) {
 vector<vpii> getWeightedGraph(int n, int m, bool directed = false) {
     vector<vpii> res(n);
     rep(_, 0, m) {
-        INT(u, v, w);
+        int u, v, w;
+        cin >> u >> v >> w;
         u--, v--;
         res[u].emplace_back(v, w);
         if(!directed) res[v].emplace_back(u, w);
@@ -602,3 +604,93 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
+
+template <typename Group>
+struct Weighted_UnionFind {
+  using E = typename Group::value_type;
+  int N;
+  int n_comp;
+  vc<E> vals;
+  vc<int> par;
+  vc<int> size;
+
+  Weighted_UnionFind(int N)
+      : N(N), n_comp(N), vals(N, Group::unit()), size(N, 1) {
+    par.resize(N);
+    iota(all(par), 0);
+  }
+
+  // (root, root=0 としたときの val)
+
+  pair<int, E> get(int v) {
+    E res = Group::unit();
+    while (v != par[v]) {
+      res = Group::op(vals[v], res);
+      res = Group::op(vals[par[v]], res);
+      vals[v] = Group::op(vals[par[v]], vals[v]);
+      v = par[v] = par[par[v]];
+    }
+    return {v, res};
+  }
+
+  pair<int, E> operator[](int v) { return get(v); }
+
+  bool merge(int frm, int to, E x) {
+    auto [v1, x1] = get(frm);
+    auto [v2, x2] = get(to);
+    if (v1 == v2) return false;
+    if (size[v1] < size[v2]) {
+      swap(v1, v2);
+      swap(x1, x2);
+      x = Group::inverse(x);
+    }
+    x = Group::op(x1, x);
+    x = Group::op(x, Group::inverse(x2));
+    vals[v2] = x;
+    par[v2] = v1;
+    size[v1] += size[v2];
+    --n_comp;
+    return true;
+  }
+};
+
+#line 2 "alg/monoid/add.hpp"
+
+template <typename X>
+struct Monoid_Add {
+  using value_type = X;
+  static constexpr X op(const X &x, const X &y) noexcept { return x + y; }
+  static constexpr X inverse(const X &x) noexcept { return -x; }
+  static constexpr X power(const X &x, ll n) noexcept { return X(n) * x; }
+  static constexpr X unit() { return X(0); }
+  static constexpr bool commute = true;
+};
+
+void solve() {
+    INT(n, q);
+    vi ans;
+    Weighted_UnionFind<Monoid_Add<ll>> uf(n);
+    rep(i, 1, q + 1) {
+        INT(a, b, d);
+        a--, b--;
+        auto [ra, xa] = uf.get(a);
+        auto [rb, xb] = uf.get(b);
+        if (ra != rb) {
+            ans.pb(i);
+            uf.merge(b, a, d);
+        } else {
+            if (xa == xb + d) ans.pb(i);
+        }
+    }
+    print(ans);
+    
+}
+
+signed main() {
+    int T = 1;
+    // INT(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

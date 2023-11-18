@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -602,3 +602,93 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
+
+#line 2 "ds/cumsum_2d.hpp"
+
+#line 2 "alg/monoid/add.hpp"
+
+template <typename X>
+struct Monoid_Add {
+  using value_type = X;
+  static constexpr X op(const X &x, const X &y) noexcept { return x + y; }
+  static constexpr X inverse(const X &x) noexcept { return -x; }
+  static constexpr X power(const X &x, ll n) noexcept { return X(n) * x; }
+  static constexpr X unit() { return X(0); }
+  static constexpr bool commute = true;
+};
+#line 4 "ds/cumsum_2d.hpp"
+
+template <typename Monoid>
+struct Cumsum_2D {
+  using MX = Monoid;
+  static_assert(MX::commute);
+  using X = typename MX::value_type;
+  int H, W;
+  vc<X> dat;
+
+  Cumsum_2D() {}
+  Cumsum_2D(vvc<X> &A) { build(A); }
+
+  void build(vvc<X> &A) {
+    H = len(A);
+    W = (H == 0 ? 0 : len(A[0]));
+    dat.assign(H * W, MX::unit());
+    FOR(x, H) FOR(y, W) {
+      int k = W * x + y;
+      dat[k] = (y == 0 ? A[x][y] : MX::op(dat[k - 1], A[x][y]));
+    }
+    FOR(i, W, H * W) dat[i] = MX::op(dat[i - W], dat[i]);
+  }
+
+  // [x1,x2) x [y1,y2)
+
+  X sum(int x1, int x2, int y1, int y2) {
+    if (x2 == 0 || y2 == 0) return MX::unit();
+    assert(0 <= x1 && x1 <= x2 && x2 <= H);
+    assert(0 <= y1 && y1 <= y2 && y2 <= W);
+    --x1, --y1, --x2, --y2;
+    X a = (x1 >= 0 && y1 >= 0 ? dat[W * x1 + y1] : MX::unit());
+    X b = (x1 >= 0 && y2 >= 0 ? dat[W * x1 + y2] : MX::unit());
+    X c = (x2 >= 0 && y1 >= 0 ? dat[W * x2 + y1] : MX::unit());
+    X d = (x2 >= 0 && y2 >= 0 ? dat[W * x2 + y2] : MX::unit());
+    return MX::op(MX::op(a, d), MX::inverse(MX::op(b, c)));
+  }
+
+  X prefix_sum(int x, int y) {
+    return (x == 0 || y == 0) ? MX::unit() : dat[W * x + y - (W + 1)];
+  }
+};
+
+void solve() {
+    INT(n, m);
+    VEC(string, a, n);
+    auto c = ndvector(n + 1, m + 1, 0);
+    rep(i, n) rep(j, m) c[i][j] = a[i][j] == '#';
+    Cumsum_2D<Monoid_Add<int>> X(c);
+    auto check = [&] (int x) -> bool {
+        auto d = ndvector(n + 1, m + 1, 0);
+        rep(i, n - x + 1) rep(j, m - x + 1) if (X.sum(i, i + x, j, j + x) == x * x) {
+            d[i][j]++;
+            d[i][j + x]--;
+            d[i + x][j]--;
+            d[i + x][j + x]++;
+        }
+        rep(i, 1, n + 1) d[i][0] += d[i - 1][0];
+        rep(j, 1, m + 1) d[0][j] += d[0][j - 1];
+        rep(i, 1, n + 1) rep(j, 1, m + 1) d[i][j] += d[i][j - 1] + d[i - 1][j] - d[i - 1][j - 1];
+        each(lst, d) each(i, lst) i = i > 0;
+        return d == c;
+    };
+    check(2);
+    print(binary_search(check, 1, min(n, m) + 1));
+    
+}
+
+signed main() {
+    int T = 1;
+    // read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

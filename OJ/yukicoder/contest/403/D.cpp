@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -602,3 +602,109 @@ const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
 const int N = 1e6 + 10;
+
+template <typename T = long long, bool REDUCE = true>
+struct Rational {
+  T num, den;
+
+  Rational() : num(0), den(1) {}
+  Rational(T x) : num(x), den(1) {}
+  Rational(T a, T b, bool coprime = false) : num(a), den(b) {
+    if (den < 0) num = -num, den = -den;
+    if (!coprime && REDUCE) reduce();
+  }
+
+  static T gcd(T a, T b) {
+    a = max(a, -a), b = max(b, -b);
+    while (b) {
+      a %= b;
+      swap(a, b);
+    }
+    return a;
+  }
+
+  void reduce() {
+    if (!REDUCE) return;
+    T g = gcd(num, den);
+    num /= g, den /= g;
+  }
+
+  Rational &operator+=(const Rational &p) {
+    T g = (REDUCE ? gcd(den, p.den) : 1);
+    num = num * (p.den / g) + p.num * (den / g);
+    den *= p.den / g;
+    reduce();
+    return *this;
+  }
+  Rational &operator-=(const Rational &p) {
+    T g = (REDUCE ? gcd(den, p.den) : 1);
+    num = num * (p.den / g) - p.num * (den / g);
+    den *= p.den / g;
+    reduce();
+    return *this;
+  }
+  Rational &operator*=(const Rational &p) {
+    T g1 = (REDUCE ? gcd(num, p.den) : 1);
+    T g2 = (REDUCE ? gcd(den, p.num) : 1);
+    num = (num / g1) * (p.num / g2);
+    den = (den / g2) * (p.den / g1);
+    return *this;
+  }
+  Rational &operator/=(const Rational &p) {
+    T g1 = (REDUCE ? gcd(num, p.num) : 1);
+    T g2 = (REDUCE ? gcd(den, p.den) : 1);
+    num = (num / g1) * (p.den / g2);
+    den = (den / g2) * (p.num / g1);
+    if (den < 0) num = -num, den = -den;
+    return *this;
+  }
+
+  Rational operator-() const { return Rational(-num, den); }
+  Rational operator+(const Rational &p) const { return Rational(*this) += p; }
+  Rational operator-(const Rational &p) const { return Rational(*this) -= p; }
+  Rational operator*(const Rational &p) const { return Rational(*this) *= p; }
+  Rational operator/(const Rational &p) const { return Rational(*this) /= p; }
+  bool operator==(const Rational &p) const {
+    return num * p.den == p.num * den;
+  }
+  bool operator!=(const Rational &p) const {
+    return num * p.den != p.num * den;
+  }
+  bool operator<(const Rational &p) const { return num * p.den < p.num * den; }
+  bool operator>(const Rational &p) const { return num * p.den > p.num * den; }
+  bool operator<=(const Rational &p) const {
+    return num * p.den <= p.num * den;
+  }
+  bool operator>=(const Rational &p) const {
+    return num * p.den >= p.num * den;
+  }
+
+  string to_string() { return std::to_string(num) + "/" + std::to_string(den); }
+  double to_double() { return double(num) / double(den); }
+};
+
+void solve() {
+    INT(n, m);
+    VEC(int, a, n);
+    VEC(int, b, m);
+    using R = Rational<ll>;
+    set<tuple<R, int, int>> S;
+    rep(i, n) S.insert({R(-a[i], b[0]), i, 1});
+    rep(m) {
+        auto it = begin(S);
+        S.erase(it);
+        auto [v, i, j] = *it;
+        print(i + 1);
+        if (j < m) S.insert({R(-a[i], b[j]), i, j + 1});
+    }
+    
+}
+
+signed main() {
+    int T = 1;
+    // read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

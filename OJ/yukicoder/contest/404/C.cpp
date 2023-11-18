@@ -340,7 +340,7 @@ void rd_integer(T &x) {
 
 void rd(int &x) { rd_integer(x); }
 void rd(ll &x) { rd_integer(x); }
-// void rd(i128 &x) { rd_integer(x); }
+void rd(i128 &x) { rd_integer(x); }
 void rd(u32 &x) { rd_integer(x); }
 void rd(u64 &x) { rd_integer(x); }
 void rd(u128 &x) { rd_integer(x); }
@@ -428,7 +428,7 @@ void wt_real(T x) {
 
 void wt(int x) { wt_integer(x); }
 void wt(ll x) { wt_integer(x); }
-// void wt(i128 x) { wt_integer(x); }
+void wt(i128 x) { wt_integer(x); }
 void wt(u32 x) { wt_integer(x); }
 void wt(u64 x) { wt_integer(x); }
 void wt(u128 x) { wt_integer(x); }
@@ -601,4 +601,38 @@ const ll MINF = 0x7fffffffffff;
 const int INF = 0x3fffffff;
 const int MOD = 1000000007;
 const int MODD = 998244353;
-const int N = 1e6 + 10;
+const int N = 1e5 + 10;
+
+void solve() {
+    INT(n, q);
+    vc<int> diff(N);
+    vc<vpii> X(n);
+    rep(q) {
+        INT(i, s, t);
+        i--;
+        X[i].eb(s, t);
+        diff[s]++;
+        diff[t]--;
+    }
+    rep(i, 1, N) diff[i] += diff[i - 1];
+    vc<double> f(N);
+    rep(i, N) if (diff[i]) {
+        f[i] = 1. / diff[i];
+    }
+    vc<double> cum = cumsum<double>(f);
+    rep(i, n) {
+        double ans = 0;
+        each(s, t, X[i]) ans += cum[t] - cum[s];
+        print(ans);
+    }
+    
+}
+
+signed main() {
+    int T = 1;
+    // read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}
