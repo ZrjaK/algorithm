@@ -4,6 +4,7 @@
 #![allow(unused_mut)]
 
 use std::{io::Read, vec::IntoIter};
+
 struct Scanner {
     iter: IntoIter<String>,
 }
@@ -36,23 +37,14 @@ fn main() {
     let T = 1;
     let T = scanner.next();
     for _ in 0..T {
-        let mut n: i64 = scanner.next();
+        let mut n: usize = scanner.next();
         let mut a = (0..n).map(|_| scanner.next::<i64>()).collect::<Vec<_>>();
         let mut ans = 0 as i64;
-        for i in 1..n+1 {
-            if n % i != 0 {
-                continue;
-            }
-            let mut j = 0;
-            let mut b: Vec<i64> = Vec::new();
-            while j < n {
-                let mut x = 0;
-                for k in j..j+i{
-                    x += a[k as usize];
-                }
-                b.push(x);
-                j += i;
-            }
+        for i in (1..n + 1).filter(|x| n % x == 0) {
+            let mut b = (0..n)
+                .filter(|x| x % i == 0)
+                .map(|x| a[x..x + i].iter().sum::<i64>())
+                .collect::<Vec<_>>();
             ans = std::cmp::max(ans, b.iter().max().unwrap() - b.iter().min().unwrap())
         }
         println!("{}", ans);
