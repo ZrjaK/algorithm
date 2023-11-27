@@ -1,7 +1,7 @@
 import random, sys, os, math, gc
 from collections import Counter, defaultdict, deque
 from functools import lru_cache, reduce, cmp_to_key
-from itertools import accumulate, combinations, permutations, product
+from itertools import accumulate, combinations, permutations, product, groupby
 from heapq import nsmallest, nlargest, heapify, heappop, heappush
 from io import BytesIO, IOBase
 from copy import deepcopy
@@ -21,7 +21,7 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
     n = II()
-    arr = LII()
+    a = LII()
     
 
 def main():
