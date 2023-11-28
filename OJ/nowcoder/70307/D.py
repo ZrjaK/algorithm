@@ -20,8 +20,23 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
+    n, S = LII()
     a = LII()
+    ans = []
+    ans.append("1 1 1 /")
+    a[0] //= a[0]
+    s = 0
+    for i in range(60):
+        if S >> i & 1:
+            ans.append(f"{n + 1} {n + 1} 1 +")
+            s += a[0]
+        ans.append(f"1 1 1 +")
+        a[0] += a[0]
+    print(len(ans))
+    print("\n".join(ans))
+        
+    
+
     
 
 def main():

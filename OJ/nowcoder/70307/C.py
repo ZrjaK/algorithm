@@ -22,6 +22,15 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 def solve():
     n = II()
     a = LII()
+    b = LII()
+    d = defaultdict(int)
+    ans = 0
+    for i, j in zip(a, b):
+        ans += d[i ^ j]
+        d[i ^ j] += 1
+    print(ans * 2 + n)
+
+
     
 
 def main():

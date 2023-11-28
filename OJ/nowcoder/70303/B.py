@@ -20,8 +20,20 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    a = LII()
+    n, m, q = LII()
+    ans = [["."] * m for _ in range(n)]
+    for _ in range(q):
+        x, y, c = LI()
+        x = int(x) - 1
+        y = int(y) - 1
+        for i in range(x - 2, x + 3):
+            if 0 <= i < n:
+                ans[i][y] = c
+        for j in range(y - 2, y + 3):
+            if 0 <= j < m:
+                ans[x][j] = c
+    for i in ans:
+        print("".join(i))
     
 
 def main():

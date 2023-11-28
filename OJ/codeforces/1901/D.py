@@ -19,9 +19,37 @@ INF = float('inf')
 D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
+class RangeQuery:
+    def __init__(self, data, func=min):
+        self.func = func
+        self._data = _data = [list(data)]
+        i, n = 1, len(_data[0])
+        while 2 * i <= n:
+            prev = _data[-1]
+            _data.append([func(prev[j], prev[j + i]) for j in range(n - 2 * i + 1)])
+            i <<= 1
+ 
+    def query(self, start, stop):
+        """func of data[start, stop)"""
+        depth = (stop - start).bit_length() - 1
+        return self.func(self._data[depth][start], self._data[depth][stop - (1 << depth)])
+ 
+    def __getitem__(self, idx):
+        return self._data[0][idx]
+    
 def solve():
     n = II()
     a = LII()
+    dat1, dat2 = [-INF] * (n + 1), [-INF] * (n + 1)
+    for i in range(n):
+        dat1[i] = a[i] + n - 1 - i
+        dat2[i] = a[i] + i
+    dat1 = list(accumulate(dat1, max)) + [-INF]
+    dat2 = list(accumulate(dat2[::-1], max))[::-1] + [-INF]
+    ans = INF
+    for i in range(n):
+        ans = min(ans, max(a[i], dat1[i - 1], dat2[i + 1]))
+    print(ans)
     
 
 def main():

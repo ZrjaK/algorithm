@@ -20,8 +20,15 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
-    a = LII()
+    f1, f2, p, A, n = LII()
+    @lru_cache(None)
+    def f(n):
+        if n == 1:
+            return f1
+        if n == 2:
+            return f2
+        return math.floor(math.log2(pow(f(n - 1), f(n - 2), p) + 1)) + A
+    print(*[f(i) for i in range(1, n + 1)])
     
 
 def main():

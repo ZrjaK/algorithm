@@ -20,8 +20,13 @@ D4 = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 
 def solve():
-    n = II()
+    n, L, k = LII()
     a = LII()
+    a.sort()
+    ans = 0
+    for i in range(n):
+        ans = max(ans, (a[i] - a[i - k - 1]) % L)
+    print(ans)
     
 
 def main():

@@ -22,11 +22,16 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 def solve():
     n = II()
     a = LII()
+    a = [1] + a
+    ans = 0
+    for i in range(1, len(a)):
+        ans += max(0, a[i] - a[i - 1])
+    print(ans)
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 

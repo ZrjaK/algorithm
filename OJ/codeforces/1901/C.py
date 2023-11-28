@@ -22,11 +22,25 @@ D8 = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
 def solve():
     n = II()
     a = LII()
+    mn, mx = min(a), max(a)
+    ans = []
+    while mn != mx:
+        if mn % 2:
+            ans.append(1)
+            mn = (mn + 1) >> 1
+            mx = (mx + 1) >> 1
+        else:
+            ans.append(0)
+            mn >>= 1
+            mx >>= 1
+    print(len(ans))
+    if len(ans) <= n:
+        print(*ans)
     
 
 def main():
     t = 1
-    # t = II()
+    t = II()
     for _ in range(t):
         solve()
 
