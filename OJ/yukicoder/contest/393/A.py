@@ -1,0 +1,1 @@
+print(["winter", "spring", "summer", "fall"][int(input()) // 3 % 4])
