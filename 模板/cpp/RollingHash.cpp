@@ -64,15 +64,16 @@ struct modint61 {
     }
     return ret;
   }
-#ifdef FASTIO
-  void write() { fastio::printer.write(val); }
-  void read() {
-    ll x;
-    fastio::scanner.read(x);
-    val = (val >= 0 ? val % mod : (mod - (-val) % mod) % mod);
-  }
-#endif
 };
+
+#ifdef FASTIO
+void rd(modint61 &x) {
+  fastio::rd(x.val);
+  assert(0 <= x.val && x.val < modint61::mod);
+}
+
+void wt(modint61 x) { fastio::wt(x.val); }
+#endif
 #line 4 "string/rollinghash.hpp"
 
 struct RollingHash {
@@ -101,7 +102,12 @@ struct RollingHash {
     return hashed;
   }
 
-  mint from_char(char x) { return x; }
+  template <typename STRING>
+  mint eval(string& s) {
+    mint x = 0;
+    for (auto& ch: s) x = base * x + ch;
+    return x;
+  }
 
   mint query(const vc<mint>& s, int l, int r) {
     expand(r - l);
