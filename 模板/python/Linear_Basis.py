@@ -44,6 +44,7 @@ class Linear_Basis:
         for i in range(logN):
             if self.b[i]:
                 self.d.append(self.b[i])
+        self.zero = 0
 
     # rebuild before kth
     def kth(self, k):

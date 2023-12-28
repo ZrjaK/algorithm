@@ -47,6 +47,7 @@ struct Linear_Basis {
         for (int i = 0; i < logN; i++) 
             if (b[i])
                 d.emplace_back(b[i]);
+		zero = 0;
     }
 
     // rebuild before kth
