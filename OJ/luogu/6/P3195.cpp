@@ -1,7 +1,7 @@
-#ifdef ONLINE_JUDGE
-#pragma GCC optimize("Ofast,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
-#endif
+// #ifdef ONLINE_JUDGE
+// #pragma GCC optimize("Ofast,unroll-loops")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+// #endif
 #include <bits/stdc++.h>
 #include <ext/rope>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -716,23 +716,17 @@ struct CHT_xy {
 };
 
 void solve() {
-    INT(n);
+    INT(n, L);
     VEC(int, a, n);
+    CHT_xy<ll> cht;
     vll cum = cumsum<ll>(a);
-    CHT_xy<ld> cht;
-    vc<ld> ans;
-    rrep(i, n - 1, -1) {
-        cht.add(cum[i + 1], -(i + 1));
-        // cum[j] - cum[i] - (j - i) * x >= 0
-        // (cum[j] - j * x) + i * x - cum[i] >= 0
-        auto check = [&] (ld x) -> bool {
-            return cht.get_max(1, x) + i * x - cum[i] >= 0;
-        };
-        ld x = binary_search_real(check, 0, 1e6 + 10, 50);
-        ans.pb(x);
+    rep(i, len(cum)) cum[i] += i;
+    vll dp(n + 1);
+    rep(i, n + 1) {
+        if (i) dp[i] = cht.get_min(1, L + 1 - cum[i]) + (cum[i] - (L + 1)) * (cum[i] - (L + 1));
+        cht.add(dp[i] + cum[i] * cum[i], 2 * cum[i]);
     }
-    REV(ans);
-    print(ans);
+    print(dp.back());
     
 }
 
