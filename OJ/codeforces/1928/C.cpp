@@ -537,14 +537,26 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
 }
 
 void solve() {
-    INT(n);
-    VEC(int, a, n);
+    INT(n, x);
+    // n % (2 * k - 2) = x
+    // n % (2 * k - 2) = -x + 2
+    set<int> ans;
+    auto calc = [&] (int n) -> void {
+        for (int i = 1; i * i <= n; i += 1) {
+            if (n % i == 0) {
+                if (i % 2 == 0 && i / 2 + 1 >= x) ans.insert(i);
+                if (n / i % 2 == 0 && n / i / 2 + 1 >= x) ans.insert(n / i);
+            }
+        }
+    };
+    calc(n - x), calc(n + x - 2);
+    print(len(ans));
     
 }
 
 signed main() {
     int T = 1;
-    // read(T);
+    read(T);
     while (T--) {
         solve();
     }

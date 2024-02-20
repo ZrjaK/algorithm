@@ -539,12 +539,19 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
 void solve() {
     INT(n);
     VEC(int, a, n);
+    UNIQUE(a);
+    int ans = 0;
+    rep(i, len(a)) {
+        int t = LB(a, a[i] + n);
+        chmax(ans, t - i);
+    }
+    print(ans);
     
 }
 
 signed main() {
     int T = 1;
-    // read(T);
+    read(T);
     while (T--) {
         solve();
     }

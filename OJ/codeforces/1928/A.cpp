@@ -537,14 +537,26 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
 }
 
 void solve() {
-    INT(n);
-    VEC(int, a, n);
+    INT(n, m);
+    if (n > m) swap(n, m);
+    if (n % 2 && m % 2) return No();
+    if (n % 2 == 0) {
+        int x = n / 2, y = m * 2;
+        if (x > y) swap(x, y);
+        if (x != n || y != m) return Yes();
+    }
+    if (m % 2 == 0) {
+        int x = n * 2, y = m / 2;
+        if (x > y) swap(x, y);
+        if (x != n || y != m) return Yes();
+    }
+    No();
     
 }
 
 signed main() {
     int T = 1;
-    // read(T);
+    read(T);
     while (T--) {
         solve();
     }
