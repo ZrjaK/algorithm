@@ -140,7 +140,7 @@ T floor(T x, U y) {
 }
 template <typename T, typename U>
 T bmod(T x, U y) {
-  return x - y * floor(x, y);
+    return x - y * floor(x, y);
 }
 template <typename T, typename U>
 pair<T, T> divmod(T x, U y) {
@@ -538,4 +538,19 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
     } else {
         return vector(n, ndvector(args...));
     }
+}
+
+void solve() {
+    VEC(int, a, 5);
+    print(len(set<int>(all(a))));
+    
+}
+
+signed main() {
+    int T = 1;
+    // read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
 }

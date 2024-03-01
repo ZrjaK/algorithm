@@ -539,3 +539,28 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
         return vector(n, ndvector(args...));
     }
 }
+
+void solve() {
+    LL(n);
+    VEC(ll, a, n);
+    auto I = argsort(a);
+    map<int, int> M;
+    rep(i, n) {
+        M[bmod(i - I[bmod(i - 1, n)], n)]++;
+        M[bmod(i - I[i], n)]++;
+        M[bmod(i - I[bmod(i + 1, n)], n)]++;
+    }
+    int ans = 0;
+    each(_, v, M) chmax(ans, v);
+    print(ans);
+    
+}
+
+signed main() {
+    int T = 1;
+    // read(T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

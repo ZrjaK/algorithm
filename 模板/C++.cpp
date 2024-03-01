@@ -139,6 +139,10 @@ T floor(T x, U y) {
     return (x > 0 ? x / y : (x - y + 1) / y);
 }
 template <typename T, typename U>
+T bmod(T x, U y) {
+    return x - y * floor(x, y);
+}
+template <typename T, typename U>
 pair<T, T> divmod(T x, U y) {
     T q = floor(x, y);
     return {q, x - q * y};
