@@ -1,6 +1,6 @@
 #ifdef ONLINE_JUDGE
 #pragma GCC optimize("Ofast,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
+// #pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #endif
 #include <bits/stdc++.h>
 #include <ext/rope>
