@@ -554,8 +554,14 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
 }
 
 void solve() {
-    INT(n);
-    VEC(int, a, n);
+    INT(n, m);
+    VEC(int, a, m);
+    rep(n) {
+        VEC(int, b, m);
+        rep(i, m) a[i] -= b[i];
+    }
+    each(i, a) if (i > 0) return No();
+    Yes();
     
 }
 

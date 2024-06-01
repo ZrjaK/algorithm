@@ -553,10 +553,429 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
     }
 }
 
-void solve() {
-    INT(n);
-    VEC(int, a, n);
+/*
+・時刻 t に x を追加する
+・時刻 t に x を削除する
+があるときに、
+・時刻 [l, r) に x を追加する
+に変換する。
+クエリが時系列順に来ることが分かっているときは monotone = true の方が高速。
+*/
+template <typename X, bool monotone>
+struct Add_Remove_Query {
+  map<X, int> MP;
+  vector<tuple<int, int, X>> dat;
+  map<X, vector<int>> ADD;
+  map<X, vector<int>> RM;
+
+  void add(int time, X x) {
+    if (monotone) return add_monotone(time, x);
+    ADD[x].emplace_back(time);
+  }
+  void remove(int time, X x) {
+    if (monotone) return remove_monotone(time, x);
+    RM[x].emplace_back(time);
+  }
+
+  // すべてのクエリが終わった現在時刻を渡す
+  vector<tuple<int, int, X>> calc(int time) {
+    if (monotone) return calc_monotone(time);
+    vector<tuple<int, int, X>> dat;
+    for (auto&& [x, A]: ADD) {
+      vector<int> B;
+      if (RM.count(x)) {
+        B = RM[x];
+        RM.erase(x);
+      }
+      while (B.size() < A.size()) B.eb(time);
+      assert(A.size() == B.size());
+
+      sort(A.begin(), A.end());
+      sort(B.begin(), B.end());
+      for (int i = 0; i < A.size(); i++) {
+        assert(A[i] <= B[i]);
+        if (A[i] < B[i]) dat.emplace_back(A[i], B[i], x);
+      }
+    }
+    assert(RM.size() == 0);
+    return dat;
+  }
+
+private:
+  void add_monotone(int time, X x) {
+    assert(!MP.count(x));
+    MP[x] = time;
+  }
+  void remove_monotone(int time, X x) {
+    auto it = MP.find(x);
+    assert(it != MP.end());
+    int t = (*it).second;
+    MP.erase(it);
+    if (t == time) return;
+    dat.emplace_back(t, time, x);
+  }
+  vector<tuple<int, int, X>> calc_monotone(int time) {
+    for (auto&& [x, t]: MP) {
+      if (t == time) continue;
+      dat.emplace_back(t, time, x);
+    }
+    return dat;
+  }
+};
     
+template <typename T>
+struct Rollback_Array {
+  int N;
+  vc<T> dat;
+  vc<pair<int, T>> history;
+
+  Rollback_Array() {}
+  Rollback_Array(vc<T> x) : N(len(x)), dat(x) {}
+  Rollback_Array(int N) : N(N), dat(N) {}
+  template <typename F>
+  Rollback_Array(int N, F f) : N(N) {
+    dat.reserve(N);
+    FOR(i, N) dat.eb(f(i));
+  }
+
+  int time() { return len(history); }
+  void rollback(int t) {
+    FOR_R(i, t, time()) {
+      auto& [idx, v] = history[i];
+      dat[idx] = v;
+    }
+    history.resize(t);
+  }
+  T get(int idx) { return dat[idx]; }
+  void set(int idx, T x) {
+    history.eb(idx, dat[idx]);
+    dat[idx] = x;
+  }
+
+  vc<T> get_all() {
+    vc<T> res(N);
+    FOR(i, N) res[i] = get(i);
+    return res;
+  }
+};
+ 
+struct Rollback_UnionFind {
+  Rollback_Array<int> dat; // parent or size
+ 
+  Rollback_UnionFind(int n) : dat(vector<int>(n, -1)) {}
+ 
+  int operator[](int v) {
+    while (dat.get(v) >= 0) v = dat.get(v);
+    return v;
+  }
+ 
+  int size(int v) { return -dat.get((*this)[v]); }
+  int time() { return dat.time(); }
+  void rollback(int t) { dat.rollback(t); }
+ 
+  bool merge(int a, int b) {
+    a = (*this)[a], b = (*this)[b];
+    if (a == b) return false;
+    if (dat.get(a) > dat.get(b)) swap(a, b);
+    dat.set(a, dat.get(a) + dat.get(b));
+    dat.set(b, a);
+    return true;
+  }
+};
+
+#line 2 "ds/segtree/rollback_lazy_segtree.hpp"
+// verify? https://qoj.ac/submission/114657
+template <typename ActedMonoid>
+struct Rollback_Lazy_SegTree {
+  using AM = ActedMonoid;
+  using MX = typename AM::Monoid_X;
+  using MA = typename AM::Monoid_A;
+  using X = typename MX::value_type;
+  using A = typename MA::value_type;
+  int n, log, size;
+  Rollback_Array<X> dat;
+  Rollback_Array<A> laz;
+
+  Rollback_Lazy_SegTree() {}
+  Rollback_Lazy_SegTree(int n) { build(n); }
+  template <typename F>
+  Rollback_Lazy_SegTree(int n, F f) {
+    build(n, f);
+  }
+  Rollback_Lazy_SegTree(const vc<X>& v) { build(v); }
+
+  void build(int m) {
+    build(m, [](int i) -> X { return MX::unit(); });
+  }
+  void build(const vc<X>& v) {
+    build(len(v), [&](int i) -> X { return v[i]; });
+  }
+  template <typename F>
+  void build(int m, F f) {
+    n = m, log = 1;
+    while ((1 << log) < n) ++log;
+    size = 1 << log;
+    dat = Rollback_Array<X>(vc<X>(size << 1, MX::unit()));
+    laz = Rollback_Array<A>(vc<A>(size, MA::unit()));
+    FOR(i, n) dat.set(size + i, f(i));
+    FOR_R(i, 1, size) update(i);
+  }
+
+  void update(int k) { dat.set(k, MX::op(dat.get(2 * k), dat.get(2 * k + 1))); }
+  void set(int p, X x) {
+    assert(0 <= p && p < n);
+    p += size;
+    for (int i = log; i >= 1; i--) push(p >> i);
+    dat.set(p, x);
+    for (int i = 1; i <= log; i++) update(p >> i);
+  }
+  void multiply(int p, const X& x) {
+    assert(0 <= p && p < n);
+    p += size;
+    for (int i = log; i >= 1; i--) push(p >> i);
+    dat.set(p, MX::op(dat.get(p), x));
+    for (int i = 1; i <= log; i++) update(p >> i);
+  }
+
+  X get(int p) {
+    assert(0 <= p && p < n);
+    p += size;
+    for (int i = log; i >= 1; i--) push(p >> i);
+    return dat.get(p);
+  }
+
+  vc<X> get_all() {
+    auto tmp = dat.get_all();
+    FOR(k, 1, size) push(k);
+    return {tmp.begin() + size, tmp.begin() + size + n};
+  }
+
+  X prod(int l, int r) {
+    assert(0 <= l && l <= r && r <= n);
+    if (l == r) return MX::unit();
+    l += size, r += size;
+    for (int i = log; i >= 1; i--) {
+      if (((l >> i) << i) != l) push(l >> i);
+      if (((r >> i) << i) != r) push((r - 1) >> i);
+    }
+    X xl = MX::unit(), xr = MX::unit();
+    while (l < r) {
+      if (l & 1) xl = MX::op(xl, dat.get(l++));
+      if (r & 1) xr = MX::op(dat.get(--r), xr);
+      l >>= 1, r >>= 1;
+    }
+    return MX::op(xl, xr);
+  }
+
+  X prod_all() { return dat.get(1); }
+
+  void apply(int l, int r, A a) {
+    assert(0 <= l && l <= r && r <= n);
+    if (l == r) return;
+    l += size, r += size;
+    for (int i = log; i >= 1; i--) {
+      if (((l >> i) << i) != l) push(l >> i);
+      if (((r >> i) << i) != r) push((r - 1) >> i);
+    }
+    int l2 = l, r2 = r;
+    while (l < r) {
+      if (l & 1) apply_at(l++, a);
+      if (r & 1) apply_at(--r, a);
+      l >>= 1, r >>= 1;
+    }
+    l = l2, r = r2;
+    for (int i = 1; i <= log; i++) {
+      if (((l >> i) << i) != l) update(l >> i);
+      if (((r >> i) << i) != r) update((r - 1) >> i);
+    }
+  }
+
+  template <typename F>
+  int max_right(const F check, int l) {
+    assert(0 <= l && l <= n);
+    assert(check(MX::unit()));
+    if (l == n) return n;
+    l += size;
+    for (int i = log; i >= 1; i--) push(l >> i);
+    X sm = MX::unit();
+    do {
+      while (l % 2 == 0) l >>= 1;
+      if (!check(MX::op(sm, dat.get(l)))) {
+        while (l < size) {
+          push(l);
+          l = (2 * l);
+          if (check(MX::op(sm, dat.get(l)))) { sm = MX::op(sm, dat.get(l++)); }
+        }
+        return l - size;
+      }
+      sm = MX::op(sm, dat.get(l++));
+    } while ((l & -l) != l);
+    return n;
+  }
+
+  template <typename F>
+  int min_left(const F check, int r) {
+    assert(0 <= r && r <= n);
+    assert(check(MX::unit()));
+    if (r == 0) return 0;
+    r += size;
+    for (int i = log; i >= 1; i--) push((r - 1) >> i);
+    X sm = MX::unit();
+    do {
+      r--;
+      while (r > 1 && (r % 2)) r >>= 1;
+      if (!check(MX::op(dat.get(r), sm))) {
+        while (r < size) {
+          push(r);
+          r = (2 * r + 1);
+          if (check(MX::op(dat.get(r), sm))) { sm = MX::op(dat.get(r--), sm); }
+        }
+        return r + 1 - size;
+      }
+      sm = MX::op(dat.get(r), sm);
+    } while ((r & -r) != r);
+    return 0;
+  }
+
+  pair<int, int> time() { return {dat.time(), laz.time()}; }
+  void rollback(pair<int, int> t) { dat.rollback(t.fi), laz.rollback(t.se); }
+
+  void push(int k) {
+    if (laz.get(k) == MA::unit()) return;
+    apply_at(2 * k, laz.get(k)), apply_at(2 * k + 1, laz.get(k));
+    laz.set(k, MA::unit());
+  }
+
+private:
+  void apply_at(int k, A a) {
+    ll sz = 1 << (log - topbit(k));
+    dat.set(k, AM::act(dat.get(k), a, sz));
+    if (k < size) laz.set(k, MA::op(laz.get(k), a));
+  }
+};
+
+#line 2 "alg/monoid/add.hpp"
+
+template <typename E>
+struct Monoid_Add {
+  using X = E;
+  using value_type = X;
+  static constexpr X op(const X &x, const X &y) noexcept { return x + y; }
+  static constexpr X inverse(const X &x) noexcept { return -x; }
+  static constexpr X power(const X &x, ll n) noexcept { return X(n) * x; }
+  static constexpr X unit() { return X(0); }
+  static constexpr bool commute = true;
+};
+#line 2 "alg/acted_monoid/sum_add.hpp"
+
+template <typename E>
+struct ActedMonoid_Sum_Add {
+  using Monoid_X = Monoid_Add<E>;
+  using Monoid_A = Monoid_Add<E>;
+  using X = typename Monoid_X::value_type;
+  using A = typename Monoid_A::value_type;
+  static constexpr X act(const X &x, const A &a, const ll &size) {
+    return x + a * E(size);
+  }
+};
+
+void solve() {
+    LL(Q, K);
+
+    Add_Remove_Query<ll, false> X;
+    vll ASK(Q, -1);
+    vll NUMS;
+    set<ll> S;
+
+    // add and remove
+    rep(q, Q) {
+        LL(op, x);
+        if (op == 1) {
+            if (!S.contains(x)) {
+                X.add(q, x);
+                S.insert(x);
+            } else {
+                X.remove(q, x);
+                S.erase(x);
+            }
+        }
+        if (op == 2) {
+            ASK[q] = x;
+        }
+        NUMS.pb(x);
+    }
+    
+    auto upd = X.calc(Q);
+    vector<int> I(len(upd));
+    iota(all(I), 0);
+    UNIQUE(NUMS);
+    int n = len(NUMS);
+
+    Rollback_UnionFind uf(n);
+    Rollback_Lazy_SegTree<ActedMonoid_Sum_Add<int>> seg(n);
+    vi ANS(Q);
+
+    auto dfs = [&] (auto& dfs, vector<int>& upd_query_I, int BEGIN, int END) -> void {
+        if (BEGIN == END) return;
+        // snapshot
+        int uf_time = uf.time();
+        auto seg_time = seg.time();
+    
+    
+        vector<int> IL, IR;
+        int mid = (BEGIN + END) / 2;
+        for (auto&& i: upd_query_I) {
+            auto [a, b, XX] = upd[i];
+            // get data in XX
+            ll x = XX;
+            int A = LB(NUMS, x);
+    
+            if (a <= BEGIN && END <= b) {
+                // X で表される update query を処理する
+                int l = LB(NUMS, x - K), r = UB(NUMS, x + K);
+                if (seg.prod(l, A)) {
+                    int B = binary_search([&] (int B) -> bool {
+                        return seg.prod(B, A) > 0;
+                    }, l, A);
+                    uf.merge(A, B);
+                }
+                if (seg.prod(A, r)) {
+                    int B = binary_search([&] (int B) -> bool {
+                        return seg.prod(A, B) > 0;
+                    }, r, A);
+                    uf.merge(A, B - 1);
+                }
+                seg.set(A, 1);
+            } else {
+                if (a < mid) IL.eb(i);
+                if (mid < b) IR.eb(i);
+            }
+        }
+        if (BEGIN + 1 == END) {
+            // 求値クエリ
+            int qid = BEGIN;
+            ll x = ASK[qid];
+            int A = LB(NUMS, x);
+            if (ASK[qid] != -1) {
+                if (seg.prod(A, A + 1)) {
+                    ANS[qid] = uf.size(A);
+                }
+            }
+    
+    
+            // ここで出力してしまってもよい
+        } else {
+            dfs(dfs, IL, BEGIN, mid);
+            dfs(dfs, IR, mid, END);
+        }
+        // rollback
+        uf.rollback(uf_time);
+        seg.rollback(seg_time);
+        
+        
+    };
+    dfs(dfs, I, 0, Q);
+    rep(qid, Q) if (ASK[qid] != -1) print(ANS[qid]);
 }
 
 signed main() {

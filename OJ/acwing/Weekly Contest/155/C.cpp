@@ -7,9 +7,6 @@ using namespace std;
 using ll   =                long long;
 using u32  =                unsigned int;
 using u64  =                unsigned long long;
-using i128 =                __int128;
-using u128 =                __uint128_t;
-using f128 =                __float128;
 using ld   =                long double;
 using pii  =                pair<int, int>;
 using pll  =                pair<ll, ll>;
@@ -29,8 +26,6 @@ template <>
 constexpr u32 infty<u32> = infty<int>;
 template <>
 constexpr u64 infty<u64> = infty<ll>;
-template <>
-constexpr i128 infty<i128> = i128(infty<ll>) * infty<ll>;
 template <>
 constexpr double infty<double> = infty<ll>;
 template <>
@@ -232,277 +227,21 @@ vc<int> s_to_vi(const string &S, char first_char) {
   FOR(i, S.size()) { A[i] = (S[i] != '?' ? S[i] - first_char : -1); }
   return A;
 }
-#define FASTIO
-#include <unistd.h>
-
-
-// https://judge.yosupo.jp/submission/21623
-
-namespace fastio {
-static constexpr uint32_t SZ = 1 << 17;
-char ibuf[SZ];
-char obuf[SZ];
-char out[100];
-// pointer of ibuf, obuf
-
-uint32_t pil = 0, pir = 0, por = 0;
-
-struct Pre {
-  char num[10000][4];
-  constexpr Pre() : num() {
-    for (int i = 0; i < 10000; i++) {
-      int n = i;
-      for (int j = 3; j >= 0; j--) {
-        num[i][j] = n % 10 | '0';
-        n /= 10;
-      }
-    }
-  }
-} constexpr pre;
-
-inline void load() {
-  memcpy(ibuf, ibuf + pil, pir - pil);
-  pir = pir - pil + fread(ibuf + pir - pil, 1, SZ - pir + pil, stdin);
-  pil = 0;
-  if (pir < SZ) ibuf[pir++] = '\n';
-}
-
-inline void flush() {
-  fwrite(obuf, 1, por, stdout);
-  por = 0;
-}
-
-void rd(char &c) {
-  do {
-    if (pil + 1 > pir) load();
-    c = ibuf[pil++];
-  } while (isspace(c));
-}
-
-void rd(string &x) {
-  x.clear();
-  char c;
-  do {
-    if (pil + 1 > pir) load();
-    c = ibuf[pil++];
-  } while (isspace(c));
-  do {
-    x += c;
-    if (pil == pir) load();
-    c = ibuf[pil++];
-  } while (!isspace(c));
-}
-
-template <typename T>
-void rd_real(T &x) {
-  string s;
-  rd(s);
-  x = stod(s);
-}
-
-template <typename T>
-void rd_integer(T &x) {
-  if (pil + 100 > pir) load();
-  char c;
-  do
-    c = ibuf[pil++];
-  while (c < '-');
-  bool minus = 0;
-  if constexpr (is_signed<T>::value || is_same_v<T, i128>) {
-    if (c == '-') { minus = 1, c = ibuf[pil++]; }
-  }
-  x = 0;
-  while ('0' <= c) { x = x * 10 + (c & 15), c = ibuf[pil++]; }
-  if constexpr (is_signed<T>::value || is_same_v<T, i128>) {
-    if (minus) x = -x;
-  }
-}
-
-void rd(int &x) { rd_integer(x); }
-void rd(ll &x) { rd_integer(x); }
-void rd(i128 &x) { rd_integer(x); }
-void rd(u32 &x) { rd_integer(x); }
-void rd(u64 &x) { rd_integer(x); }
-void rd(u128 &x) { rd_integer(x); }
-void rd(double &x) { rd_real(x); }
-void rd(long double &x) { rd_real(x); }
-void rd(f128 &x) { rd_real(x); }
-
-template <class T, class U>
-void rd(pair<T, U> &p) {
-  return rd(p.first), rd(p.second);
-}
-template <size_t N = 0, typename T>
-void rd_tuple(T &t) {
-  if constexpr (N < std::tuple_size<T>::value) {
-    auto &x = std::get<N>(t);
-    rd(x);
-    rd_tuple<N + 1>(t);
-  }
-}
-template <class... T>
-void rd(tuple<T...> &tpl) {
-  rd_tuple(tpl);
-}
-
-template <size_t N = 0, typename T>
-void rd(array<T, N> &x) {
-  for (auto &d: x) rd(d);
-}
-template <class T>
-void rd(vc<T> &x) {
-  for (auto &d: x) rd(d);
-}
-
-void read() {}
-template <class H, class... T>
-void read(H &h, T &... t) {
-  rd(h), read(t...);
-}
-
-void wt(const char c) {
-  if (por == SZ) flush();
-  obuf[por++] = c;
-}
-void wt(const string s) {
-  for (char c: s) wt(c);
-}
-void wt(const char *s) {
-  size_t len = strlen(s);
-  for (size_t i = 0; i < len; i++) wt(s[i]);
-}
-
-template <typename T>
-void wt_integer(T x) {
-  if (por > SZ - 100) flush();
-  if (x < 0) { obuf[por++] = '-', x = -x; }
-  int outi;
-  for (outi = 96; x >= 10000; outi -= 4) {
-    memcpy(out + outi, pre.num[x % 10000], 4);
-    x /= 10000;
-  }
-  if (x >= 1000) {
-    memcpy(obuf + por, pre.num[x], 4);
-    por += 4;
-  } else if (x >= 100) {
-    memcpy(obuf + por, pre.num[x] + 1, 3);
-    por += 3;
-  } else if (x >= 10) {
-    int q = (x * 103) >> 10;
-    obuf[por] = q | '0';
-    obuf[por + 1] = (x - q * 10) | '0';
-    por += 2;
-  } else
-    obuf[por++] = x | '0';
-  memcpy(obuf + por, out + outi + 4, 96 - outi);
-  por += 96 - outi;
-}
-
-template <typename T>
-void wt_real(T x) {
-  ostringstream oss;
-  oss << fixed << setprecision(15) << double(x);
-  string s = oss.str();
-  wt(s);
-}
-
-void wt(int x) { wt_integer(x); }
-void wt(ll x) { wt_integer(x); }
-void wt(i128 x) { wt_integer(x); }
-void wt(u32 x) { wt_integer(x); }
-void wt(u64 x) { wt_integer(x); }
-void wt(u128 x) { wt_integer(x); }
-void wt(double x) { wt_real(x); }
-void wt(long double x) { wt_real(x); }
-void wt(f128 x) { wt_real(x); }
-
-template <class T, class U>
-void wt(const pair<T, U> val) {
-  wt(val.first);
-  wt(' ');
-  wt(val.second);
-}
-template <size_t N = 0, typename T>
-void wt_tuple(const T t) {
-  if constexpr (N < std::tuple_size<T>::value) {
-    if constexpr (N > 0) { wt(' '); }
-    const auto x = std::get<N>(t);
-    wt(x);
-    wt_tuple<N + 1>(t);
-  }
-}
-template <class... T>
-void wt(tuple<T...> tpl) {
-  wt_tuple(tpl);
-}
-template <class T, size_t S>
-void wt(const array<T, S> val) {
-  auto n = val.size();
-  for (size_t i = 0; i < n; i++) {
-    if (i) wt(' ');
-    wt(val[i]);
-  }
-}
-template <class T>
-void wt(const vector<T> val) {
-  auto n = val.size();
-  for (size_t i = 0; i < n; i++) {
-    if (i) wt(' ');
-    wt(val[i]);
-  }
-}
-
-void print() { wt('\n'); }
-template <class Head, class... Tail>
-void print(Head &&head, Tail &&... tail) {
-  wt(head);
-  if (sizeof...(Tail)) wt(' ');
-  print(forward<Tail>(tail)...);
-}
-
-// gcc expansion. called automaticall after main.
-
-void __attribute__((destructor)) _d() { flush(); }
-} // namespace fastio
-
-using fastio::read;
-using fastio::print;
-using fastio::flush;
-
-#ifndef ONLINE_JUDGE
-#define SHOW(...) \
-  SHOW_IMPL(__VA_ARGS__, SHOW4, SHOW3, SHOW2, SHOW1)(__VA_ARGS__)
-#define SHOW_IMPL(_1, _2, _3, _4, NAME, ...) NAME
-#define SHOW1(x) print(#x, "=", (x)), flush()
-#define SHOW2(x, y) print(#x, "=", (x), #y, "=", (y)), flush()
-#define SHOW3(x, y, z) print(#x, "=", (x), #y, "=", (y), #z, "=", (z)), flush()
-#define SHOW4(x, y, z, w) \
-  print(#x, "=", (x), #y, "=", (y), #z, "=", (z), #w, "=", (w)), flush()
-#else
-#define SHOW(...)
-#endif
-
-#define INT(...)   \
+#define INT(...) \
   int __VA_ARGS__; \
-  read(__VA_ARGS__)
-#define LL(...)   \
+  IN(__VA_ARGS__)
+#define LL(...) \
   ll __VA_ARGS__; \
-  read(__VA_ARGS__)
-#define U32(...)   \
-  u32 __VA_ARGS__; \
-  read(__VA_ARGS__)
-#define U64(...)   \
-  u64 __VA_ARGS__; \
-  read(__VA_ARGS__)
-#define STR(...)      \
+  IN(__VA_ARGS__)
+#define STR(...) \
   string __VA_ARGS__; \
-  read(__VA_ARGS__)
-#define CHAR(...)   \
+  IN(__VA_ARGS__)
+#define CHR(...) \
   char __VA_ARGS__; \
-  read(__VA_ARGS__)
-#define DBL(...)      \
-  double __VA_ARGS__; \
-  read(__VA_ARGS__)
+  IN(__VA_ARGS__)
+#define DBL(...) \
+  long double __VA_ARGS__; \
+  IN(__VA_ARGS__)
 
 #define VEC(type, name, size) \
   vector<type> name(size);    \
@@ -511,20 +250,54 @@ using fastio::flush;
   vector<vector<type>> name(h, vector<type>(w)); \
   read(name)
 
+void read(int &a) { cin >> a; }
+void read(long long &a) { cin >> a; }
+void read(char &a) { cin >> a; }
+void read(double &a) { cin >> a; }
+void read(long double &a) { cin >> a; }
+void read(string &a) { cin >> a; }
+template <class T, class S> void read(pair<T, S> &p) { read(p.first), read(p.second); }
+template <class T> void read(vector<T> &a) {for(auto &i : a) read(i);}
+template <class T> void read(T &a) { cin >> a; }
+void IN() {}
+template <class Head, class... Tail> void IN(Head &head, Tail &...tail) {
+  read(head);
+  IN(tail...);
+}
+
+template <typename T, typename U>
+ostream& operator<<(ostream& os, const pair<T, U>& A) {
+  os << A.fi << " " << A.se;
+  return os;
+}
+
+template <typename T>
+ostream& operator<<(ostream& os, const vector<T>& A) {
+  for (size_t i = 0; i < A.size(); i++) {
+    if(i) os << " ";
+    os << A[i];
+  }
+  return os;
+}
+
+void print() {
+  cout << "\n";
+  cout.flush();
+}
+
+template <class Head, class... Tail>
+void print(Head&& head, Tail&&... tail) {
+  cout << head;
+  if (sizeof...(Tail)) cout << " ";
+  print(forward<Tail>(tail)...);
+}
+
 void YES(bool t = 1) { print(t ? "YES" : "NO"); }
 void NO(bool t = 1) { YES(!t); }
 void Yes(bool t = 1) { print(t ? "Yes" : "No"); }
 void No(bool t = 1) { Yes(!t); }
 void yes(bool t = 1) { print(t ? "yes" : "no"); }
 void no(bool t = 1) { yes(!t); }
-template <typename Iterable>
-auto print_all(const Iterable& v, std::string sep = " ", std::string end = "\n") -> decltype(fastio::wt(*v.begin())) {
-    for (auto it = v.begin(); it != v.end();) {
-        fastio::wt(*it);
-        if (++it != v.end()) fastio::wt(sep);
-    }
-    fastio::wt(end);
-}
 vvi getGraph(int n, int m, bool directed = false) {
     vvi res(n);
     rep(_, 0, m) {
@@ -553,9 +326,181 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
     }
 }
 
+#line 1 "ds/binary_trie.hpp"
+// 非永続ならば、2 * 要素数 のノード数
+template <int LOG, bool PERSISTENT, int NODES, typename UINT = u64,
+          typename SIZE_TYPE = int>
+struct Binary_Trie {
+  using T = SIZE_TYPE;
+  struct Node {
+    int width;
+    UINT val;
+    T cnt;
+    Node *l, *r;
+  };
+
+  Node *pool;
+  int pid;
+  using np = Node *;
+
+  Binary_Trie() : pid(0) { pool = new Node[NODES]; }
+
+  void reset() { pid = 0; }
+
+  np new_root() { return nullptr; }
+
+  np add(np root, UINT val, T cnt = 1) {
+    if (!root) root = new_node(0, 0);
+    assert(0 <= val && val < (1LL << LOG));
+    return add_rec(root, LOG, val, cnt);
+  }
+
+  // f(val, cnt)
+  template <typename F>
+  void enumerate(np root, F f) {
+    auto dfs = [&](auto &dfs, np root, UINT val, int ht) -> void {
+      if (ht == 0) {
+        f(val, root->cnt);
+        return;
+      }
+      np c = root->l;
+      if (c) { dfs(dfs, c, val << (c->width) | (c->val), ht - (c->width)); }
+      c = root->r;
+      if (c) { dfs(dfs, c, val << (c->width) | (c->val), ht - (c->width)); }
+    };
+    if (root) dfs(dfs, root, 0, LOG);
+  }
+
+  // xor_val したあとの値で昇順 k 番目
+  UINT kth(np root, T k, UINT xor_val) {
+    assert(root && 0 <= k && k < root->cnt);
+    return kth_rec(root, 0, k, LOG, xor_val) ^ xor_val;
+  }
+
+  // xor_val したあとの値で最小値
+  UINT min(np root, UINT xor_val) {
+    assert(root && root->cnt);
+    return kth(root, 0, xor_val);
+  }
+
+  // xor_val したあとの値で最大値
+  UINT max(np root, UINT xor_val) {
+    assert(root && root->cnt);
+    return kth(root, (root->cnt) - 1, xor_val);
+  }
+
+  // xor_val したあとの値で [0, upper) 内に入るものの個数
+  T prefix_count(np root, UINT upper, UINT xor_val) {
+    if (!root) return 0;
+    return prefix_count_rec(root, LOG, upper, xor_val, 0);
+  }
+
+  // xor_val したあとの値で [lo, hi) 内に入るものの個数
+  T count(np root, UINT lo, UINT hi, UINT xor_val) {
+    return prefix_count(root, hi, xor_val) - prefix_count(root, lo, xor_val);
+  }
+
+private:
+  inline UINT mask(int k) { return (UINT(1) << k) - 1; }
+
+  np new_node(int width, UINT val) {
+    pool[pid].l = pool[pid].r = nullptr;
+    pool[pid].width = width;
+    pool[pid].val = val;
+    pool[pid].cnt = 0;
+    return &(pool[pid++]);
+  }
+
+  np copy_node(np c) {
+    if (!c || !PERSISTENT) return c;
+    np res = &(pool[pid++]);
+    res->width = c->width, res->val = c->val;
+    res->cnt = c->cnt, res->l = c->l, res->r = c->r;
+    return res;
+  }
+
+  np add_rec(np root, int ht, UINT val, T cnt) {
+    root = copy_node(root);
+    root->cnt += cnt;
+    if (ht == 0) return root;
+
+    bool go_r = (val >> (ht - 1)) & 1;
+    np c = (go_r ? root->r : root->l);
+    if (!c) {
+      c = new_node(ht, val);
+      c->cnt = cnt;
+      if (!go_r) root->l = c;
+      if (go_r) root->r = c;
+      return root;
+    }
+    int w = c->width;
+    if ((val >> (ht - w)) == c->val) {
+      c = add_rec(c, ht - w, val & mask(ht - w), cnt);
+      if (!go_r) root->l = c;
+      if (go_r) root->r = c;
+      return root;
+    }
+    int same = w - 1 - topbit((val >> (ht - w)) ^ (c->val));
+    np n = new_node(same, (c->val) >> (w - same));
+    n->cnt = c->cnt + cnt;
+    c = copy_node(c);
+    c->width = w - same;
+    c->val = c->val & mask(w - same);
+    if ((val >> (ht - same - 1)) & 1) {
+      n->l = c;
+      n->r = new_node(ht - same, val & mask(ht - same));
+      n->r->cnt = cnt;
+    } else {
+      n->r = c;
+      n->l = new_node(ht - same, val & mask(ht - same));
+      n->l->cnt = cnt;
+    }
+    if (!go_r) root->l = n;
+    if (go_r) root->r = n;
+    return root;
+  }
+
+  UINT kth_rec(np root, UINT val, T k, int ht, UINT xor_val) {
+    if (ht == 0) return val;
+    np left = root->l, right = root->r;
+    if ((xor_val >> (ht - 1)) & 1) swap(left, right);
+    T sl = (left ? left->cnt : 0);
+    np c;
+    if (k < sl) { c = left; }
+    if (k >= sl) { c = right, k -= sl; }
+    int w = c->width;
+    return kth_rec(c, val << w | (c->val), k, ht - w, xor_val);
+  }
+
+  T prefix_count_rec(np root, int ht, UINT LIM, UINT xor_val, UINT val) {
+    UINT now = (val << ht) ^ (xor_val);
+    if ((LIM >> ht) > (now >> ht)) return root->cnt;
+    if (ht == 0 || (LIM >> ht) < (now >> ht)) return 0;
+    T res = 0;
+    FOR(k, 2) {
+      np c = (k == 0 ? root->l : root->r);
+      if (c) {
+        int w = c->width;
+        res += prefix_count_rec(c, ht - w, LIM, xor_val, val << w | c->val);
+      }
+    }
+    return res;
+  }
+};
+
 void solve() {
-    INT(n);
+    INT(n, k);
     VEC(int, a, n);
+    Binary_Trie<60, false, 5'000'000> X;
+    auto root = X.new_root();
+    root = X.add(root, 0);
+    ll ans = 0, s = 0;
+    each(i, a) {
+        s ^= i;
+        ans += X.count(root, k, 1e12, s);
+        root = X.add(root, s);
+    }
+    print(ans);
     
 }
 

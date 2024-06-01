@@ -554,8 +554,12 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
 }
 
 void solve() {
-    INT(n);
-    VEC(int, a, n);
+    INT(n, l, r);
+    vi a(n);
+    iota(all(a), 1);
+    l--;
+    reverse(a.begin() + l, a.begin() + r);
+    print(a);
     
 }
 

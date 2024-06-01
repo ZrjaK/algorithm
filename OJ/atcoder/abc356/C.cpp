@@ -554,8 +554,29 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
 }
 
 void solve() {
-    INT(n);
-    VEC(int, a, n);
+    INT(N, M, K);
+    vc<pii> dat;
+    rep(M) {
+        INT(C);
+        VEC(int, A, C);
+        each(i, A) i--;
+        CHAR(R);
+        int mask = 0;
+        each(i, A) mask |= 1 << i;
+        dat.eb(mask, R);
+    }
+    ll ans = 0;
+    rep(mask, 1 << N) {
+        int ok = 1;
+        each(m, R, dat) {
+            if ((popcnt(mask & m) >= K) == (R == 'o')) {
+                continue;
+            }
+            ok = 0;
+        }
+        ans += ok;
+    }
+    print(ans);
     
 }
 

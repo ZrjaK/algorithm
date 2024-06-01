@@ -469,19 +469,6 @@ using fastio::read;
 using fastio::print;
 using fastio::flush;
 
-#ifndef ONLINE_JUDGE
-#define SHOW(...) \
-  SHOW_IMPL(__VA_ARGS__, SHOW4, SHOW3, SHOW2, SHOW1)(__VA_ARGS__)
-#define SHOW_IMPL(_1, _2, _3, _4, NAME, ...) NAME
-#define SHOW1(x) print(#x, "=", (x)), flush()
-#define SHOW2(x, y) print(#x, "=", (x), #y, "=", (y)), flush()
-#define SHOW3(x, y, z) print(#x, "=", (x), #y, "=", (y), #z, "=", (z)), flush()
-#define SHOW4(x, y, z, w) \
-  print(#x, "=", (x), #y, "=", (y), #z, "=", (z), #w, "=", (w)), flush()
-#else
-#define SHOW(...)
-#endif
-
 #define INT(...)   \
   int __VA_ARGS__; \
   read(__VA_ARGS__)
@@ -553,15 +540,186 @@ template <class... Args> auto ndvector(size_t n, Args &&...args) {
     }
 }
 
+#line 2 "ds/segtree/segtree.hpp"
+
+template <class Monoid>
+struct SegTree {
+  using MX = Monoid;
+  using X = typename MX::value_type;
+  using value_type = X;
+  vc<X> dat;
+  int n, log, size;
+
+  SegTree() {}
+  SegTree(int n) { build(n); }
+  template <typename F>
+  SegTree(int n, F f) {
+    build(n, f);
+  }
+  SegTree(const vc<X>& v) { build(v); }
+
+  void build(int m) {
+    build(m, [](int i) -> X { return MX::unit(); });
+  }
+  void build(const vc<X>& v) {
+    build(len(v), [&](int i) -> X { return v[i]; });
+  }
+  template <typename F>
+  void build(int m, F f) {
+    n = m, log = 1;
+    while ((1 << log) < n) ++log;
+    size = 1 << log;
+    dat.assign(size << 1, MX::unit());
+    FOR(i, n) dat[size + i] = f(i);
+    FOR_R(i, 1, size) update(i);
+  }
+
+  X get(int i) { return dat[size + i]; }
+  vc<X> get_all() { return {dat.begin() + size, dat.begin() + size + n}; }
+
+  void update(int i) { dat[i] = Monoid::op(dat[2 * i], dat[2 * i + 1]); }
+  void set(int i, const X& x) {
+    assert(i < n);
+    dat[i += size] = x;
+    while (i >>= 1) update(i);
+  }
+
+  void multiply(int i, const X& x) {
+    assert(i < n);
+    i += size;
+    dat[i] = Monoid::op(dat[i], x);
+    while (i >>= 1) update(i);
+  }
+
+  X prod(int L, int R) {
+    assert(0 <= L && L <= R && R <= n);
+    X vl = Monoid::unit(), vr = Monoid::unit();
+    L += size, R += size;
+    while (L < R) {
+      if (L & 1) vl = Monoid::op(vl, dat[L++]);
+      if (R & 1) vr = Monoid::op(dat[--R], vr);
+      L >>= 1, R >>= 1;
+    }
+    return Monoid::op(vl, vr);
+  }
+
+  X prod_all() { return dat[1]; }
+
+  template <class F>
+  int max_right(F check, int L) {
+    assert(0 <= L && L <= n && check(Monoid::unit()));
+    if (L == n) return n;
+    L += size;
+    X sm = Monoid::unit();
+    do {
+      while (L % 2 == 0) L >>= 1;
+      if (!check(Monoid::op(sm, dat[L]))) {
+        while (L < size) {
+          L = 2 * L;
+          if (check(Monoid::op(sm, dat[L]))) { sm = Monoid::op(sm, dat[L++]); }
+        }
+        return L - size;
+      }
+      sm = Monoid::op(sm, dat[L++]);
+    } while ((L & -L) != L);
+    return n;
+  }
+
+  template <class F>
+  int min_left(F check, int R) {
+    assert(0 <= R && R <= n && check(Monoid::unit()));
+    if (R == 0) return 0;
+    R += size;
+    X sm = Monoid::unit();
+    do {
+      --R;
+      while (R > 1 && (R % 2)) R >>= 1;
+      if (!check(Monoid::op(dat[R], sm))) {
+        while (R < size) {
+          R = 2 * R + 1;
+          if (check(Monoid::op(dat[R], sm))) { sm = Monoid::op(dat[R--], sm); }
+        }
+        return R + 1 - size;
+      }
+      sm = Monoid::op(dat[R], sm);
+    } while ((R & -R) != R);
+    return 0;
+  }
+
+  // prod_{l<=i<r} A[i xor x]
+  X xor_prod(int l, int r, int xor_val) {
+    static_assert(Monoid::commute);
+    X x = Monoid::unit();
+    for (int k = 0; k < log + 1; ++k) {
+      if (l >= r) break;
+      if (l & 1) { x = Monoid::op(x, dat[(size >> k) + ((l++) ^ xor_val)]); }
+      if (r & 1) { x = Monoid::op(x, dat[(size >> k) + ((--r) ^ xor_val)]); }
+      l /= 2, r /= 2, xor_val /= 2;
+    }
+    return x;
+  }
+};
+
+#line 2 "alg/monoid/add.hpp"
+
+template <typename E>
+struct Monoid_Add {
+  using X = E;
+  using value_type = X;
+  static constexpr X op(const X &x, const X &y) noexcept { return x + y; }
+  static constexpr X inverse(const X &x) noexcept { return -x; }
+  static constexpr X power(const X &x, ll n) noexcept { return X(n) * x; }
+  static constexpr X unit() { return X(0); }
+  static constexpr bool commute = true;
+};
+
 void solve() {
-    INT(n);
-    VEC(int, a, n);
+    INT(n, m);
+    VEC(ll, a, n + m + 1);
+    VEC(ll, b, n + m + 1);
+    vll c(n + m + 1);
+    rep(i, n + m + 1) c[i] = max(a[i], b[i]);
+    vll cuma = cumsum<ll>(a);
+    vll cumb = cumsum<ll>(b);
+    vll cumc = cumsum<ll>(c);
+    SegTree<Monoid_Add<int>> seg1(n + m + 1, [&] (int i) -> int {
+        return a[i] > b[i];
+    });
+    SegTree<Monoid_Add<int>> seg2(n + m + 1, [&] (int i) -> int {
+        return a[i] < b[i];
+    });
+    vll ANS;
+    rep(i, n + m + 1) {
+        auto check = [&] (int x) -> bool {
+            int A = seg1.prod(0, x), B = seg2.prod(0, x);
+            if (i < x) A -= a[i] > b[i];
+            if (i < x) B -= a[i] < b[i];
+            return A >= n || B >= m;
+        };
+        int x = binary_search(check, n + m + 1, -1);
+        ll ans = cumc[x];
+        int A = seg1.prod(0, x), B = seg2.prod(0, x);
+        if (i < x) A -= a[i] > b[i];
+        if (i < x) B -= a[i] < b[i];
+        if (A >= n) ans += cumb.back() - cumb[x];
+        if (B >= m) ans += cuma.back() - cuma[x];
+        if (i < x) {
+            ans -= max(a[i], b[i]);
+        } else {
+            if (A >= n) ans -= b[i];
+            if (B >= m) ans -= a[i];
+        }
+        ANS.pb(ans);
+    }
+    print(ANS);
+
+
     
 }
 
 signed main() {
     int T = 1;
-    // read(T);
+    read(T);
     while (T--) {
         solve();
     }
