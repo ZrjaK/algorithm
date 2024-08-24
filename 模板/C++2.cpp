@@ -170,6 +170,11 @@ vc<T> rearrange(const vc<T> &A, const vc<int> &I) {
   FOR(i, len(I)) B[i] = A[I[i]];
   return B;
 }
+template <typename T, typename... Vectors>
+void concat(vc<T> &first, const Vectors &... others) {
+  vc<T> &res = first;
+  (res.insert(res.end(), others.begin(), others.end()), ...);
+}
 template <typename T>
 T POP(deque<T> &que) {
   T a = que.front();
