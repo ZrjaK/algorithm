@@ -1,0 +1,1 @@
+print(round(float(input()) + 5e-4))
