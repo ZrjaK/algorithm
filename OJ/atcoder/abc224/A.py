@@ -1,0 +1,1 @@
+print(["ist", "er"][input().endswith("er")])
