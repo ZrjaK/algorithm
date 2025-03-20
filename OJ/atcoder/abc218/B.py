@@ -1,0 +1,1 @@
+print("".join(chr(i + 96) for i in [int(i) for i in input().split()]))
